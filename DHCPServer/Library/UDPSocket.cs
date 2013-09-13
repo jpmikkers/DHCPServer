@@ -30,7 +30,13 @@ namespace CodePlex.JPMikkers.DHCP
 {
     public class UDPSocket : IDisposable
     {
-        public delegate void OnReceiveDelegate(UDPSocket sender, IPEndPoint endPoint, ArraySegment<byte> data);
+        // See: http://stackoverflow.com/questions/5199026/c-sharp-async-udp-listener-socketexception
+
+        const uint IOC_IN = 0x80000000;
+        const uint IOC_VENDOR = 0x18000000;
+        const uint SIO_UDP_CONNRESET = IOC_IN | IOC_VENDOR | 12;
+
+        public delegate void OnReceiveDelegate(UDPSocket sender,IPEndPoint endPoint,ArraySegment<byte> data);
         public delegate void OnStopDelegate(UDPSocket sender, Exception reason);
 
         #region private types, members
@@ -46,7 +52,7 @@ namespace CodePlex.JPMikkers.DHCP
 
         private Queue<PacketBuffer> m_SendFifo;             // queue of the outgoing packets
         private bool m_SendPending;                         // true => an asynchronous send is in progress
-        private int m_ReceivePending;
+        private int m_ReceivePending;   
 
         private AutoPumpQueue<PacketBuffer> m_ReceiveFifo;  // queue of the incoming packets
         private int m_PacketSize;                           // size of packets we'll try to receive
@@ -97,8 +103,8 @@ namespace CodePlex.JPMikkers.DHCP
             m_SendFifo = new Queue<PacketBuffer>();
 
             m_ReceiveFifo = new AutoPumpQueue<PacketBuffer>(
-                delegate(AutoPumpQueue<PacketBuffer> sender, PacketBuffer data)
-                {              
+                (sender, data) => 
+                {
                     bool isDisposed = false;
 
                     lock (m_Sync)
@@ -129,12 +135,22 @@ namespace CodePlex.JPMikkers.DHCP
             }
             m_Socket.Bind(localEndPoint);
             m_LocalEndPoint = m_Socket.LocalEndPoint;
+
+            m_Socket.IOControl((IOControlCode)SIO_UDP_CONNRESET, new byte[] { 0, 0, 0, 0 }, null);
+
             BeginReceive();
         }
 
         ~UDPSocket()
         {
-            Dispose(false);
+			try
+			{
+	            Dispose(false);
+			}
+            catch
+			{
+                // never let any exception escape the finalizer, or else your process will be killed.
+			}			
         }
 
         #endregion
@@ -146,7 +162,7 @@ namespace CodePlex.JPMikkers.DHCP
         /// </summary>
         /// <param name="endPoint">Target for the data</param>
         /// <param name="msg">Data to send</param>
-        public void Send(IPEndPoint endPoint, ArraySegment<byte> msg)
+        public void Send(IPEndPoint endPoint,ArraySegment<byte> msg)
         {
             try
             {
@@ -237,7 +253,7 @@ namespace CodePlex.JPMikkers.DHCP
                 }
                 else
                 {
-                    System.Diagnostics.Debug.WriteLine("BeginSend while send pending?");
+                    //System.Diagnostics.Debug.WriteLine("BeginSend while send pending?");
                 }
             }
         }
@@ -271,7 +287,8 @@ namespace CodePlex.JPMikkers.DHCP
         /// </summary>
         private void BeginReceive()
         {
-            while (m_ReceivePending < 2)
+            // just one pending receive for now. Anything more causes packet reordering at ReceiveDone (even on loopback connections) which doesn't feel right.
+            while (m_ReceivePending < 1)
             {
                 m_ReceivePending++;
                 PacketBuffer receivePacket = new PacketBuffer(new IPEndPoint(m_IPv6 ? IPAddress.IPv6Any : IPAddress.Any, 0), new ArraySegment<byte>(new byte[m_PacketSize], 0, m_PacketSize));
@@ -294,8 +311,15 @@ namespace CodePlex.JPMikkers.DHCP
                         try
                         {
                             PacketBuffer buf = (PacketBuffer)ar.AsyncState;
-                            int packetSize = m_Socket.EndReceiveFrom(ar, ref buf.EndPoint);
+                            int packetSize;
+                            try
+                            {
+                                packetSize = m_Socket.EndReceiveFrom(ar, ref buf.EndPoint);
+                            }
+                            finally
+                            {
                             m_ReceivePending--;
+                            }
                             buf.Data = new ArraySegment<byte>(buf.Data.Array, 0, packetSize);
                             m_ReceiveFifo.Enqueue(buf);
                             // BeginReceive should check state again because Stop() could have been called synchronously at NotifyReceive()
@@ -335,7 +359,10 @@ namespace CodePlex.JPMikkers.DHCP
 
         protected virtual void Dispose(bool disposing)
         {
-            Stop(null);
+            if (disposing)
+            {
+                Stop(null);
+            }
         }
 
         #endregion

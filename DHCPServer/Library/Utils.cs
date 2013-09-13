@@ -117,7 +117,8 @@ namespace CodePlex.JPMikkers.DHCP
                     {
                         if (address.Equals(unicastIPAddressInformation.Address))
                         {
-                            return unicastIPAddressInformation.IPv4Mask;
+                            // the following mask can be null.. return 255.255.255.0 in that case
+                            return unicastIPAddressInformation.IPv4Mask ?? new IPAddress(new byte[] {255, 255, 255, 0});
                         }
                     }
                 }

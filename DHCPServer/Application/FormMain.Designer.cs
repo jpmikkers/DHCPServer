@@ -56,15 +56,15 @@ namespace DHCPServerApp
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
             this.panel5 = new System.Windows.Forms.Panel();
             this.buttonRefresh = new System.Windows.Forms.Button();
-            this.ColumnName = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.ColumnAddress = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.ColumnNetMask = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.HWAddress = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.MACTaste = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.State = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.IPAddress = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.LeaseStart = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.LeaseEnd = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.IPAddress = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.State = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.HWAddress = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.MACTaste = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.ColumnName = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.ColumnAddress = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.panel1.SuspendLayout();
             this.panel2.SuspendLayout();
             this.panel3.SuspendLayout();
@@ -322,15 +322,15 @@ namespace DHCPServerApp
             this.dataGridView1.AllowUserToOrderColumns = true;
             this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dataGridView1.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
-            this.ColumnName,
-            this.ColumnAddress,
             this.ColumnNetMask,
-            this.HWAddress,
-            this.MACTaste,
-            this.State,
+            this.IPAddress,
             this.LeaseStart,
             this.LeaseEnd,
-            this.IPAddress});
+            this.State,
+            this.HWAddress,
+            this.MACTaste,
+            this.ColumnName,
+            this.ColumnAddress});
             this.dataGridView1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.dataGridView1.Location = new System.Drawing.Point(10, 10);
             this.dataGridView1.MultiSelect = false;
@@ -361,20 +361,6 @@ namespace DHCPServerApp
             this.buttonRefresh.UseVisualStyleBackColor = true;
             this.buttonRefresh.Click += new System.EventHandler(this.buttonRefresh_Click);
             // 
-            // ColumnName
-            // 
-            this.ColumnName.DataPropertyName = "ServerName";
-            this.ColumnName.HeaderText = "Srv Name";
-            this.ColumnName.Name = "ColumnName";
-            this.ColumnName.ReadOnly = true;
-            // 
-            // ColumnAddress
-            // 
-            this.ColumnAddress.DataPropertyName = "ServerIPAddress";
-            this.ColumnAddress.HeaderText = "Srv Address";
-            this.ColumnAddress.Name = "ColumnAddress";
-            this.ColumnAddress.ReadOnly = true;
-            // 
             // ColumnNetMask
             // 
             this.ColumnNetMask.DataPropertyName = "IdentifierAsString";
@@ -382,26 +368,12 @@ namespace DHCPServerApp
             this.ColumnNetMask.Name = "ColumnNetMask";
             this.ColumnNetMask.ReadOnly = true;
             // 
-            // HWAddress
+            // IPAddress
             // 
-            this.HWAddress.DataPropertyName = "HardwareAddressAsString";
-            this.HWAddress.HeaderText = "HW Address";
-            this.HWAddress.Name = "HWAddress";
-            this.HWAddress.ReadOnly = true;
-            // 
-            // MACTaste
-            // 
-            this.MACTaste.DataPropertyName = "MACTaste";
-            this.MACTaste.HeaderText = "MAC Taste";
-            this.MACTaste.Name = "MACTaste";
-            this.MACTaste.ReadOnly = true;
-            // 
-            // State
-            // 
-            this.State.DataPropertyName = "Client.State";
-            this.State.HeaderText = "State";
-            this.State.Name = "State";
-            this.State.ReadOnly = true;
+            this.IPAddress.DataPropertyName = "Client.IPAddress";
+            this.IPAddress.HeaderText = "IP Address";
+            this.IPAddress.Name = "IPAddress";
+            this.IPAddress.ReadOnly = true;
             // 
             // LeaseStart
             // 
@@ -417,12 +389,40 @@ namespace DHCPServerApp
             this.LeaseEnd.Name = "LeaseEnd";
             this.LeaseEnd.ReadOnly = true;
             // 
-            // IPAddress
+            // State
             // 
-            this.IPAddress.DataPropertyName = "Client.IPAddress";
-            this.IPAddress.HeaderText = "IP Address";
-            this.IPAddress.Name = "IPAddress";
-            this.IPAddress.ReadOnly = true;
+            this.State.DataPropertyName = "Client.State";
+            this.State.HeaderText = "State";
+            this.State.Name = "State";
+            this.State.ReadOnly = true;
+            // 
+            // HWAddress
+            // 
+            this.HWAddress.DataPropertyName = "HardwareAddressAsString";
+            this.HWAddress.HeaderText = "HW Address";
+            this.HWAddress.Name = "HWAddress";
+            this.HWAddress.ReadOnly = true;
+            // 
+            // MACTaste
+            // 
+            this.MACTaste.DataPropertyName = "MACTaste";
+            this.MACTaste.HeaderText = "MAC Taste";
+            this.MACTaste.Name = "MACTaste";
+            this.MACTaste.ReadOnly = true;
+            // 
+            // ColumnName
+            // 
+            this.ColumnName.DataPropertyName = "ServerName";
+            this.ColumnName.HeaderText = "Srv Name";
+            this.ColumnName.Name = "ColumnName";
+            this.ColumnName.ReadOnly = true;
+            // 
+            // ColumnAddress
+            // 
+            this.ColumnAddress.DataPropertyName = "ServerIPAddress";
+            this.ColumnAddress.HeaderText = "Srv Address";
+            this.ColumnAddress.Name = "ColumnAddress";
+            this.ColumnAddress.ReadOnly = true;
             // 
             // FormMain
             // 
@@ -483,14 +483,14 @@ namespace DHCPServerApp
         private System.Windows.Forms.Panel panel4;
         private System.Windows.Forms.Panel panel5;
         private System.Windows.Forms.Button buttonRefresh;
-        private System.Windows.Forms.DataGridViewTextBoxColumn ColumnName;
-        private System.Windows.Forms.DataGridViewTextBoxColumn ColumnAddress;
         private System.Windows.Forms.DataGridViewTextBoxColumn ColumnNetMask;
-        private System.Windows.Forms.DataGridViewTextBoxColumn HWAddress;
-        private System.Windows.Forms.DataGridViewTextBoxColumn MACTaste;
-        private System.Windows.Forms.DataGridViewTextBoxColumn State;
+        private System.Windows.Forms.DataGridViewTextBoxColumn IPAddress;
         private System.Windows.Forms.DataGridViewTextBoxColumn LeaseStart;
         private System.Windows.Forms.DataGridViewTextBoxColumn LeaseEnd;
-        private System.Windows.Forms.DataGridViewTextBoxColumn IPAddress;
+        private System.Windows.Forms.DataGridViewTextBoxColumn State;
+        private System.Windows.Forms.DataGridViewTextBoxColumn HWAddress;
+        private System.Windows.Forms.DataGridViewTextBoxColumn MACTaste;
+        private System.Windows.Forms.DataGridViewTextBoxColumn ColumnName;
+        private System.Windows.Forms.DataGridViewTextBoxColumn ColumnAddress;
     }
 }

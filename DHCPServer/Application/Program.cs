@@ -124,10 +124,6 @@ namespace DHCPServerApp
         [STAThread]
         static void Main(string[] args)
         {
-            DHCPClientInformation ci = new DHCPClientInformation();
-            ci.Clients.Add(new DHCPClient());
-            ci.Write("blah.xml");
-
             if (args.Length > 0 && args[0].ToLower() == Switch_Service)
             {
                 ServiceBase.Run(new ServiceBase[] { new DHCPService() });
@@ -139,16 +135,7 @@ namespace DHCPServerApp
 
                 if (args.Length == 0)
                 {
-                    ServiceController serviceController = null;
-
-                    foreach(ServiceController candidate in ServiceController.GetServices())
-                    {
-                        if(candidate.ServiceName == "DHCPServer")
-                        {
-                            serviceController = candidate;
-                            break;
-                        }
-                    }
+                    ServiceController serviceController = ServiceController.GetServices().FirstOrDefault(x => x.ServiceName == "DHCPServer");
 
                     if (serviceController == null)
                     {

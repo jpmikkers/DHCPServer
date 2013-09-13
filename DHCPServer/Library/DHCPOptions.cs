@@ -160,24 +160,51 @@ namespace CodePlex.JPMikkers.DHCP
 
     public interface IDHCPOption
     {
+        bool ZeroTerminatedStrings { get; set; }
         TDHCPOption OptionType { get; }
         IDHCPOption FromStream(Stream s);
         void ToStream(Stream s);
     }
 
-    public class DHCPOptionParameterRequestList : IDHCPOption
+    public abstract class DHCPOptionBase : IDHCPOption
     {
-        private List<TDHCPOption> m_RequestList = new List<TDHCPOption>();
-
-        #region IDHCPOption Members
+        protected TDHCPOption m_OptionType;
+        private bool m_ZeroTerminatedStrings;
 
         public TDHCPOption OptionType
         {
             get
             {
-                return TDHCPOption.ParameterRequestList;
+                return m_OptionType;
             }
         }
+
+        public bool ZeroTerminatedStrings
+        {
+            get
+            {
+                return m_ZeroTerminatedStrings;
+            }
+            set
+            {
+                m_ZeroTerminatedStrings = value;
+            }
+        }
+
+        public abstract IDHCPOption FromStream(Stream s);
+        public abstract void ToStream(Stream s);
+
+        public DHCPOptionBase(TDHCPOption optionType)
+        {
+            m_OptionType = optionType;
+        }
+    }
+
+    public class DHCPOptionParameterRequestList : DHCPOptionBase
+    {
+        private List<TDHCPOption> m_RequestList = new List<TDHCPOption>();
+
+        #region IDHCPOption Members
 
         public List<TDHCPOption> RequestList
         {
@@ -187,7 +214,7 @@ namespace CodePlex.JPMikkers.DHCP
             }
         }
 
-        public IDHCPOption FromStream(Stream s)
+        public override IDHCPOption FromStream(Stream s)
         {
             DHCPOptionParameterRequestList result = new DHCPOptionParameterRequestList();
             while(true)
@@ -199,7 +226,7 @@ namespace CodePlex.JPMikkers.DHCP
             return result;
         }
 
-        public void ToStream(Stream s)
+        public override void ToStream(Stream s)
         {
             foreach(TDHCPOption opt in m_RequestList)
             {
@@ -210,6 +237,7 @@ namespace CodePlex.JPMikkers.DHCP
         #endregion
 
         public DHCPOptionParameterRequestList()
+            : base(TDHCPOption.ParameterRequestList)
         {
         }
 
@@ -226,19 +254,11 @@ namespace CodePlex.JPMikkers.DHCP
         }
     }
 
-    public class DHCPOptionHostName : IDHCPOption
+    public class DHCPOptionHostName : DHCPOptionBase
     {
         private string m_HostName;
 
         #region IDHCPOption Members
-
-        public TDHCPOption OptionType
-        {
-            get
-            {
-                return TDHCPOption.HostName;
-            }
-        }
 
         public string HostName
         {
@@ -248,25 +268,27 @@ namespace CodePlex.JPMikkers.DHCP
             }
         }
 
-        public IDHCPOption FromStream(Stream s)
+        public override IDHCPOption FromStream(Stream s)
         {
             DHCPOptionHostName result = new DHCPOptionHostName();
             result.m_HostName = ParseHelper.ReadString(s);
             return result;
         }
 
-        public void ToStream(Stream s)
+        public override void ToStream(Stream s)
         {
-            ParseHelper.WriteString(s, m_HostName);
+            ParseHelper.WriteString(s, ZeroTerminatedStrings, m_HostName);
         }
 
         #endregion
 
         public DHCPOptionHostName()
+            : base(TDHCPOption.HostName)
         {
         }
 
         public DHCPOptionHostName(string hostName)
+            : base(TDHCPOption.HostName)
         {
             m_HostName = hostName;
         }
@@ -278,19 +300,11 @@ namespace CodePlex.JPMikkers.DHCP
     }
 
 
-    public class DHCPOptionMessage : IDHCPOption
+    public class DHCPOptionMessage : DHCPOptionBase
     {
         private string m_Message;
 
         #region IDHCPOption Members
-
-        public TDHCPOption OptionType
-        {
-            get
-            {
-                return TDHCPOption.Message;
-            }
-        }
 
         public string Message
         {
@@ -300,25 +314,27 @@ namespace CodePlex.JPMikkers.DHCP
             }
         }
 
-        public IDHCPOption FromStream(Stream s)
+        public override IDHCPOption FromStream(Stream s)
         {
             DHCPOptionMessage result = new DHCPOptionMessage();
             result.m_Message = ParseHelper.ReadString(s);
             return result;
         }
 
-        public void ToStream(Stream s)
+        public override void ToStream(Stream s)
         {
-            ParseHelper.WriteString(s, m_Message);
+            ParseHelper.WriteString(s, ZeroTerminatedStrings, m_Message);
         }
 
         #endregion
 
         public DHCPOptionMessage()
+            : base(TDHCPOption.Message)
         {
         }
 
         public DHCPOptionMessage(string message)
+            : base(TDHCPOption.Message)
         {
             m_Message = message;
         }
@@ -329,19 +345,11 @@ namespace CodePlex.JPMikkers.DHCP
         }
     }
 
-    public class DHCPOptionTFTPServerName : IDHCPOption
+    public class DHCPOptionTFTPServerName : DHCPOptionBase
     {
         private string m_Name;
 
         #region IDHCPOption Members
-
-        public TDHCPOption OptionType
-        {
-            get
-            {
-                return TDHCPOption.TFTPServerName;
-            }
-        }
 
         public string Name
         {
@@ -351,25 +359,27 @@ namespace CodePlex.JPMikkers.DHCP
             }
         }
 
-        public IDHCPOption FromStream(Stream s)
+        public override IDHCPOption FromStream(Stream s)
         {
             DHCPOptionTFTPServerName result = new DHCPOptionTFTPServerName();
             result.m_Name = ParseHelper.ReadString(s);
             return result;
         }
 
-        public void ToStream(Stream s)
+        public override void ToStream(Stream s)
         {
-            ParseHelper.WriteString(s,m_Name);
+            ParseHelper.WriteString(s, ZeroTerminatedStrings, m_Name);
         }
 
         #endregion
 
         public DHCPOptionTFTPServerName()
+            : base(TDHCPOption.TFTPServerName)
         {
         }
 
         public DHCPOptionTFTPServerName(string name)
+            : base(TDHCPOption.TFTPServerName)
         {
             m_Name = name;
         }
@@ -380,19 +390,11 @@ namespace CodePlex.JPMikkers.DHCP
         }
     }
 
-    public class DHCPOptionBootFileName : IDHCPOption
+    public class DHCPOptionBootFileName : DHCPOptionBase
     {
         private string m_Name;
 
         #region IDHCPOption Members
-
-        public TDHCPOption OptionType
-        {
-            get
-            {
-                return TDHCPOption.BootFileName;
-            }
-        }
 
         public string Name
         {
@@ -402,25 +404,27 @@ namespace CodePlex.JPMikkers.DHCP
             }
         }
 
-        public IDHCPOption FromStream(Stream s)
+        public override IDHCPOption FromStream(Stream s)
         {
             DHCPOptionBootFileName result = new DHCPOptionBootFileName();
             result.m_Name = ParseHelper.ReadString(s);
             return result;
         }
 
-        public void ToStream(Stream s)
+        public override void ToStream(Stream s)
         {
-            ParseHelper.WriteString(s, m_Name);
+            ParseHelper.WriteString(s, ZeroTerminatedStrings, m_Name);
         }
 
         #endregion
 
         public DHCPOptionBootFileName()
+            : base(TDHCPOption.BootFileName)
         {
         }
 
         public DHCPOptionBootFileName(string name)
+            : base(TDHCPOption.BootFileName)
         {
             m_Name = name;
         }
@@ -431,19 +435,11 @@ namespace CodePlex.JPMikkers.DHCP
         }
     }
 
-    public class DHCPOptionOptionOverload : IDHCPOption
+    public class DHCPOptionOptionOverload : DHCPOptionBase
     {
         private byte m_Overload;
 
         #region IDHCPOption Members
-
-        public TDHCPOption OptionType
-        {
-            get
-            {
-                return TDHCPOption.OptionOverload;
-            }
-        }
 
         public byte Overload
         {
@@ -453,7 +449,7 @@ namespace CodePlex.JPMikkers.DHCP
             }
         }
 
-        public IDHCPOption FromStream(Stream s)
+        public override IDHCPOption FromStream(Stream s)
         {
             DHCPOptionOptionOverload result = new DHCPOptionOptionOverload();
             if (s.Length != 1) throw new IOException("Invalid DHCP option length");
@@ -461,7 +457,7 @@ namespace CodePlex.JPMikkers.DHCP
             return result;
         }
 
-        public void ToStream(Stream s)
+        public override void ToStream(Stream s)
         {
             s.WriteByte(m_Overload);
         }
@@ -469,10 +465,12 @@ namespace CodePlex.JPMikkers.DHCP
         #endregion
 
         public DHCPOptionOptionOverload()
+            : base(TDHCPOption.OptionOverload)
         {
         }
 
         public DHCPOptionOptionOverload(byte overload)
+            : base(TDHCPOption.OptionOverload)
         {
             m_Overload = overload;
         }
@@ -483,19 +481,11 @@ namespace CodePlex.JPMikkers.DHCP
         }
     }
 
-    public class DHCPOptionMaximumDHCPMessageSize : IDHCPOption
+    public class DHCPOptionMaximumDHCPMessageSize : DHCPOptionBase
     {
         private ushort m_MaxSize;
 
         #region IDHCPOption Members
-
-        public TDHCPOption OptionType
-        {
-            get
-            {
-                return TDHCPOption.MaximumDHCPMessageSize;
-            }
-        }
 
         public ushort MaxSize
         {
@@ -505,7 +495,7 @@ namespace CodePlex.JPMikkers.DHCP
             }
         }
 
-        public IDHCPOption FromStream(Stream s)
+        public override IDHCPOption FromStream(Stream s)
         {
             DHCPOptionMaximumDHCPMessageSize result = new DHCPOptionMaximumDHCPMessageSize();
             if (s.Length != 2) throw new IOException("Invalid DHCP option length");
@@ -513,7 +503,7 @@ namespace CodePlex.JPMikkers.DHCP
             return result;
         }
 
-        public void ToStream(Stream s)
+        public override void ToStream(Stream s)
         {
             ParseHelper.WriteUInt16(s,m_MaxSize);
         }
@@ -521,10 +511,12 @@ namespace CodePlex.JPMikkers.DHCP
         #endregion
 
         public DHCPOptionMaximumDHCPMessageSize()
+            : base(TDHCPOption.MaximumDHCPMessageSize)
         {
         }
 
         public DHCPOptionMaximumDHCPMessageSize(ushort maxSize)
+            : base(TDHCPOption.MaximumDHCPMessageSize)
         {
             m_MaxSize = maxSize;
         }
@@ -535,19 +527,11 @@ namespace CodePlex.JPMikkers.DHCP
         }
     }
 
-    public class DHCPOptionMessageType : IDHCPOption
+    public class DHCPOptionMessageType : DHCPOptionBase
     {
         private TDHCPMessageType m_MessageType;
 
         #region IDHCPOption Members
-
-        public TDHCPOption OptionType
-        {
-            get
-            {
-                return TDHCPOption.MessageType;
-            }
-        }
 
         public TDHCPMessageType MessageType
         {
@@ -557,7 +541,7 @@ namespace CodePlex.JPMikkers.DHCP
             }
         }
 
-        public IDHCPOption FromStream(Stream s)
+        public override IDHCPOption FromStream(Stream s)
         {
             DHCPOptionMessageType result = new DHCPOptionMessageType();
             if (s.Length != 1) throw new IOException("Invalid DHCP option length");
@@ -565,7 +549,7 @@ namespace CodePlex.JPMikkers.DHCP
             return result;
         }
 
-        public void ToStream(Stream s)
+        public override void ToStream(Stream s)
         {
             s.WriteByte((byte)m_MessageType);
         }
@@ -573,10 +557,12 @@ namespace CodePlex.JPMikkers.DHCP
         #endregion
 
         public DHCPOptionMessageType()
+            : base(TDHCPOption.MessageType)
         {
         }
 
         public DHCPOptionMessageType(TDHCPMessageType messageType)
+            : base(TDHCPOption.MessageType)
         {
             m_MessageType = messageType;
         }
@@ -588,19 +574,11 @@ namespace CodePlex.JPMikkers.DHCP
     }
 
 
-    public class DHCPOptionServerIdentifier : IDHCPOption
+    public class DHCPOptionServerIdentifier : DHCPOptionBase
     {
         private IPAddress m_IPAddress;
 
         #region IDHCPOption Members
-
-        public TDHCPOption OptionType
-        {
-            get
-            {
-                return TDHCPOption.ServerIdentifier;
-            }
-        }
 
         public IPAddress IPAddress
         {
@@ -610,7 +588,7 @@ namespace CodePlex.JPMikkers.DHCP
             }
         }
 
-        public IDHCPOption FromStream(Stream s)
+        public override IDHCPOption FromStream(Stream s)
         {
             DHCPOptionServerIdentifier result = new DHCPOptionServerIdentifier();
             if (s.Length != 4) throw new IOException("Invalid DHCP option length");
@@ -618,7 +596,7 @@ namespace CodePlex.JPMikkers.DHCP
             return result;
         }
 
-        public void ToStream(Stream s)
+        public override void ToStream(Stream s)
         {
             ParseHelper.WriteIPAddress(s, m_IPAddress);
         }
@@ -626,10 +604,12 @@ namespace CodePlex.JPMikkers.DHCP
         #endregion
 
         public DHCPOptionServerIdentifier()
+            : base(TDHCPOption.ServerIdentifier)
         {
         }
 
-           public DHCPOptionServerIdentifier(IPAddress ipAddress)
+        public DHCPOptionServerIdentifier(IPAddress ipAddress)
+            : base(TDHCPOption.ServerIdentifier)
         {
             m_IPAddress = ipAddress;
         }
@@ -641,19 +621,11 @@ namespace CodePlex.JPMikkers.DHCP
     }
 
 
-    public class DHCPOptionRequestedIPAddress : IDHCPOption
+    public class DHCPOptionRequestedIPAddress : DHCPOptionBase
     {
         private IPAddress m_IPAddress;
 
         #region IDHCPOption Members
-
-        public TDHCPOption OptionType
-        {
-            get
-            {
-                return TDHCPOption.RequestedIPAddress;
-            }
-        }
 
         public IPAddress IPAddress
         {
@@ -663,7 +635,7 @@ namespace CodePlex.JPMikkers.DHCP
             }
         }
 
-        public IDHCPOption FromStream(Stream s)
+        public override IDHCPOption FromStream(Stream s)
         {
             DHCPOptionRequestedIPAddress result = new DHCPOptionRequestedIPAddress();
             if (s.Length != 4) throw new IOException("Invalid DHCP option length");
@@ -671,7 +643,7 @@ namespace CodePlex.JPMikkers.DHCP
             return result;
         }
 
-        public void ToStream(Stream s)
+        public override void ToStream(Stream s)
         {
             ParseHelper.WriteIPAddress(s, m_IPAddress);
         }
@@ -679,10 +651,12 @@ namespace CodePlex.JPMikkers.DHCP
         #endregion
 
         public DHCPOptionRequestedIPAddress()
+            : base(TDHCPOption.RequestedIPAddress)
         {
         }
 
         public DHCPOptionRequestedIPAddress(IPAddress ipAddress)
+            : base(TDHCPOption.RequestedIPAddress)
         {
             m_IPAddress = ipAddress;
         }
@@ -694,19 +668,11 @@ namespace CodePlex.JPMikkers.DHCP
     }
 
 
-    public class DHCPOptionSubnetMask : IDHCPOption
+    public class DHCPOptionSubnetMask : DHCPOptionBase
     {
         private IPAddress m_SubnetMask;
 
         #region IDHCPOption Members
-
-        public TDHCPOption OptionType
-        {
-            get
-            {
-                return TDHCPOption.SubnetMask;
-            }
-        }
 
         public IPAddress SubnetMask
         {
@@ -716,7 +682,7 @@ namespace CodePlex.JPMikkers.DHCP
             }
         }
 
-        public IDHCPOption FromStream(Stream s)
+        public override IDHCPOption FromStream(Stream s)
         {
             DHCPOptionSubnetMask result = new DHCPOptionSubnetMask();
             if (s.Length != 4) throw new IOException("Invalid DHCP option length");
@@ -724,7 +690,7 @@ namespace CodePlex.JPMikkers.DHCP
             return result;
         }
 
-        public void ToStream(Stream s)
+        public override void ToStream(Stream s)
         {
             ParseHelper.WriteIPAddress(s, m_SubnetMask);
         }
@@ -732,10 +698,12 @@ namespace CodePlex.JPMikkers.DHCP
         #endregion
 
         public DHCPOptionSubnetMask()
+            : base(TDHCPOption.SubnetMask)
         {
         }
 
         public DHCPOptionSubnetMask(IPAddress subnetMask)
+            : base(TDHCPOption.SubnetMask)
         {
             m_SubnetMask = subnetMask;
         }
@@ -747,19 +715,11 @@ namespace CodePlex.JPMikkers.DHCP
     }
 
 
-    public class DHCPOptionIPAddressLeaseTime : IDHCPOption
+    public class DHCPOptionIPAddressLeaseTime : DHCPOptionBase
     {
         private TimeSpan m_LeaseTime;
 
         #region IDHCPOption Members
-
-        public TDHCPOption OptionType
-        {
-            get
-            {
-                return TDHCPOption.IPAddressLeaseTime;
-            }
-        }
 
         public TimeSpan LeaseTime
         {
@@ -769,7 +729,7 @@ namespace CodePlex.JPMikkers.DHCP
             }
         }
 
-        public IDHCPOption FromStream(Stream s)
+        public override IDHCPOption FromStream(Stream s)
         {
             DHCPOptionIPAddressLeaseTime result = new DHCPOptionIPAddressLeaseTime();
             if (s.Length != 4) throw new IOException("Invalid DHCP option length");
@@ -777,7 +737,7 @@ namespace CodePlex.JPMikkers.DHCP
             return result;
         }
 
-        public void ToStream(Stream s)
+        public override void ToStream(Stream s)
         {
             ParseHelper.WriteUInt32(s, (uint)m_LeaseTime.TotalSeconds);
         }
@@ -785,10 +745,12 @@ namespace CodePlex.JPMikkers.DHCP
         #endregion
 
         public DHCPOptionIPAddressLeaseTime()
+            : base(TDHCPOption.IPAddressLeaseTime)
         {
         }
 
         public DHCPOptionIPAddressLeaseTime(TimeSpan leaseTime)
+            : base(TDHCPOption.IPAddressLeaseTime)
         {
             m_LeaseTime = leaseTime;
             if (m_LeaseTime > Utils.InfiniteTimeSpan)
@@ -803,19 +765,11 @@ namespace CodePlex.JPMikkers.DHCP
         }
     }
 
-    public class DHCPOptionRenewalTimeValue : IDHCPOption
+    public class DHCPOptionRenewalTimeValue : DHCPOptionBase
     {
         private TimeSpan m_TimeSpan;
 
         #region IDHCPOption Members
-
-        public TDHCPOption OptionType
-        {
-            get
-            {
-                return TDHCPOption.RenewalTimeValue;
-            }
-        }
 
         public TimeSpan TimeSpan
         {
@@ -825,7 +779,7 @@ namespace CodePlex.JPMikkers.DHCP
             }
         }
 
-        public IDHCPOption FromStream(Stream s)
+        public override IDHCPOption FromStream(Stream s)
         {
             DHCPOptionRenewalTimeValue result = new DHCPOptionRenewalTimeValue();
             if (s.Length != 4) throw new IOException("Invalid DHCP option length");
@@ -833,7 +787,7 @@ namespace CodePlex.JPMikkers.DHCP
             return result;
         }
 
-        public void ToStream(Stream s)
+        public override void ToStream(Stream s)
         {
             ParseHelper.WriteUInt32(s, (uint)m_TimeSpan.TotalSeconds);
         }
@@ -841,10 +795,12 @@ namespace CodePlex.JPMikkers.DHCP
         #endregion
 
         public DHCPOptionRenewalTimeValue()
+            : base(TDHCPOption.RenewalTimeValue)
         {
         }
 
         public DHCPOptionRenewalTimeValue(TimeSpan timeSpan)
+            : base(TDHCPOption.RenewalTimeValue)
         {
             m_TimeSpan = timeSpan;
         }
@@ -855,19 +811,11 @@ namespace CodePlex.JPMikkers.DHCP
         }
     }
 
-    public class DHCPOptionRebindingTimeValue : IDHCPOption
+    public class DHCPOptionRebindingTimeValue : DHCPOptionBase
     {
         private TimeSpan m_TimeSpan;
 
         #region IDHCPOption Members
-
-        public TDHCPOption OptionType
-        {
-            get
-            {
-                return TDHCPOption.RebindingTimeValue;
-            }
-        }
 
         public TimeSpan TimeSpan
         {
@@ -877,7 +825,7 @@ namespace CodePlex.JPMikkers.DHCP
             }
         }
 
-        public IDHCPOption FromStream(Stream s)
+        public override IDHCPOption FromStream(Stream s)
         {
             DHCPOptionRebindingTimeValue result = new DHCPOptionRebindingTimeValue();
             if (s.Length != 4) throw new IOException("Invalid DHCP option length");
@@ -885,7 +833,7 @@ namespace CodePlex.JPMikkers.DHCP
             return result;
         }
 
-        public void ToStream(Stream s)
+        public override void ToStream(Stream s)
         {
             ParseHelper.WriteUInt32(s, (uint)m_TimeSpan.TotalSeconds);
         }
@@ -893,10 +841,12 @@ namespace CodePlex.JPMikkers.DHCP
         #endregion
 
         public DHCPOptionRebindingTimeValue()
+            : base(TDHCPOption.RebindingTimeValue)
         {
         }
 
         public DHCPOptionRebindingTimeValue(TimeSpan timeSpan)
+            : base(TDHCPOption.RebindingTimeValue)
         {
             m_TimeSpan = timeSpan;
         }
@@ -907,9 +857,8 @@ namespace CodePlex.JPMikkers.DHCP
         }
     }
 
-    public class DHCPOptionGeneric : IDHCPOption
+    public class DHCPOptionGeneric : DHCPOptionBase
     {
-        private TDHCPOption m_Option;
         private byte[] m_Data;
 
         public byte[] Data
@@ -920,48 +869,38 @@ namespace CodePlex.JPMikkers.DHCP
 
         #region IDHCPOption Members
 
-        public TDHCPOption OptionType
+        public override IDHCPOption FromStream(Stream s)
         {
-            get
-            {
-                return m_Option;
-            }
-        }
-
-        public IDHCPOption FromStream(Stream s)
-        {
-            DHCPOptionGeneric result = new DHCPOptionGeneric(m_Option);
+            DHCPOptionGeneric result = new DHCPOptionGeneric(m_OptionType);
             result.m_Data = new byte[s.Length];
             s.Read(result.m_Data, 0, result.m_Data.Length);
             return result;
         }
 
-        public void ToStream(Stream s)
+        public override void ToStream(Stream s)
         {
             s.Write(m_Data, 0, m_Data.Length);
         }
 
         #endregion
 
-        public DHCPOptionGeneric(TDHCPOption option)
+        public DHCPOptionGeneric(TDHCPOption option) : base(option)
         {
-            m_Option = option;
             m_Data = new byte[0];
         }
 
-        public DHCPOptionGeneric(TDHCPOption option, byte[] data)
+        public DHCPOptionGeneric(TDHCPOption option, byte[] data) : base(option)
         {
-            m_Option = option;
             m_Data = data;
         }
 
         public override string ToString()
         {
-            return string.Format("Option(name=[{0}],value=[{1}])", m_Option, Utils.BytesToHexString(m_Data," "));
+            return string.Format("Option(name=[{0}],value=[{1}])", m_OptionType, Utils.BytesToHexString(m_Data," "));
         }
     }
 
-    public class DHCPOptionFullyQualifiedDomainName : IDHCPOption
+    public class DHCPOptionFullyQualifiedDomainName : DHCPOptionBase
     {
         private byte[] m_Data;
 
@@ -973,15 +912,7 @@ namespace CodePlex.JPMikkers.DHCP
 
         #region IDHCPOption Members
 
-        public TDHCPOption OptionType
-        {
-            get
-            {
-                return TDHCPOption.FullyQualifiedDomainName;
-            }
-        }
-
-        public IDHCPOption FromStream(Stream s)
+        public override IDHCPOption FromStream(Stream s)
         {
             DHCPOptionFullyQualifiedDomainName result = new DHCPOptionFullyQualifiedDomainName();
             result.m_Data = new byte[s.Length];
@@ -989,7 +920,7 @@ namespace CodePlex.JPMikkers.DHCP
             return result;
         }
 
-        public void ToStream(Stream s)
+        public override void ToStream(Stream s)
         {
             s.Write(m_Data, 0, m_Data.Length);
         }
@@ -997,6 +928,7 @@ namespace CodePlex.JPMikkers.DHCP
         #endregion
 
         public DHCPOptionFullyQualifiedDomainName()
+            : base(TDHCPOption.FullyQualifiedDomainName)
         {
             m_Data = new byte[0];
         }
@@ -1007,7 +939,7 @@ namespace CodePlex.JPMikkers.DHCP
         }
     }
 
-    public class DHCPOptionVendorClassIdentifier : IDHCPOption
+    public class DHCPOptionVendorClassIdentifier : DHCPOptionBase
     {
         private byte[] m_Data;
 
@@ -1019,15 +951,7 @@ namespace CodePlex.JPMikkers.DHCP
 
         #region IDHCPOption Members
 
-        public TDHCPOption OptionType
-        {
-            get
-            {
-                return TDHCPOption.VendorClassIdentifier;
-            }
-        }
-
-        public IDHCPOption FromStream(Stream s)
+        public override IDHCPOption FromStream(Stream s)
         {
             DHCPOptionVendorClassIdentifier result = new DHCPOptionVendorClassIdentifier();
             result.m_Data = new byte[s.Length];
@@ -1035,7 +959,7 @@ namespace CodePlex.JPMikkers.DHCP
             return result;
         }
 
-        public void ToStream(Stream s)
+        public override void ToStream(Stream s)
         {
             s.Write(m_Data, 0, m_Data.Length);
         }
@@ -1043,11 +967,13 @@ namespace CodePlex.JPMikkers.DHCP
         #endregion
 
         public DHCPOptionVendorClassIdentifier()
+            : base(TDHCPOption.VendorClassIdentifier)
         {
             m_Data = new byte[0];
         }
 
         public DHCPOptionVendorClassIdentifier(byte[] data)
+            : base(TDHCPOption.VendorClassIdentifier)
         {
             m_Data = data;
         }
@@ -1058,7 +984,7 @@ namespace CodePlex.JPMikkers.DHCP
         }
     }
 
-    public class DHCPOptionClientIdentifier : IDHCPOption
+    public class DHCPOptionClientIdentifier : DHCPOptionBase
     {
         private DHCPMessage.THardwareType m_HardwareType;
         private byte[] m_Data;
@@ -1077,15 +1003,7 @@ namespace CodePlex.JPMikkers.DHCP
 
         #region IDHCPOption Members
 
-        public TDHCPOption OptionType
-        {
-            get
-            {
-                return TDHCPOption.ClientIdentifier;
-            }
-        }
-
-        public IDHCPOption FromStream(Stream s)
+        public override IDHCPOption FromStream(Stream s)
         {
             DHCPOptionClientIdentifier result = new DHCPOptionClientIdentifier();
             m_HardwareType = (DHCPMessage.THardwareType)ParseHelper.ReadUInt8(s);
@@ -1094,7 +1012,7 @@ namespace CodePlex.JPMikkers.DHCP
             return result;
         }
 
-        public void ToStream(Stream s)
+        public override void ToStream(Stream s)
         {
             ParseHelper.WriteUInt8(s, (byte)m_HardwareType);
             s.Write(m_Data, 0, m_Data.Length);
@@ -1103,12 +1021,14 @@ namespace CodePlex.JPMikkers.DHCP
         #endregion
 
         public DHCPOptionClientIdentifier()
+            : base(TDHCPOption.ClientIdentifier)
         {
             m_HardwareType = DHCPMessage.THardwareType.Unknown;
             m_Data = new byte[0];
         }
 
         public DHCPOptionClientIdentifier(DHCPMessage.THardwareType hardwareType,byte[] data)
+            : base(TDHCPOption.ClientIdentifier)
         {
             m_HardwareType = hardwareType;
             m_Data = data;
@@ -1120,7 +1040,7 @@ namespace CodePlex.JPMikkers.DHCP
         }
     }
 
-    public class DHCPOptionVendorSpecificInformation : IDHCPOption
+    public class DHCPOptionVendorSpecificInformation : DHCPOptionBase
     {
         private byte[] m_Data;
 
@@ -1132,15 +1052,7 @@ namespace CodePlex.JPMikkers.DHCP
 
         #region IDHCPOption Members
 
-        public TDHCPOption OptionType
-        {
-            get
-            {
-                return TDHCPOption.VendorSpecificInformation;
-            }
-        }
-
-        public IDHCPOption FromStream(Stream s)
+        public override IDHCPOption FromStream(Stream s)
         {
             DHCPOptionVendorSpecificInformation result = new DHCPOptionVendorSpecificInformation();
             result.m_Data = new byte[s.Length];
@@ -1148,7 +1060,7 @@ namespace CodePlex.JPMikkers.DHCP
             return result;
         }
 
-        public void ToStream(Stream s)
+        public override void ToStream(Stream s)
         {
             s.Write(m_Data, 0, m_Data.Length);
         }
@@ -1156,19 +1068,22 @@ namespace CodePlex.JPMikkers.DHCP
         #endregion
 
         public DHCPOptionVendorSpecificInformation()
+            : base(TDHCPOption.VendorSpecificInformation)
         {
             m_Data = new byte[0];
         }
 
         public DHCPOptionVendorSpecificInformation(byte[] data)
+            : base(TDHCPOption.VendorSpecificInformation)
         {
             m_Data = data;
         }
 
         public DHCPOptionVendorSpecificInformation(string data)
+            : base(TDHCPOption.VendorSpecificInformation)
         {
             MemoryStream ms = new MemoryStream();
-            ParseHelper.WriteString(ms, data);
+            ParseHelper.WriteString(ms, ZeroTerminatedStrings, data);
             ms.Flush();
             m_Data = ms.ToArray();
         }
@@ -1179,39 +1094,28 @@ namespace CodePlex.JPMikkers.DHCP
         }
     }
 
-    public class DHCPOptionFixedLength : IDHCPOption
+    public class DHCPOptionFixedLength : DHCPOptionBase
     {
-        private TDHCPOption m_Option;
-
         #region IDHCPOption Members
 
-        public TDHCPOption OptionType
-        {
-            get
-            {
-                return m_Option;
-            }
-        }
-
-        public IDHCPOption FromStream(Stream s)
+        public override IDHCPOption FromStream(Stream s)
         {
             return this;
         }
 
-        public void ToStream(Stream s)
+        public override void ToStream(Stream s)
         {
         }
 
         #endregion
 
-        public DHCPOptionFixedLength(TDHCPOption option)
+        public DHCPOptionFixedLength(TDHCPOption option) : base(option)
         {
-            m_Option = option;
         }
 
         public override string ToString()
         {
-            return string.Format("Option(name=[{0}],value=[])", m_Option);
+            return string.Format("Option(name=[{0}],value=[])", m_OptionType);
         }
     }
 }
