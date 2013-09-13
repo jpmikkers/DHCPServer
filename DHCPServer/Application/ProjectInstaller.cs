@@ -43,13 +43,13 @@ namespace DHCPServerApp
                 System.Diagnostics.Trace.WriteLine(String.Format("Exception: {0}", ex));
             }
 
-            Context.Parameters["assemblypath"] += "\" \"/service";
+            Context.Parameters["assemblypath"] = string.Format("\"{0}\" {1}", Context.Parameters["assemblypath"], "/service");
             base.OnBeforeInstall(savedState);
         }
 
         protected override void OnBeforeUninstall(IDictionary savedState)
         {
-            Context.Parameters["assemblypath"] += "\" \"/service";
+            Context.Parameters["assemblypath"] = string.Format("\"{0}\" {1}", Context.Parameters["assemblypath"], "/service");
             base.OnBeforeUninstall(savedState);
         }
 

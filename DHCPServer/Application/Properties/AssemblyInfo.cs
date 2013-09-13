@@ -7,7 +7,7 @@ using System.Runtime.InteropServices;
 // associated with an assembly.
 [assembly: AssemblyTitle("DHCPServer")]
 [assembly: AssemblyDescription(
-    "Copyright (c) 2010 Jean-Paul Mikkers"+
+    "Copyright (c) 2010-2013 Jean-Paul Mikkers"+
     "\r\n" +
     "\r\n" +
     "Permission is hereby granted, free of charge, to any person obtaining a copy of this software"+
@@ -29,7 +29,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("JPMikkers")]
 [assembly: AssemblyProduct("DHCPServer")]
-[assembly: AssemblyCopyright("Copyright © Jean-Paul Mikkers 2010")]
+[assembly: AssemblyCopyright("Copyright © Jean-Paul Mikkers 2010-2013")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -51,5 +51,5 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("1.0.0.0")]
-[assembly: AssemblyFileVersion("1.0.0.0")]
+[assembly: AssemblyVersion("1.2.0.0")]
+[assembly: AssemblyFileVersion("1.2.0.0")]

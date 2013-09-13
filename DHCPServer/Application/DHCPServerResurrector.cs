@@ -54,7 +54,14 @@ namespace DHCPServerApp
 
         ~DHCPServerResurrector()
         {
-            Dispose(false);
+            try
+            {
+                Dispose(false);
+            }
+            catch
+            {
+                // never let any exception escape the finalizer, or else your process will be killed.
+            }
         }
 
         private void Resurrect(object state)

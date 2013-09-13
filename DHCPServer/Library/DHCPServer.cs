@@ -297,12 +297,22 @@ namespace CodePlex.JPMikkers.DHCP
 
         ~DHCPServer()
         {
-            Dispose(false);
+            try
+            {
+                Dispose(false);
+            }
+            catch
+            {
+                // never let any exception escape the finalizer, or else your process will be killed.
+            }
         }
 
         protected void Dispose(bool disposing)
         {
-            Stop();
+            if (disposing)
+            {
+                Stop();
+            }
         }
 
         #endregion
@@ -398,14 +408,13 @@ namespace CodePlex.JPMikkers.DHCP
             }
         }
 
-        private void SendMessage(DHCPMessage msg, bool direct)
+        private void SendMessage(DHCPMessage msg, IPEndPoint endPoint)
         {
-            IPEndPoint endPoint = direct ? new IPEndPoint(msg.ClientIPAddress, 68) : new IPEndPoint(IPAddress.Broadcast, 68);
-            Trace(string.Format("==== Sending response to {0} ====",endPoint));
-            Trace(Utils.PrefixLines(msg.ToString(),"s->c "));
+            Trace(string.Format("==== Sending response to {0} ====", endPoint));
+            Trace(Utils.PrefixLines(msg.ToString(), "s->c "));
             MemoryStream m = new MemoryStream();
             msg.ToStream(m, m_MinimumPacketSize);
-            m_Socket.Send(endPoint, new ArraySegment<byte>(m.ToArray()));                                
+            m_Socket.Send(endPoint, new ArraySegment<byte>(m.ToArray()));
         }
 
         private void AppendConfiguredOptions(DHCPMessage sourceMsg,DHCPMessage targetMsg)
@@ -473,7 +482,7 @@ namespace CodePlex.JPMikkers.DHCP
             response.Options.Add(new DHCPOptionServerIdentifier(((IPEndPoint)m_Socket.LocalEndPoint).Address));
             if (sourceMsg.IsRequestedParameter(TDHCPOption.SubnetMask)) response.Options.Add(new DHCPOptionSubnetMask(this.m_SubnetMask));
             AppendConfiguredOptions(sourceMsg, response);
-            SendMessage(response,false);
+            SendOfferOrAck(sourceMsg, response);
         }
 
         private void SendNAK(DHCPMessage sourceMsg)
@@ -510,7 +519,20 @@ namespace CodePlex.JPMikkers.DHCP
             response.MessageType = TDHCPMessageType.NAK;
             response.Options.Add(new DHCPOptionServerIdentifier(((IPEndPoint)m_Socket.LocalEndPoint).Address));
             if (sourceMsg.IsRequestedParameter(TDHCPOption.SubnetMask)) response.Options.Add(new DHCPOptionSubnetMask(this.m_SubnetMask));
-            SendMessage(response,false);
+
+            if (!sourceMsg.RelayAgentIPAddress.Equals(IPAddress.Any))
+            {
+                // If the 'giaddr' field in a DHCP message from a client is non-zero,
+                // the server sends any return messages to the 'DHCP server' port on the
+                // BOOTP relay agent whose address appears in 'giaddr'.
+                SendMessage(response, new IPEndPoint(sourceMsg.RelayAgentIPAddress, 67));
+            }
+            else
+            {
+                // In all cases, when 'giaddr' is zero, the server broadcasts any DHCPNAK
+                // messages to 0xffffffff.
+                SendMessage(response, new IPEndPoint(IPAddress.Broadcast,68));
+            }
         }
 
         private void SendACK(DHCPMessage sourceMsg, IPAddress assignedAddress, TimeSpan leaseTime)
@@ -564,61 +586,7 @@ namespace CodePlex.JPMikkers.DHCP
             response.Options.Add(new DHCPOptionServerIdentifier(((IPEndPoint)m_Socket.LocalEndPoint).Address));
             if (sourceMsg.IsRequestedParameter(TDHCPOption.SubnetMask)) response.Options.Add(new DHCPOptionSubnetMask(this.m_SubnetMask));
             AppendConfiguredOptions(sourceMsg, response);
-            SendMessage(response, false);
-        }
-
-        private void SendRENEWACK(DHCPMessage sourceMsg, IPAddress assignedAddress, TimeSpan leaseTime)
-        {
-            //Field      DHCPACK             
-            //-----      -------             
-            //'op'       BOOTREPLY           
-            //'htype'    (From "Assigned Numbers" RFC)
-            //'hlen'     (Hardware address length in octets)
-            //'hops'     0                   
-            //'xid'      'xid' from client DHCPREQUEST message             
-            //'secs'     0                   
-            //'ciaddr'   'ciaddr' from DHCPREQUEST or 0
-            //'yiaddr'   IP address assigned to client
-            //'siaddr'   IP address of next bootstrap server
-            //'flags'    'flags' from client DHCPREQUEST message             
-            //'giaddr'   'giaddr' from client DHCPREQUEST message             
-            //'chaddr'   'chaddr' from client DHCPREQUEST message             
-            //'sname'    Server host name or options
-            //'file'     Client boot file name or options
-            //'options'  options
-            DHCPMessage response = new DHCPMessage();
-            response.Opcode = DHCPMessage.TOpcode.BootReply;
-            response.HardwareType = sourceMsg.HardwareType;
-            response.Hops = 0;
-            response.XID = sourceMsg.XID;
-            response.Secs = 0;
-            response.ClientIPAddress = sourceMsg.ClientIPAddress;
-            response.YourIPAddress = assignedAddress;
-            response.NextServerIPAddress = IPAddress.Any;
-            response.BroadCast = sourceMsg.BroadCast;
-            response.RelayAgentIPAddress = sourceMsg.RelayAgentIPAddress;
-            response.ClientHardwareAddress = sourceMsg.ClientHardwareAddress;
-            response.MessageType = TDHCPMessageType.ACK;
-
-            //Option                    DHCPACK            
-            //------                    -------            
-            //Requested IP address      MUST NOT           : ok
-            //IP address lease time     MUST (DHCPREQUEST) : ok
-            //Use 'file'/'sname' fields MAY                
-            //DHCP message type         DHCPACK            : ok
-            //Parameter request list    MUST NOT           : ok
-            //Message                   SHOULD             
-            //Client identifier         MUST NOT           : ok
-            //Vendor class identifier   MAY                
-            //Server identifier         MUST               : ok
-            //Maximum message size      MUST NOT           : ok  
-            //All others                MAY                
-
-            response.Options.Add(new DHCPOptionIPAddressLeaseTime(leaseTime));
-            response.Options.Add(new DHCPOptionServerIdentifier(((IPEndPoint)m_Socket.LocalEndPoint).Address));
-            if (sourceMsg.IsRequestedParameter(TDHCPOption.SubnetMask)) response.Options.Add(new DHCPOptionSubnetMask(this.m_SubnetMask));
-            AppendConfiguredOptions(sourceMsg, response);
-            SendMessage(response, true);
+            SendOfferOrAck(sourceMsg, response);
         }
 
         private void SendINFORMACK(DHCPMessage sourceMsg)
@@ -677,7 +645,42 @@ namespace CodePlex.JPMikkers.DHCP
             response.Options.Add(new DHCPOptionServerIdentifier(((IPEndPoint)m_Socket.LocalEndPoint).Address));
             if (sourceMsg.IsRequestedParameter(TDHCPOption.SubnetMask)) response.Options.Add(new DHCPOptionSubnetMask(this.m_SubnetMask));
             AppendConfiguredOptions(sourceMsg, response);
-            SendMessage(response, true);
+            SendMessage(response, new IPEndPoint(sourceMsg.ClientIPAddress, 68));
+        }
+
+        private void SendOfferOrAck(DHCPMessage request, DHCPMessage response)
+        {
+            // RFC2131.txt, 4.1, paragraph 4
+
+            // DHCP messages broadcast by a client prior to that client obtaining
+            // its IP address must have the source address field in the IP header
+            // set to 0.
+
+            if (!request.RelayAgentIPAddress.Equals(IPAddress.Any))
+            {
+                // If the 'giaddr' field in a DHCP message from a client is non-zero,
+                // the server sends any return messages to the 'DHCP server' port on the
+                // BOOTP relay agent whose address appears in 'giaddr'.
+                SendMessage(response, new IPEndPoint(request.RelayAgentIPAddress, 67));
+            }
+            else
+            {
+                if (!request.ClientIPAddress.Equals(IPAddress.Any))
+                {
+                    // If the 'giaddr' field is zero and the 'ciaddr' field is nonzero, then the server
+                    // unicasts DHCPOFFER and DHCPACK messages to the address in 'ciaddr'.
+                    SendMessage(response, new IPEndPoint(request.ClientIPAddress, 68));
+                }
+                else
+                {
+                    // If 'giaddr' is zero and 'ciaddr' is zero, and the broadcast bit is
+                    // set, then the server broadcasts DHCPOFFER and DHCPACK messages to
+                    // 0xffffffff. If the broadcast bit is not set and 'giaddr' is zero and
+                    // 'ciaddr' is zero, then the server unicasts DHCPOFFER and DHCPACK
+                    // messages to the client's hardware address and 'yiaddr' address.  
+                    SendMessage(response, new IPEndPoint(IPAddress.Broadcast, 68));
+                }
+            }
         }
 
         private bool ServerIdentifierPrecondition(DHCPMessage msg)
@@ -941,10 +944,16 @@ namespace CodePlex.JPMikkers.DHCP
                                 else
                                 {
                                     // no server identifier: the message is a request to verify or extend an existing lease
-                                    Trace("Received REQUEST without server identifier, client is RENEWING or REBINDING");
+                                    // Received REQUEST without server identifier, client is INIT-REBOOT, RENEWING or REBINDING
 
-                                    if(!dhcpMessage.ClientIPAddress.Equals(IPAddress.Any))
+                                    Trace("Received REQUEST without server identifier, client state is INIT-REBOOT, RENEWING or REBINDING");
+
+                                    if (!dhcpMessage.ClientIPAddress.Equals(IPAddress.Any))
                                     {
+                                        Trace("REQUEST client IP is filled in -> client state is RENEWING or REBINDING");
+
+                                        // see : http://www.tcpipguide.com/free/t_DHCPLeaseRenewalandRebindingProcesses-2.htm
+
                                         if (knownClient!=null && 
                                             knownClient.State == DHCPClient.TState.Assigned && 
                                             knownClient.IPAddress.Equals(dhcpMessage.ClientIPAddress))
@@ -952,7 +961,7 @@ namespace CodePlex.JPMikkers.DHCP
                                             // known, assigned, and IP address matches administration. ACK
                                             knownClient.LeaseStartTime = DateTime.Now;
                                             knownClient.LeaseDuration = m_LeaseTime;
-                                            SendRENEWACK(dhcpMessage, dhcpMessage.ClientIPAddress, knownClient.LeaseDuration);
+                                            SendACK(dhcpMessage, dhcpMessage.ClientIPAddress, knownClient.LeaseDuration);
                                         }
                                         else
                                         {
@@ -968,7 +977,7 @@ namespace CodePlex.JPMikkers.DHCP
                                                 client.LeaseStartTime = DateTime.Now;
                                                 client.LeaseDuration = m_LeaseTime;
                                                 m_Clients.Add(client, client);
-                                                SendRENEWACK(dhcpMessage, dhcpMessage.ClientIPAddress, knownClient.LeaseDuration);
+                                                SendACK(dhcpMessage, dhcpMessage.ClientIPAddress, knownClient.LeaseDuration);
                                             }
                                             else
                                             {
@@ -978,7 +987,39 @@ namespace CodePlex.JPMikkers.DHCP
                                     }
                                     else
                                     {
-                                        Trace("Received REQUEST without server identifier, but clientIPAddress was empty. Oops..");
+                                        Trace("REQUEST client IP is empty -> client state is INIT-REBOOT");
+
+                                        if (dhcpOptionRequestedIPAddress != null)
+                                        {
+                                            if (knownClient != null &&
+                                                knownClient.State == DHCPClient.TState.Assigned)
+                                            {
+                                                if (knownClient.IPAddress.Equals(dhcpOptionRequestedIPAddress.IPAddress))
+                                                {
+                                                    Trace("Client request matches cached address -> ACK");
+                                                    // known, assigned, and IP address matches administration. ACK
+                                                    knownClient.LeaseStartTime = DateTime.Now;
+                                                    knownClient.LeaseDuration = m_LeaseTime;
+                                                    SendACK(dhcpMessage, dhcpOptionRequestedIPAddress.IPAddress, knownClient.LeaseDuration);
+                                                }
+                                                else
+                                                {
+                                                    Trace(string.Format("Client sent request for IP address '{0}', but it does not match cached address '{1}' -> NAK", dhcpOptionRequestedIPAddress.IPAddress, knownClient.IPAddress));
+                                                    SendNAK(dhcpMessage);
+                                                    RemoveClient(knownClient);
+                                                }
+                                            }
+                                            else
+                                            {
+                                                // client not known, or known but in some other state. Just dump the old one.
+                                                if (knownClient != null) RemoveClient(knownClient);
+                                                Trace("Client attempted INIT-REBOOT REQUEST but server has no administration for this client -> silently ignoring this client");
+                                            }
+                                        }
+                                        else
+                                        {
+                                            Trace("Client sent apparent INIT-REBOOT REQUEST but with an empty 'RequestedIPAddress' option. Oops..");
+                                        }
                                     }
                                 }
                             }

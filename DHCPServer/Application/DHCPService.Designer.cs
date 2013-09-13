@@ -29,9 +29,9 @@ namespace DHCPServerApp
         private void InitializeComponent()
         {
             // 
-            // TFTPService
+            // DHCPService
             // 
-            this.ServiceName = "TFTPServer";
+            this.ServiceName = "DHCPServer";
 
         }
 

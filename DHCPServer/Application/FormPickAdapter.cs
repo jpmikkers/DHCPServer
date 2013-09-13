@@ -70,7 +70,7 @@ namespace DHCPServerApp
                 {
                     NetworkInterface adapter = (NetworkInterface)comboBoxAdapter.SelectedItem;
 
-                    foreach (UnicastIPAddressInformation uni in adapter.GetIPProperties().UnicastAddresses)
+                    foreach (var uni in adapter.GetIPProperties().UnicastAddresses)
                     {
                         if (uni.Address.AddressFamily == AddressFamily.InterNetwork)
                         {
@@ -78,7 +78,7 @@ namespace DHCPServerApp
                         }
                     }
 
-                    foreach (UnicastIPAddressInformation uni in adapter.GetIPProperties().UnicastAddresses)
+                    foreach (var uni in adapter.GetIPProperties().UnicastAddresses)
                     {
                         if (uni.Address.AddressFamily == AddressFamily.InterNetworkV6)
                         {

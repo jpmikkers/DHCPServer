@@ -71,14 +71,15 @@ namespace DHCPServerApp
             textBoxLeaseTime.DataBindings.Clear();
             textBoxOfferTime.DataBindings.Clear();
             textBoxMinimumPacketSize.DataBindings.Clear();
-            textBoxName.DataBindings.Add("Text", m_Configuration, "Name");
-            textBoxAddress.DataBindings.Add("Text", m_Configuration, "Address");
-            textBoxNetMask.DataBindings.Add("Text", m_Configuration, "NetMask");
-            textBoxPoolStart.DataBindings.Add("Text", m_Configuration, "PoolStart");
-            textBoxPoolEnd.DataBindings.Add("Text", m_Configuration, "PoolEnd");
-            textBoxLeaseTime.DataBindings.Add("Text", m_Configuration, "LeaseTime");
-            textBoxOfferTime.DataBindings.Add("Text", m_Configuration, "OfferTime");
-            textBoxMinimumPacketSize.DataBindings.Add("Text", m_Configuration, "MinimumPacketSize");
+            var bs = new BindingSource(m_Configuration, null);
+            textBoxName.DataBindings.Add("Text", bs, "Name");
+            textBoxAddress.DataBindings.Add("Text", bs, "Address");
+            textBoxNetMask.DataBindings.Add("Text", bs, "NetMask");
+            textBoxPoolStart.DataBindings.Add("Text", bs, "PoolStart");
+            textBoxPoolEnd.DataBindings.Add("Text", bs, "PoolEnd");
+            textBoxLeaseTime.DataBindings.Add("Text", bs, "LeaseTime");
+            textBoxOfferTime.DataBindings.Add("Text", bs, "OfferTime");
+            textBoxMinimumPacketSize.DataBindings.Add("Text", bs, "MinimumPacketSize");
         }
 
         private void buttonPickAddress_Click(object sender, EventArgs e)

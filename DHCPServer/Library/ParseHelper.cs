@@ -137,9 +137,15 @@ namespace CodePlex.JPMikkers.DHCP
 
         public static void WriteString(Stream s, string msg)
         {
+            WriteString(s, false, msg);
+        }
+
+        public static void WriteString(Stream s, bool zeroTerminated, string msg)
+        {
             TextWriter tw = new StreamWriter(s, Encoding.ASCII);
             tw.Write(msg);
             tw.Flush();
+            if(zeroTerminated) s.WriteByte(0);
         }
     }
 }

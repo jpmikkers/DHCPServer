@@ -24,6 +24,7 @@ THE SOFTWARE.
 using System;
 using System.Net;
 using System.Collections.Generic;
+using System.Runtime.Serialization;
 using System.Xml.Serialization;
 using System.IO;
 using System.ComponentModel;
@@ -41,6 +42,9 @@ namespace DHCPServerApp
     {
         public OptionMode Mode;
 
+        [OptionalField]
+        public bool ZeroTerminatedStrings;
+
         public OptionConfiguration()
         {
             Mode = OptionMode.Default;
@@ -54,6 +58,12 @@ namespace DHCPServerApp
         }
 
         public abstract IDHCPOption ConstructDHCPOption();
+
+        protected IDHCPOption FixZString(IDHCPOption i)
+        {
+            i.ZeroTerminatedStrings = ZeroTerminatedStrings;
+            return i;
+        }
     }
 
     [Serializable()]
@@ -69,13 +79,15 @@ namespace DHCPServerApp
         public override OptionConfiguration Clone()
         {
             OptionConfigurationTFTPServerName result = new OptionConfigurationTFTPServerName();
+            result.Mode = this.Mode;
+            result.ZeroTerminatedStrings = this.ZeroTerminatedStrings;
             result.Name = this.Name;
             return result;
         }
 
         public override IDHCPOption ConstructDHCPOption()
         {
-            return new DHCPOptionTFTPServerName(Name);
+            return FixZString(new DHCPOptionTFTPServerName(Name));
         }
     }
 
@@ -92,13 +104,15 @@ namespace DHCPServerApp
         public override OptionConfiguration Clone()
         {
             OptionConfigurationBootFileName result = new OptionConfigurationBootFileName();
+            result.Mode = this.Mode;
+            result.ZeroTerminatedStrings = this.ZeroTerminatedStrings;
             result.Name = this.Name;
             return result;
         }
 
         public override IDHCPOption ConstructDHCPOption()
         {
-            return new DHCPOptionBootFileName(Name);
+            return FixZString(new DHCPOptionBootFileName(Name));
         }
     }
 
@@ -115,13 +129,15 @@ namespace DHCPServerApp
         public override OptionConfiguration Clone()
         {
             OptionConfigurationVendorSpecificInformation result = new OptionConfigurationVendorSpecificInformation();
+            result.Mode = this.Mode;
+            result.ZeroTerminatedStrings = this.ZeroTerminatedStrings;
             result.Information = this.Information;
             return result;
         }
 
         public override IDHCPOption ConstructDHCPOption()
         {
-            return new DHCPOptionVendorSpecificInformation(Information);
+            return FixZString(new DHCPOptionVendorSpecificInformation(Information));
         }
     }
 
@@ -140,6 +156,8 @@ namespace DHCPServerApp
         public override OptionConfiguration Clone()
         {
             OptionConfigurationVendorClassIdentifier result = new OptionConfigurationVendorClassIdentifier();
+            result.Mode = this.Mode;
+            result.ZeroTerminatedStrings = this.ZeroTerminatedStrings;
             result.DataAsString = this.DataAsString;
             result.DataAsHex = this.DataAsHex;
             return result;
@@ -161,7 +179,7 @@ namespace DHCPServerApp
                 data = m.ToArray();
             }
 
-            return new DHCPOptionVendorClassIdentifier(data);
+            return FixZString(new DHCPOptionVendorClassIdentifier(data));
         }
     }
 
@@ -178,6 +196,8 @@ namespace DHCPServerApp
         public override OptionConfiguration Clone()
         {
             OptionConfigurationGeneric result = new OptionConfigurationGeneric();
+            result.Mode = this.Mode;
+            result.ZeroTerminatedStrings = this.ZeroTerminatedStrings;
             result.Option = Option;
             result.Data = Data;
             return result;

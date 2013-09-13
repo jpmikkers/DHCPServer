@@ -145,8 +145,7 @@ namespace DHCPServerApp
                 UpdateServiceStatus();
                 if(m_HasAdministrativeRight && m_Service.Status == ServiceControllerStatus.Running)
                 {
-                    if (MessageBox.Show("The TFTP Service has to be restarted to enable the new settings.\r\n" +
-                        "This will cause any transfers in progress to be aborted.\r\n" +
+                    if (MessageBox.Show("The DHCP Service has to be restarted to enable the new settings.\r\n" +
                         "Are you sure you want to continue?", "Warning", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.Yes)
                     {
                         m_Service.Stop();
