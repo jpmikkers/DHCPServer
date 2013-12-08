@@ -31,6 +31,7 @@ using System.Net.Sockets;
 using System.Net.NetworkInformation;
 using System.Net.Configuration;
 using System.Threading;
+using System.Linq;
 
 namespace CodePlex.JPMikkers.DHCP
 {
@@ -53,6 +54,7 @@ namespace CodePlex.JPMikkers.DHCP
         private TimeSpan m_LeaseTime = TimeSpan.FromDays(1);
         private bool m_Active = false;
         private List<OptionItem> m_Options = new List<OptionItem>();
+        private List<ReservationItem> m_Reservations = new List<ReservationItem>();
         private int m_MinimumPacketSize = 576;
         private AutoPumpQueue<int> m_UpdateClientInfoQueue;
         private Random m_Random = new Random();
@@ -192,6 +194,18 @@ namespace CodePlex.JPMikkers.DHCP
             set
             {
                 m_Options = value;
+            }
+        }
+
+        public List<ReservationItem> Reservations
+        {
+            get
+            {
+                return m_Reservations;
+            }
+            set
+            {
+                m_Reservations = value;
             }
         }
 
@@ -744,6 +758,22 @@ namespace CodePlex.JPMikkers.DHCP
         private IPAddress AllocateIPAddress(DHCPMessage dhcpMessage)
         {
             DHCPOptionRequestedIPAddress dhcpOptionRequestedIPAddress = (DHCPOptionRequestedIPAddress)dhcpMessage.GetOption(TDHCPOption.RequestedIPAddress);
+
+            var reservation = m_Reservations.FirstOrDefault(x => x.Match(dhcpMessage));
+
+            if (reservation != null)
+            {
+                // the client matches a reservation.. find the first free address in the reservation block
+                for (UInt32 host = Utils.IPAddressToUInt32(SanitizeHostRange(reservation.PoolStart)); host <= Utils.IPAddressToUInt32(SanitizeHostRange(reservation.PoolEnd)); host++)
+                {
+                    IPAddress testIPAddress = Utils.UInt32ToIPAddress(host);
+                    // I don't see the point of avoiding released addresses for reservations (yet)
+                    if (IPAddressIsFree(testIPAddress, true))
+                    {
+                        return testIPAddress;
+                    }
+                }
+            }
 
             if(dhcpOptionRequestedIPAddress!=null)
             {

@@ -86,8 +86,15 @@ namespace DHCPServerApp
                         {
                             options.Add(optionConfiguration.ConstructOptionItem());
                         }
-
                         m_Server.Options = options;
+
+                        List<ReservationItem> reservations = new List<ReservationItem>();
+                        foreach (ReservationConfiguration reservationConfiguration in m_Config.Reservations)
+                        {
+                            reservations.Add(reservationConfiguration.ConstructReservationItem());
+                        }
+                        m_Server.Reservations = reservations;
+                        
                         m_Server.OnStatusChange += server_OnStatusChange;
                         m_Server.OnTrace += server_OnTrace;
                         m_Server.Start();

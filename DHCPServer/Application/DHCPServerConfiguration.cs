@@ -33,6 +33,70 @@ using CodePlex.JPMikkers.DHCP;
 namespace DHCPServerApp
 {
     [Serializable()]
+    public class ReservationConfiguration
+    {
+        private IPAddress m_PoolStart;
+        private IPAddress m_PoolEnd;
+
+        public string MacTaste
+        {
+            get;
+            set;
+        }
+
+        public string HostName
+        {
+            get;
+            set;
+        }
+
+        public string PoolStart
+        {
+            get
+            {
+                return m_PoolStart.ToString();
+            }
+            set
+            {
+                m_PoolStart = IPAddress.Parse(value);
+            }
+        }
+
+        public string PoolEnd
+        {
+            get
+            {
+                return m_PoolEnd.ToString();
+            }
+            set
+            {
+                m_PoolEnd = IPAddress.Parse(value);
+            }
+        }
+
+        public ReservationConfiguration Clone()
+        {
+            ReservationConfiguration result = new ReservationConfiguration();
+            result.MacTaste = this.MacTaste;
+            result.HostName = this.HostName;
+            result.m_PoolStart = this.m_PoolStart;
+            result.m_PoolEnd = this.m_PoolEnd;
+            return result;
+        }
+
+        public ReservationItem ConstructReservationItem()
+        {
+            return new ReservationItem()
+            { 
+                HostName = this.HostName, 
+                MacTaste = this.MacTaste, 
+                PoolStart = m_PoolStart, 
+                PoolEnd = m_PoolEnd
+            };
+        }
+    }
+
+    [Serializable()]
     [XmlInclude(typeof(OptionConfigurationTFTPServerName))]
     [XmlInclude(typeof(OptionConfigurationBootFileName))]
     [XmlInclude(typeof(OptionConfigurationVendorSpecificInformation))]
@@ -221,6 +285,7 @@ namespace DHCPServerApp
         private int m_OfferTime;
         private int m_MinimumPacketSize;
         private List<OptionConfiguration> m_Options;
+        private List<ReservationConfiguration> m_Reservations;
 
         public string Name
         {
@@ -323,7 +388,19 @@ namespace DHCPServerApp
                 m_Options = value;
             }
         }
-        
+
+        public List<ReservationConfiguration> Reservations
+        {
+            get
+            {
+                return m_Reservations;
+            }
+            set
+            {
+                m_Reservations = value;
+            }
+        }
+
         public DHCPServerConfiguration()
         {
             Name = "DHCP";
@@ -335,6 +412,7 @@ namespace DHCPServerApp
             OfferTime = 30;
             MinimumPacketSize = 576;
             Options = new List<OptionConfiguration>();
+            Reservations = new List<ReservationConfiguration>();
         }
 
         public DHCPServerConfiguration Clone()
@@ -353,6 +431,12 @@ namespace DHCPServerApp
             foreach(OptionConfiguration o in Options)
             {
                 result.m_Options.Add(o.Clone());
+            }
+
+            result.m_Reservations = new List<ReservationConfiguration>();
+            foreach (ReservationConfiguration r in Reservations)
+            {
+                result.m_Reservations.Add(r.Clone());
             }
 
             return result;
