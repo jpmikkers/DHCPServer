@@ -8,6 +8,21 @@ EndProject
 Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "Setup", "Setup\Setup.vdproj", "{A3347593-5957-493F-B609-4A4F723BFE10}"
 EndProject
 Global
+	GlobalSection(TeamFoundationVersionControl) = preSolution
+		SccNumberOfProjects = 4
+		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
+		SccTeamFoundationServer = https://tfs.codeplex.com/tfs/tfs02
+		SccLocalPath0 = .
+		SccProjectUniqueName1 = Library\\Library.csproj
+		SccProjectName1 = Library
+		SccLocalPath1 = Library
+		SccProjectUniqueName2 = Application\\Application.csproj
+		SccProjectName2 = Application
+		SccLocalPath2 = Application
+		SccProjectUniqueName3 = Setup\\Setup.vdproj
+		SccProjectName3 = Setup
+		SccLocalPath3 = Setup
+	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
