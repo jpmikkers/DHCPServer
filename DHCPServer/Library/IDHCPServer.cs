@@ -103,6 +103,7 @@ namespace CodePlex.JPMikkers.DHCP
         public string HostName { get; set; }
         public IPAddress PoolStart { get; set; }
         public IPAddress PoolEnd { get; set; }
+        public bool Preempt { get; set; }
 
         private static bool MacMatch(byte[] mac, byte[] prefix, int bits)
         {
