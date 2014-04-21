@@ -37,6 +37,7 @@ namespace DHCPServerApp
     {
         private IPAddress m_PoolStart;
         private IPAddress m_PoolEnd;
+        private bool m_Preempt;
 
         public string MacTaste
         {
@@ -74,6 +75,19 @@ namespace DHCPServerApp
             }
         }
 
+        [DefaultValue(false)]
+        public bool Preemt
+        {
+            get
+            {
+                return m_Preempt;
+            }
+            set
+            {
+                m_Preempt = value;
+            }
+        }
+
         public ReservationConfiguration Clone()
         {
             ReservationConfiguration result = new ReservationConfiguration();
@@ -81,6 +95,7 @@ namespace DHCPServerApp
             result.HostName = this.HostName;
             result.m_PoolStart = this.m_PoolStart;
             result.m_PoolEnd = this.m_PoolEnd;
+            result.m_Preempt = this.m_Preempt;
             return result;
         }
 
@@ -91,7 +106,8 @@ namespace DHCPServerApp
                 HostName = this.HostName, 
                 MacTaste = this.MacTaste, 
                 PoolStart = m_PoolStart, 
-                PoolEnd = m_PoolEnd
+                PoolEnd = m_PoolEnd,
+                Preempt = m_Preempt,
             };
         }
     }

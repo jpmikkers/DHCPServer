@@ -772,6 +772,12 @@ namespace CodePlex.JPMikkers.DHCP
                     {
                         return testIPAddress;
                     }
+                    else if (reservation.Preempt)
+                    {
+                        // if Preempt is true, return the first address of the reservation range. Preempt should ONLY ever be used if the range is a single address, and you're 100% sure you'll 
+                        // _always_ have just a single device in your network that matches the reservation MAC or name.
+                        return testIPAddress;
+                    }
                 }
             }
 
