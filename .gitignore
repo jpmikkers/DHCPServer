@@ -1,0 +1,12 @@
+﻿*.rsuser
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.cache
+*.pdb
+*.exe
+**/obj/**
+*.dll
+*.class
+**/bin/**
