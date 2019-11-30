@@ -1013,7 +1013,7 @@ namespace CodePlex.JPMikkers.DHCP
                                                 client.LeaseStartTime = DateTime.Now;
                                                 client.LeaseDuration = m_LeaseTime;
                                                 m_Clients.Add(client, client);
-                                                SendACK(dhcpMessage, dhcpMessage.ClientIPAddress, knownClient.LeaseDuration);
+                                                SendACK(dhcpMessage, dhcpMessage.ClientIPAddress, client.LeaseDuration);
                                             }
                                             else
                                             {
