@@ -255,29 +255,27 @@ namespace CodePlex.JPMikkers.DHCP
             m_UpdateClientInfoQueue = new AutoPumpQueue<int>(OnUpdateClientInfo);
             m_ClientInfoPath = clientInfoPath;
             m_HostName = System.Environment.MachineName;
-
-            try
-            {
-                DHCPClientInformation clientInformation = DHCPClientInformation.Read(m_ClientInfoPath);
-
-                foreach(DHCPClient client in clientInformation.Clients)
-                {
-                    // Forget about offered clients.
-                    if (client.State != DHCPClient.TState.Offered)
-                    {
-                        m_Clients.Add(client, client);
-                    }
-                }
-            }
-            catch(Exception)
-            {                
-            }
         }
 
         public void Start()
         {
             lock (m_Sync)
             {
+                try
+                {
+                    DHCPClientInformation clientInformation = DHCPClientInformation.Read(m_ClientInfoPath);
+
+                    foreach (DHCPClient client in clientInformation.Clients
+                        .Where(c => c.State != DHCPClient.TState.Offered)   // Forget offered clients.
+                        .Where(c => IsIPAddressInPoolRange(c.IPAddress)))   // Forget clients no longer in ip range.
+                    {
+                        m_Clients.Add(client, client);
+                    }
+                }
+                catch (Exception)
+                {
+                }
+
                 if (!m_Active)
                 {
                     try
@@ -720,6 +718,22 @@ namespace CodePlex.JPMikkers.DHCP
             return result;
         }
 
+        private bool IsIPAddressInRange(IPAddress address,IPAddress start,IPAddress end)
+        {
+            var adr32 = Utils.IPAddressToUInt32(address);
+            return adr32 >= Utils.IPAddressToUInt32(SanitizeHostRange(start)) && adr32 <= Utils.IPAddressToUInt32(SanitizeHostRange(end));
+        }
+
+        /// <summary>
+        /// Checks whether the given IP address falls within the known pool ranges.
+        /// </summary>
+        /// <param name="address">IP address to check</param>
+        /// <returns>true when the ip address matches one of the known pool ranges</returns>
+        private bool IsIPAddressInPoolRange(IPAddress address)
+        {
+            return IsIPAddressInRange(address, m_PoolStart, m_PoolEnd) || m_Reservations.Any(r => IsIPAddressInRange(address, r.PoolStart, r.PoolEnd));
+        }
+
         private bool IPAddressIsInSubnet(IPAddress address)
         {
             return ((Utils.IPAddressToUInt32(address) & Utils.IPAddressToUInt32(m_SubnetMask)) == (Utils.IPAddressToUInt32(m_EndPoint.Address) & Utils.IPAddressToUInt32(m_SubnetMask)));
@@ -1047,9 +1061,12 @@ namespace CodePlex.JPMikkers.DHCP
                                             }
                                             else
                                             {
-                                                // client not known, or known but in some other state. Just dump the old one.
+                                                // client not known, or known but in some other state.
+                                                // send NAK so client will drop to INIT state where it can acquire a new lease.
+                                                // see also: http://tcpipguide.com/free/t_DHCPGeneralOperationandClientFiniteStateMachine.htm
+                                                Trace("Client attempted INIT-REBOOT REQUEST but server has no lease for this client -> NAK");
+                                                SendNAK(dhcpMessage);
                                                 if (knownClient != null) RemoveClient(knownClient);
-                                                Trace("Client attempted INIT-REBOOT REQUEST but server has no administration for this client -> silently ignoring this client");
                                             }
                                         }
                                         else
