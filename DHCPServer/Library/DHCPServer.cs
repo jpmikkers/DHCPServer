@@ -1061,9 +1061,12 @@ namespace CodePlex.JPMikkers.DHCP
                                             }
                                             else
                                             {
-                                                // client not known, or known but in some other state. Just dump the old one.
+                                                // client not known, or known but in some other state.
+                                                // send NAK so client will drop to INIT state where it can acquire a new lease.
+                                                // see also: http://tcpipguide.com/free/t_DHCPGeneralOperationandClientFiniteStateMachine.htm
+                                                Trace("Client attempted INIT-REBOOT REQUEST but server has no lease for this client -> NAK");
+                                                SendNAK(dhcpMessage);
                                                 if (knownClient != null) RemoveClient(knownClient);
-                                                Trace("Client attempted INIT-REBOOT REQUEST but server has no administration for this client -> silently ignoring this client");
                                             }
                                         }
                                         else
