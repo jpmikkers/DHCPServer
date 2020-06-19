@@ -16,29 +16,14 @@ namespace DHCPServerApp
 {
     static class Program
     {
-        public const string CustomEventLog = "DHCPServerLog";
-        public const string CustomEventSource = "DHCPServerSource";
 
         private const string Switch_Install = "/install";
         private const string Switch_Uninstall = "/uninstall";
         private const string Switch_Service = "/service";
 
-        public static string GetConfigurationPath()
-        {
-            return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "JPMikkers\\DHCP Server\\Configuration.xml");
-        }
+       
 
-        public static string GetClientInfoPath(string serverName,string serverAddress)
-        {
-            string configurationPath = GetConfigurationPath();
-            return Path.Combine(Path.GetDirectoryName(GetConfigurationPath()), string.Format("{0}_{1}.xml", serverName, serverAddress.Replace('.', '_')));
-        }
-
-        public static string GetMacTastePath()
-        {
-            string configurationPath = GetConfigurationPath();
-            return Path.Combine(Path.GetDirectoryName(GetConfigurationPath()), "mactaste.cfg");
-        }
+     
 
         public static bool HasAdministrativeRight()
         {
@@ -66,7 +51,7 @@ namespace DHCPServerApp
 
         public static bool RunElevated(string args)
         {
-            return RunElevated(Application.ExecutablePath, args);
+            return RunElevated(System.Windows.Forms.Application.ExecutablePath, args);
         }
 
         private static void Install()
@@ -130,8 +115,8 @@ namespace DHCPServerApp
             }
             else
             {
-                Application.EnableVisualStyles();
-                Application.SetCompatibleTextRenderingDefault(false);
+                System.Windows.Forms.Application.EnableVisualStyles();
+                System.Windows.Forms.Application.SetCompatibleTextRenderingDefault(false);
 
                 if (args.Length == 0)
                 {
@@ -146,7 +131,7 @@ namespace DHCPServerApp
                     }
                     else
                     {
-                        Application.Run(new FormMain(serviceController));
+                        System.Windows.Forms.Application.Run(new FormMain(serviceController));
                     }
                 }
                 else

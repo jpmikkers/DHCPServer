@@ -22,21 +22,47 @@ THE SOFTWARE.
 
 */
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
-using System.Text;
-using System.Net.Sockets;
-using System.Net.NetworkInformation;
-using System.Net.Configuration;
 using System.Threading;
 using System.Linq;
+using Library;
+using DHCPServerApp;
 
 namespace CodePlex.JPMikkers.DHCP
 {
     public class DHCPServer : IDHCPServer
     {
+        public static DHCPServer FromConfig(DHCPServerConfiguration m_Config)
+        {
+            var m_Server = new DHCPServer(Config.GetClientInfoPath(m_Config.Name, m_Config.Address));
+            m_Server.EndPoint = new IPEndPoint(IPAddress.Parse(m_Config.Address), 67);
+            m_Server.SubnetMask = IPAddress.Parse(m_Config.NetMask);
+            m_Server.PoolStart = IPAddress.Parse(m_Config.PoolStart);
+            m_Server.PoolEnd = IPAddress.Parse(m_Config.PoolEnd);
+            m_Server.LeaseTime = (m_Config.LeaseTime > 0) ? TimeSpan.FromSeconds(m_Config.LeaseTime) : Utils.InfiniteTimeSpan;
+            m_Server.OfferExpirationTime = TimeSpan.FromSeconds(Math.Max(1, m_Config.OfferTime));
+            m_Server.MinimumPacketSize = m_Config.MinimumPacketSize;
+
+            List<OptionItem> options = new List<OptionItem>();
+            foreach (OptionConfiguration optionConfiguration in m_Config.Options)
+            {
+                options.Add(optionConfiguration.ConstructOptionItem());
+            }
+            m_Server.Options = options;
+
+            List<ReservationItem> reservations = new List<ReservationItem>();
+            foreach (ReservationConfiguration reservationConfiguration in m_Config.Reservations)
+            {
+                reservations.Add(reservationConfiguration.ConstructReservationItem());
+            }
+            m_Server.Reservations = reservations;
+            return m_Server;
+        }
+
+
+
         private const int ClientInformationWriteRetries = 10;
 
         private object m_Sync = new object();

@@ -36,6 +36,7 @@ using System.Security.Principal;
 using System.IO;
 using System.Diagnostics;
 using CodePlex.JPMikkers.DHCP;
+using Library;
 
 namespace DHCPServerApp
 {
@@ -50,7 +51,7 @@ namespace DHCPServerApp
         {
             m_Service = service;
             m_HasAdministrativeRight = Program.HasAdministrativeRight();
-            m_MACTaster = new MACTaster(Program.GetMacTastePath());
+            m_MACTaster = new MACTaster(Config.GetMacTastePath());
             InitializeComponent();
             UpdateServiceStatus();
             timerServiceWatcher.Enabled = true;
@@ -139,7 +140,7 @@ namespace DHCPServerApp
 
         private void buttonConfigure_Click(object sender, EventArgs e)
         {
-            FormConfigureOverview f = new FormConfigureOverview(Program.GetConfigurationPath());
+            FormConfigureOverview f = new FormConfigureOverview(Config.GetConfigurationPath());
             if (f.ShowDialog(this) == DialogResult.OK)
             {
                 UpdateServiceStatus();
@@ -259,7 +260,7 @@ namespace DHCPServerApp
             try
             {
                 DHCPServerConfigurationList configurationList =
-                    DHCPServerConfigurationList.Read(Program.GetConfigurationPath());
+                    DHCPServerConfigurationList.Read(Config.GetConfigurationPath());
 
                 foreach (DHCPServerConfiguration configuration in configurationList)
                 {
@@ -267,7 +268,7 @@ namespace DHCPServerApp
                     {
                         DHCPClientInformation clientInformation =
                             DHCPClientInformation.Read(
-                                Program.GetClientInfoPath(configuration.Name, configuration.Address));
+                                Config.GetClientInfoPath(configuration.Name, configuration.Address));
 
                         foreach (DHCPClient client in clientInformation.Clients)
                         {

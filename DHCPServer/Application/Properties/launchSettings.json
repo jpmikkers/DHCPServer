@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "Application": {
+      "commandName": "Project",
+      "remoteDebugEnabled": true,
+      "remoteDebugMachine": "127.0.0.1:4900",
+      "authenticationMode": "Windows"
+    }
+  }
+}

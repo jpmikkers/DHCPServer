@@ -32,6 +32,7 @@ using System.Text;
 using System.Configuration;
 using System.Threading;
 using CodePlex.JPMikkers.DHCP;
+using Library;
 
 namespace DHCPServerApp
 {
@@ -44,12 +45,12 @@ namespace DHCPServerApp
         public DHCPService()
         {
             InitializeComponent();
-            m_EventLog = new EventLog(Program.CustomEventLog, ".", Program.CustomEventSource);
+            m_EventLog = new EventLog(Config.CustomEventLog, ".", Config.CustomEventSource);
         }
 
         protected override void OnStart(string[] args)
         {
-            m_Configuration = DHCPServerConfigurationList.Read(Program.GetConfigurationPath());
+            m_Configuration = DHCPServerConfigurationList.Read(Config.GetConfigurationPath());
             m_Servers = new List<DHCPServerResurrector>();
 
             foreach (DHCPServerConfiguration config in m_Configuration)
