@@ -6,8 +6,6 @@ using System.Drawing;
 using System.IO;
 using System.Reflection;
 using System.Security;
-using WebControls = System.Web.UI.WebControls;
-using HTMLControls = System.Web.UI.HtmlControls;
 using WinForms = System.Windows.Forms;
 using SQLTypes = System.Data.SqlTypes;
 
@@ -28,22 +26,6 @@ using SQLTypes = System.Data.SqlTypes;
 [assembly: DebuggerDisplay(@"\{Width = {width} Height = {height}}", Target = typeof(SizeF))]
 [assembly: DebuggerDisplay(@"\{Color = {color}}", Target = typeof(SolidBrush))]
 
-// System.Web.UI.WebControls
-[assembly: DebuggerDisplay(@"\{Text = {Text}}", Target = typeof(WebControls::Button))]
-[assembly: DebuggerDisplay(@"\{Text = {Text}}", Target = typeof(WebControls::Label))]
-[assembly: DebuggerDisplay(@"\{Text = {Text}}", Target = typeof(WebControls::HyperLink))]
-[assembly: DebuggerDisplay(@"\{Text = {Text} Checked = {Checked}}", Target = typeof(WebControls::CheckBox))]
-[assembly: DebuggerDisplay(@"\{Text = {Text} Checked = {Checked}}", Target = typeof(WebControls::RadioButton))]
-[assembly: DebuggerDisplay(@"\{SelectedDate = {SelectedData}}", Target = typeof(WebControls::Calendar))]
-[assembly: DebuggerDisplay(@"\{Text = {Text}}", Target = typeof(WebControls::LinkButton))]
-
-// System.Web.UI.HtmlControls
-[assembly: DebuggerDisplay(@"\{Value = {Value}}", Target = typeof(HTMLControls::HtmlInputButton))]
-[assembly: DebuggerDisplay(@"\{InnerText = {InnerText}}", Target = typeof(HTMLControls::HtmlGenericControl))]
-[assembly: DebuggerDisplay(@"\{Value = {Value}}", Target = typeof(HTMLControls::HtmlTextArea))]
-[assembly: DebuggerDisplay(@"\{Value = {Value}}", Target = typeof(HTMLControls::HtmlInputText))]
-[assembly: DebuggerDisplay(@"\{Value = {Value} Checked = {Checked}}", Target = typeof(HTMLControls::HtmlInputCheckBox))]
-[assembly: DebuggerDisplay(@"\{Value = {Value} Checked = {Checked}}", Target = typeof(HTMLControls::HtmlInputRadioButton))]
 
 // System.Windows.Forms
 [assembly: DebuggerDisplay(@"\{ExecutablePath = {executablePath}}", Target = typeof(WinForms::Application))]

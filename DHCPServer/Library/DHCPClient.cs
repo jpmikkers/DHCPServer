@@ -22,14 +22,7 @@ THE SOFTWARE.
 
 */
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.IO;
 using System.Net;
-using System.Text;
-using System.Net.Sockets;
-using System.Net.NetworkInformation;
-using System.Net.Configuration;
 using System.Xml.Serialization;
 
 namespace CodePlex.JPMikkers.DHCP

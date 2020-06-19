@@ -173,7 +173,8 @@ namespace CodePlex.JPMikkers.DHCP
         {
             get
             {
-                DHCPOptionMessageType messageTypeDHCPOption = (DHCPOptionMessageType)GetOption(TDHCPOption.MessageType);
+                var option = GetOption(TDHCPOption.MessageType);
+                DHCPOptionMessageType messageTypeDHCPOption = (DHCPOptionMessageType)option;
                 if (messageTypeDHCPOption != null)
                 {
                     return messageTypeDHCPOption.MessageType;

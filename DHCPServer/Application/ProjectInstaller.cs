@@ -5,7 +5,7 @@ using System.ComponentModel;
 using System.Configuration.Install;
 using System.Linq;
 using System.Diagnostics;
-
+using Library;
 
 namespace DHCPServerApp
 {
@@ -26,17 +26,7 @@ namespace DHCPServerApp
                 //EventLogPermission eventLogPermission = new EventLogPermission(EventLogPermissionAccess.Administer, ".");
                 //eventLogPermission.PermitOnly();
 
-                if (!EventLog.SourceExists(Program.CustomEventSource))
-                {
-                    EventLog.CreateEventSource(Program.CustomEventSource, Program.CustomEventLog);
-                }
-                // write something to the event log, or else the EventLog component in the UI
-                // won't fire the updating events. I know, it sucks.
-                EventLog tmp = new EventLog(Program.CustomEventLog, ".", Program.CustomEventSource);
-                tmp.WriteEntry("Installation complete");
-                tmp.MaximumKilobytes = 16000;   // value MUST be a factor of 64
-                tmp.ModifyOverflowPolicy(OverflowAction.OverwriteAsNeeded,7);
-                tmp.Close();
+                Config.InitializeEventLog();
             }
             catch (Exception ex)
             {
@@ -59,15 +49,7 @@ namespace DHCPServerApp
 
             try
             {
-                if (EventLog.SourceExists(Program.CustomEventSource))
-                {
-                    EventLog.DeleteEventSource(Program.CustomEventSource);
-                }
-
-                if(EventLog.Exists(Program.CustomEventLog))
-                {
-                    EventLog.Delete(Program.CustomEventLog);
-                }
+                Config.DeleteEventLog();
             }
             catch(Exception ex)
             {
