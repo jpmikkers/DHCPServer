@@ -88,17 +88,6 @@ namespace DHCPServerApp
             }
         }
 
-        public ReservationConfiguration Clone()
-        {
-            ReservationConfiguration result = new ReservationConfiguration();
-            result.MacTaste = this.MacTaste;
-            result.HostName = this.HostName;
-            result.m_PoolStart = this.m_PoolStart;
-            result.m_PoolEnd = this.m_PoolEnd;
-            result.m_Preempt = this.m_Preempt;
-            return result;
-        }
-
         public ReservationItem ConstructReservationItem()
         {
             return new ReservationItem()
@@ -130,8 +119,6 @@ namespace DHCPServerApp
             Mode = OptionMode.Default;
         }
 
-        public abstract OptionConfiguration Clone();
-
         public OptionItem ConstructOptionItem()
         {
             return new OptionItem(Mode,ConstructDHCPOption());
@@ -156,15 +143,6 @@ namespace DHCPServerApp
             Name = "";
         }
 
-        public override OptionConfiguration Clone()
-        {
-            OptionConfigurationTFTPServerName result = new OptionConfigurationTFTPServerName();
-            result.Mode = this.Mode;
-            result.ZeroTerminatedStrings = this.ZeroTerminatedStrings;
-            result.Name = this.Name;
-            return result;
-        }
-
         public override IDHCPOption ConstructDHCPOption()
         {
             return FixZString(new DHCPOptionTFTPServerName(Name));
@@ -179,15 +157,6 @@ namespace DHCPServerApp
         public OptionConfigurationBootFileName()
         {
             Name = "";
-        }
-
-        public override OptionConfiguration Clone()
-        {
-            OptionConfigurationBootFileName result = new OptionConfigurationBootFileName();
-            result.Mode = this.Mode;
-            result.ZeroTerminatedStrings = this.ZeroTerminatedStrings;
-            result.Name = this.Name;
-            return result;
         }
 
         public override IDHCPOption ConstructDHCPOption()
@@ -206,15 +175,6 @@ namespace DHCPServerApp
             Information = "";
         }
 
-        public override OptionConfiguration Clone()
-        {
-            OptionConfigurationVendorSpecificInformation result = new OptionConfigurationVendorSpecificInformation();
-            result.Mode = this.Mode;
-            result.ZeroTerminatedStrings = this.ZeroTerminatedStrings;
-            result.Information = this.Information;
-            return result;
-        }
-
         public override IDHCPOption ConstructDHCPOption()
         {
             return FixZString(new DHCPOptionVendorSpecificInformation(Information));
@@ -231,16 +191,6 @@ namespace DHCPServerApp
         {
             DataAsString = "";
             DataAsHex = "";
-        }
-
-        public override OptionConfiguration Clone()
-        {
-            OptionConfigurationVendorClassIdentifier result = new OptionConfigurationVendorClassIdentifier();
-            result.Mode = this.Mode;
-            result.ZeroTerminatedStrings = this.ZeroTerminatedStrings;
-            result.DataAsString = this.DataAsString;
-            result.DataAsHex = this.DataAsHex;
-            return result;
         }
 
         public override IDHCPOption ConstructDHCPOption()
@@ -271,16 +221,6 @@ namespace DHCPServerApp
 
         public OptionConfigurationGeneric()
         {
-        }
-
-        public override OptionConfiguration Clone()
-        {
-            OptionConfigurationGeneric result = new OptionConfigurationGeneric();
-            result.Mode = this.Mode;
-            result.ZeroTerminatedStrings = this.ZeroTerminatedStrings;
-            result.Option = Option;
-            result.Data = Data;
-            return result;
         }
 
         public override IDHCPOption ConstructDHCPOption()
@@ -433,29 +373,7 @@ namespace DHCPServerApp
 
         public DHCPServerConfiguration Clone()
         {
-            DHCPServerConfiguration result = new DHCPServerConfiguration();
-            result.Name = Name;
-            result.Address = Address;
-            result.NetMask = NetMask;
-            result.PoolStart = PoolStart;
-            result.PoolEnd = PoolEnd;
-            result.LeaseTime = LeaseTime;
-            result.OfferTime = OfferTime;
-            result.MinimumPacketSize = MinimumPacketSize;
-
-            result.m_Options = new List<OptionConfiguration>();
-            foreach(OptionConfiguration o in Options)
-            {
-                result.m_Options.Add(o.Clone());
-            }
-
-            result.m_Reservations = new List<ReservationConfiguration>();
-            foreach (ReservationConfiguration r in Reservations)
-            {
-                result.m_Reservations.Add(r.Clone());
-            }
-
-            return result;
+            return DeepCopier.Copy(this);
         }
     }
 
