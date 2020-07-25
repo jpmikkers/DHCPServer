@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2010 Jean-Paul Mikkers
+Copyright (c) 2020 Jean-Paul Mikkers
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -27,6 +27,7 @@ using System.Text;
 using System.Net.Sockets;
 using System.Net;
 using System.IO;
+using System.Runtime.InteropServices;
 
 namespace GitHub.JPMikkers.DHCP
 {
@@ -193,6 +194,11 @@ namespace GitHub.JPMikkers.DHCP
             }
         }
 
+        private static void RegisterOption(IDHCPOption option) 
+        { 
+            optionsTemplates[(int)option.OptionType] = option; 
+        }
+
         static DHCPMessage()
         {
             optionsTemplates = new IDHCPOption[256];
@@ -200,25 +206,29 @@ namespace GitHub.JPMikkers.DHCP
             {
                 optionsTemplates[t] = new DHCPOptionGeneric((TDHCPOption)t);
             }
-            optionsTemplates[0] = new DHCPOptionFixedLength(TDHCPOption.Pad);
-            optionsTemplates[255] = new DHCPOptionFixedLength(TDHCPOption.End);
-            optionsTemplates[(int)TDHCPOption.HostName] = new DHCPOptionHostName();
-            optionsTemplates[(int)TDHCPOption.IPAddressLeaseTime] = new DHCPOptionIPAddressLeaseTime();
-            optionsTemplates[(int)TDHCPOption.ServerIdentifier] = new DHCPOptionServerIdentifier();
-            optionsTemplates[(int)TDHCPOption.RequestedIPAddress] = new DHCPOptionRequestedIPAddress();
-            optionsTemplates[(int)TDHCPOption.OptionOverload] = new DHCPOptionOptionOverload();
-            optionsTemplates[(int)TDHCPOption.TFTPServerName] = new DHCPOptionTFTPServerName();
-            optionsTemplates[(int)TDHCPOption.BootFileName] = new DHCPOptionBootFileName();
-            optionsTemplates[(int)TDHCPOption.MessageType] = new DHCPOptionMessageType();
-            optionsTemplates[(int)TDHCPOption.Message] = new DHCPOptionMessage();
-            optionsTemplates[(int)TDHCPOption.MaximumDHCPMessageSize] = new DHCPOptionMaximumDHCPMessageSize();
-            optionsTemplates[(int)TDHCPOption.ParameterRequestList] = new DHCPOptionParameterRequestList();
-            optionsTemplates[(int)TDHCPOption.RenewalTimeValue] = new DHCPOptionRenewalTimeValue();
-            optionsTemplates[(int)TDHCPOption.RebindingTimeValue] = new DHCPOptionRebindingTimeValue();
-            optionsTemplates[(int)TDHCPOption.VendorClassIdentifier] = new DHCPOptionVendorClassIdentifier();
-            optionsTemplates[(int)TDHCPOption.ClientIdentifier] = new DHCPOptionClientIdentifier();
-            optionsTemplates[(int)TDHCPOption.FullyQualifiedDomainName] = new DHCPOptionFullyQualifiedDomainName();
-            optionsTemplates[(int)TDHCPOption.SubnetMask] = new DHCPOptionSubnetMask();
+
+            RegisterOption(new DHCPOptionFixedLength(TDHCPOption.Pad));
+            RegisterOption(new DHCPOptionFixedLength(TDHCPOption.End));
+            RegisterOption(new DHCPOptionHostName());
+            RegisterOption(new DHCPOptionIPAddressLeaseTime());
+            RegisterOption(new DHCPOptionServerIdentifier());
+            RegisterOption(new DHCPOptionRequestedIPAddress());
+            RegisterOption(new DHCPOptionOptionOverload());
+            RegisterOption(new DHCPOptionTFTPServerName());
+            RegisterOption(new DHCPOptionBootFileName());
+            RegisterOption(new DHCPOptionMessageType());
+            RegisterOption(new DHCPOptionMessage());
+            RegisterOption(new DHCPOptionMaximumDHCPMessageSize());
+            RegisterOption(new DHCPOptionParameterRequestList());
+            RegisterOption(new DHCPOptionRenewalTimeValue());
+            RegisterOption(new DHCPOptionRebindingTimeValue());
+            RegisterOption(new DHCPOptionVendorClassIdentifier());
+            RegisterOption(new DHCPOptionClientIdentifier());
+            RegisterOption(new DHCPOptionFullyQualifiedDomainName());
+            RegisterOption(new DHCPOptionSubnetMask());
+            RegisterOption(new DHCPOptionRouter());
+            RegisterOption(new DHCPOptionDomainNameServer());
+            RegisterOption(new DHCPOptionNetworkTimeProtocolServers());
         }
 
         public DHCPMessage()
@@ -304,7 +314,7 @@ namespace GitHub.JPMikkers.DHCP
 
         private static List<IDHCPOption> ReadOptions(byte[] buffer1, byte[] buffer2, byte[] buffer3)
         {
-            List<IDHCPOption> result = new List<IDHCPOption>();
+            var result = new List<IDHCPOption>();
             ReadOptions(result, new MemoryStream(buffer1, true), new MemoryStream(buffer2, true), new MemoryStream(buffer3, true));
             ReadOptions(result, new MemoryStream(buffer2, true), new MemoryStream(buffer3, true));
             ReadOptions(result, new MemoryStream(buffer3, true));
