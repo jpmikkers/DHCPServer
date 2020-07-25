@@ -29,7 +29,7 @@ using System.Net.Sockets;
 using System.Text;
 using System.IO;
 
-namespace CodePlex.JPMikkers.DHCP
+namespace GitHub.JPMikkers.DHCP
 {
     public class Utils
     {

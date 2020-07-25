@@ -35,7 +35,7 @@ using System.Security;
 using System.Security.Principal;
 using System.IO;
 using System.Diagnostics;
-using CodePlex.JPMikkers.DHCP;
+using GitHub.JPMikkers.DHCP;
 
 namespace DHCPServerApp
 {

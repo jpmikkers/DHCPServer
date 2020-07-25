@@ -27,7 +27,7 @@ using System.IO;
 using System.Net;
 using System.Text;
 
-namespace CodePlex.JPMikkers.DHCP
+namespace GitHub.JPMikkers.DHCP
 {
     public class ParseHelper
     {

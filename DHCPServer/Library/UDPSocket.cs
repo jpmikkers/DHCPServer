@@ -26,7 +26,7 @@ using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
 
-namespace CodePlex.JPMikkers.DHCP
+namespace GitHub.JPMikkers.DHCP
 {
     public class UDPSocket : IDisposable
     {

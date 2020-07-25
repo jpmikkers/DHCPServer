@@ -6,7 +6,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
-using CodePlex.JPMikkers.DHCP;
+using GitHub.JPMikkers.DHCP;
 using System.Reflection;
 using System.IO;
 

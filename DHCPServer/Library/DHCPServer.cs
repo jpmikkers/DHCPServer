@@ -33,7 +33,7 @@ using System.Net.Configuration;
 using System.Threading;
 using System.Linq;
 
-namespace CodePlex.JPMikkers.DHCP
+namespace GitHub.JPMikkers.DHCP
 {
     public class DHCPServer : IDHCPServer
     {

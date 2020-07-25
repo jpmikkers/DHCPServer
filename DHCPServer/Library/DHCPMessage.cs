@@ -28,7 +28,7 @@ using System.Net.Sockets;
 using System.Net;
 using System.IO;
 
-namespace CodePlex.JPMikkers.DHCP
+namespace GitHub.JPMikkers.DHCP
 {
     public class DHCPMessage
     {

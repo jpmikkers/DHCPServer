@@ -8,9 +8,9 @@
     <ProjectGuid>{4F2230EB-DADF-46E6-868D-B727C3FD52E5}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>CodePlex.JPMikkers.DHCP</RootNamespace>
+    <RootNamespace>GitHub.JPMikkers.DHCP</RootNamespace>
     <AssemblyName>DHCPLibrary</AssemblyName>
-    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileUpgradeFlags>
     </FileUpgradeFlags>
     <UpgradeBackupLocation>

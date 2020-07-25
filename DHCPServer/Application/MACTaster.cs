@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
-using CodePlex.JPMikkers.DHCP;
+using GitHub.JPMikkers.DHCP;
 
 namespace DHCPServerApp
 {

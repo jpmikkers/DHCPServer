@@ -26,7 +26,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading;
 
-namespace CodePlex.JPMikkers.DHCP
+namespace GitHub.JPMikkers.DHCP
 {
     public class AutoPumpQueue<T>
     {

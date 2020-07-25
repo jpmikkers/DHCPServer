@@ -12,7 +12,7 @@
     <AssemblyName>DHCPServer</AssemblyName>
     <FileAlignment>512</FileAlignment>
     <ApplicationIcon>Resources\MainIcon.ico</ApplicationIcon>
-    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileUpgradeFlags>
     </FileUpgradeFlags>
     <UpgradeBackupLocation>

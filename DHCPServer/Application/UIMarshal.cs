@@ -35,9 +35,9 @@ using System.Net.Sockets;
 using System.Net.NetworkInformation;
 using System.Net.Configuration;
 using System.Reflection;
-using CodePlex.JPMikkers.DHCP;
+using GitHub.JPMikkers.DHCP;
 
-namespace CodePlex.JPMikkers
+namespace GitHub.JPMikkers
 {
 /*
     public static class UIThreadCall

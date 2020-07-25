@@ -28,7 +28,7 @@ using System.Runtime.Serialization;
 using System.Xml.Serialization;
 using System.IO;
 using System.ComponentModel;
-using CodePlex.JPMikkers.DHCP;
+using GitHub.JPMikkers.DHCP;
 
 namespace DHCPServerApp
 {

@@ -27,7 +27,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Net;
 using System.Threading;
-using CodePlex.JPMikkers.DHCP;
+using GitHub.JPMikkers.DHCP;
 
 namespace DHCPServerApp
 {

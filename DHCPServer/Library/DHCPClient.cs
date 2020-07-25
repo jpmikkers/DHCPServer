@@ -32,7 +32,7 @@ using System.Net.NetworkInformation;
 using System.Net.Configuration;
 using System.Xml.Serialization;
 
-namespace CodePlex.JPMikkers.DHCP
+namespace GitHub.JPMikkers.DHCP
 {
     [Serializable]
     public class DHCPClient : IEquatable<DHCPClient>

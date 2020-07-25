@@ -31,7 +31,7 @@ using System.ServiceProcess;
 using System.Text;
 using System.Configuration;
 using System.Threading;
-using CodePlex.JPMikkers.DHCP;
+using GitHub.JPMikkers.DHCP;
 
 namespace DHCPServerApp
 {
