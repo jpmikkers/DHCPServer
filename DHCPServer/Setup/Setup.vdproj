@@ -183,6 +183,11 @@
             "AssemblyAsmDisplayName" = "8:DHCPLibrary, Version=1.4.2.0, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
+                    "_053CC6572BFB385B5AB364FCA9296097"
+                    {
+                    "Name" = "8:DHCPLibrary.dll"
+                    "Attributes" = "3:512"
+                    }
                 }
             "SourcePath" = "8:DHCPLibrary.dll"
             "TargetName" = "8:"
@@ -324,7 +329,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:DHCP Server"
         "ProductCode" = "8:{8964D3D2-A5BA-4204-8ACA-1656E2B9855D}"
-        "PackageCode" = "8:{5F96DF49-D758-4383-A053-3862BFFD8A61}"
+        "PackageCode" = "8:{D9FF2879-AF97-4429-959C-84D4F6438218}"
         "UpgradeCode" = "8:{9353E831-1F53-4A3A-8EFD-5C6513D0C02D}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
@@ -340,7 +345,7 @@
         "ARPCONTACT" = "8:JPMikkers"
         "Keywords" = "8:dhcp"
         "ARPCOMMENTS" = "8:DHCP Server Installer"
-        "ARPURLINFOABOUT" = "8:http://dhcpserver.codeplex.com/"
+        "ARPURLINFOABOUT" = "8:https://github.com/jpmikkers/dhcpserver"
         "ARPPRODUCTICON" = "8:"
         "ARPIconIndex" = "3:0"
         "SearchPath" = "8:"
