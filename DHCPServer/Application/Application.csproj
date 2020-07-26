@@ -78,6 +78,7 @@
       <DependentUpon>AboutBox.cs</DependentUpon>
     </Compile>
     <Compile Include="DeepCopier.cs" />
+    <Compile Include="Configuration\DHCPServerConfigurationList.cs" />
     <Compile Include="FormMain.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -103,6 +104,14 @@
       <DependentUpon>FormSettings.cs</DependentUpon>
     </Compile>
     <Compile Include="MACTaster.cs" />
+    <Compile Include="Configuration\OptionConfiguration.cs" />
+    <Compile Include="Configuration\OptionConfigurationAdresses.cs" />
+    <Compile Include="Configuration\OptionConfigurationBootFileName.cs" />
+    <Compile Include="Configuration\OptionConfigurationGeneric.cs" />
+    <Compile Include="Configuration\OptionConfigurationRouter.cs" />
+    <Compile Include="Configuration\OptionConfigurationTFTPServerName.cs" />
+    <Compile Include="Configuration\OptionConfigurationVendorClassIdentifier.cs" />
+    <Compile Include="Configuration\OptionConfigurationVendorSpecificInformation.cs" />
     <Compile Include="ProjectInstaller.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -119,7 +128,7 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
-    <Compile Include="DHCPServerConfiguration.cs" />
+    <Compile Include="Configuration\DHCPServerConfiguration.cs" />
     <Compile Include="DHCPServerResurrector.cs" />
     <Compile Include="DHCPService.cs">
       <SubType>Component</SubType>
@@ -129,7 +138,9 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Configuration\ReservationConfiguration.cs" />
     <Compile Include="UIMarshal.cs" />
+    <Compile Include="Configuration\XmlSerializableIPAddress.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
