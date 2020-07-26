@@ -36,7 +36,7 @@ namespace DHCPServerApp
         {
         }
 
-        public override IDHCPOption ConstructDHCPOption()
+        protected override IDHCPOption ConstructDHCPOption()
         {
             return new DHCPOptionGeneric((TDHCPOption) Option, Utils.HexStringToBytes(Data));
         }

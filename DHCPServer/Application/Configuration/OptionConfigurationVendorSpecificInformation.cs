@@ -36,9 +36,9 @@ namespace DHCPServerApp
             Information = "";
         }
 
-        public override IDHCPOption ConstructDHCPOption()
+        protected override IDHCPOption ConstructDHCPOption()
         {
-            return FixZString(new DHCPOptionVendorSpecificInformation(Information));
+            return new DHCPOptionVendorSpecificInformation(Information);
         }
     }
 }

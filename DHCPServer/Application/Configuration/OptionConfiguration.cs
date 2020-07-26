@@ -51,15 +51,11 @@ namespace DHCPServerApp
 
         public OptionItem ConstructOptionItem()
         {
-            return new OptionItem(Mode, ConstructDHCPOption());
+            var option = ConstructDHCPOption();
+            option.ZeroTerminatedStrings = ZeroTerminatedStrings;
+            return new OptionItem(Mode, option);
         }
 
-        public abstract IDHCPOption ConstructDHCPOption();
-
-        protected IDHCPOption FixZString(IDHCPOption i)
-        {
-            i.ZeroTerminatedStrings = ZeroTerminatedStrings;
-            return i;
-        }
+        protected abstract IDHCPOption ConstructDHCPOption();
     }
 }

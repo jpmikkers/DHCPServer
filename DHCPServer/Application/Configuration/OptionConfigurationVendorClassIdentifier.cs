@@ -39,7 +39,7 @@ namespace DHCPServerApp
             DataAsHex = "";
         }
 
-        public override IDHCPOption ConstructDHCPOption()
+        protected override IDHCPOption ConstructDHCPOption()
         {
             byte[] data;
 
@@ -55,7 +55,7 @@ namespace DHCPServerApp
                 data = m.ToArray();
             }
 
-            return FixZString(new DHCPOptionVendorClassIdentifier(data));
+            return new DHCPOptionVendorClassIdentifier(data);
         }
     }
 }

@@ -34,7 +34,7 @@ namespace DHCPServerApp
         {
         }
 
-        public override IDHCPOption ConstructDHCPOption()
+        protected override IDHCPOption ConstructDHCPOption()
         {
             return new DHCPOptionDomainNameServer()
             {
