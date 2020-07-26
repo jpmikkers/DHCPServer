@@ -7,7 +7,7 @@ using System.Runtime.InteropServices;
 // associated with an assembly.
 [assembly: AssemblyTitle("DHCPServer")]
 [assembly: AssemblyDescription(
-    "Copyright (c) 2010-2019 Jean-Paul Mikkers"+
+    "Copyright (c) 2010-2020 Jean-Paul Mikkers"+
     "\r\n" +
     "\r\n" +
     "Permission is hereby granted, free of charge, to any person obtaining a copy of this software"+
@@ -29,7 +29,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("JPMikkers")]
 [assembly: AssemblyProduct("DHCPServer")]
-[assembly: AssemblyCopyright("Copyright © Jean-Paul Mikkers 2010-2019")]
+[assembly: AssemblyCopyright("Copyright © Jean-Paul Mikkers 2010-2020")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
