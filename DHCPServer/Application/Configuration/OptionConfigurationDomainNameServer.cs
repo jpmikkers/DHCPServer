@@ -22,44 +22,26 @@ THE SOFTWARE.
 
 */
 using System;
-using System.Runtime.Serialization;
-using System.Xml.Serialization;
 using GitHub.JPMikkers.DHCP;
+using System.Linq;
 
 namespace DHCPServerApp
 {
     [Serializable()]
-    [XmlInclude(typeof(OptionConfigurationTFTPServerName))]
-    [XmlInclude(typeof(OptionConfigurationBootFileName))]
-    [XmlInclude(typeof(OptionConfigurationVendorSpecificInformation))]
-    [XmlInclude(typeof(OptionConfigurationGeneric))]
-    [XmlInclude(typeof(OptionConfigurationVendorClassIdentifier))]
-    [XmlInclude(typeof(OptionConfigurationRouter))]
-    [XmlInclude(typeof(OptionConfigurationNetworkTimeProtocolServers))]
-    [XmlInclude(typeof(OptionConfigurationDomainNameServer))]
-    public abstract class OptionConfiguration
+    public class OptionConfigurationDomainNameServer : OptionConfigurationAddresses
     {
-        public OptionMode Mode;
-
-        [OptionalField]
-        public bool ZeroTerminatedStrings;
-
-        public OptionConfiguration()
+        public OptionConfigurationDomainNameServer()
         {
-            Mode = OptionMode.Default;
         }
 
-        public OptionItem ConstructOptionItem()
+        public override IDHCPOption ConstructDHCPOption()
         {
-            return new OptionItem(Mode, ConstructDHCPOption());
-        }
-
-        public abstract IDHCPOption ConstructDHCPOption();
-
-        protected IDHCPOption FixZString(IDHCPOption i)
-        {
-            i.ZeroTerminatedStrings = ZeroTerminatedStrings;
-            return i;
+            return new DHCPOptionDomainNameServer()
+            {
+                IPAddresses = Addresses
+                    .Where(x => x.Address != null)
+                    .Select(x => x.Address)
+            };
         }
     }
 }

@@ -22,44 +22,20 @@ THE SOFTWARE.
 
 */
 using System;
-using System.Runtime.Serialization;
+using System.Collections.Generic;
 using System.Xml.Serialization;
-using GitHub.JPMikkers.DHCP;
 
 namespace DHCPServerApp
 {
     [Serializable()]
-    [XmlInclude(typeof(OptionConfigurationTFTPServerName))]
-    [XmlInclude(typeof(OptionConfigurationBootFileName))]
-    [XmlInclude(typeof(OptionConfigurationVendorSpecificInformation))]
-    [XmlInclude(typeof(OptionConfigurationGeneric))]
-    [XmlInclude(typeof(OptionConfigurationVendorClassIdentifier))]
-    [XmlInclude(typeof(OptionConfigurationRouter))]
-    [XmlInclude(typeof(OptionConfigurationNetworkTimeProtocolServers))]
-    [XmlInclude(typeof(OptionConfigurationDomainNameServer))]
-    public abstract class OptionConfiguration
+    public abstract class OptionConfigurationAddresses : OptionConfiguration
     {
-        public OptionMode Mode;
+        [XmlArrayItem("Address")]
+        public List<XmlSerializableIPAddress> Addresses { get; set; }
 
-        [OptionalField]
-        public bool ZeroTerminatedStrings;
-
-        public OptionConfiguration()
-        {
-            Mode = OptionMode.Default;
-        }
-
-        public OptionItem ConstructOptionItem()
-        {
-            return new OptionItem(Mode, ConstructDHCPOption());
-        }
-
-        public abstract IDHCPOption ConstructDHCPOption();
-
-        protected IDHCPOption FixZString(IDHCPOption i)
-        {
-            i.ZeroTerminatedStrings = ZeroTerminatedStrings;
-            return i;
+        public OptionConfigurationAddresses()
+        { 
+            Addresses = new List<XmlSerializableIPAddress>();
         }
     }
 }

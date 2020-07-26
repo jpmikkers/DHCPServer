@@ -34,6 +34,10 @@ namespace DHCPServerApp
     {
         public IPAddress Address { get; set; }
 
+        public XmlSerializableIPAddress()
+        {
+        }
+
         public XmlSchema GetSchema()
         {
             return null;

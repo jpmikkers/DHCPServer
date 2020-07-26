@@ -28,11 +28,20 @@ using System.Linq;
 namespace DHCPServerApp
 {
     [Serializable()]
-    public class OptionConfigurationRouter : OptionConfigurationAdresses
+    public class OptionConfigurationRouter : OptionConfigurationAddresses
     {
+        public OptionConfigurationRouter()
+        {
+        }
+
         public override IDHCPOption ConstructDHCPOption()
         {
-            return FixZString(new DHCPOptionRouter() { IPAddresses = Adresses.Select(x => x.Address) });
+            return new DHCPOptionRouter() 
+            { 
+                IPAddresses = Addresses
+                    .Where(x => x.Address!=null)
+                    .Select(x => x.Address) 
+            };
         }
     }
 }

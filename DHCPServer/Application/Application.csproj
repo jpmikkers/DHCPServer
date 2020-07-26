@@ -77,6 +77,8 @@
     <Compile Include="AboutBox.Designer.cs">
       <DependentUpon>AboutBox.cs</DependentUpon>
     </Compile>
+    <Compile Include="Configuration\OptionConfigurationDomainNameServer.cs" />
+    <Compile Include="Configuration\OptionConfigurationNetworkTimeProtocolServers.cs" />
     <Compile Include="DeepCopier.cs" />
     <Compile Include="Configuration\DHCPServerConfigurationList.cs" />
     <Compile Include="FormMain.cs">
@@ -105,7 +107,7 @@
     </Compile>
     <Compile Include="MACTaster.cs" />
     <Compile Include="Configuration\OptionConfiguration.cs" />
-    <Compile Include="Configuration\OptionConfigurationAdresses.cs" />
+    <Compile Include="Configuration\OptionConfigurationAddresses.cs" />
     <Compile Include="Configuration\OptionConfigurationBootFileName.cs" />
     <Compile Include="Configuration\OptionConfigurationGeneric.cs" />
     <Compile Include="Configuration\OptionConfigurationRouter.cs" />

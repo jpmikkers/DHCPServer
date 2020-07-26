@@ -22,20 +22,26 @@ THE SOFTWARE.
 
 */
 using System;
-using System.Collections.Generic;
-using System.Xml.Serialization;
+using GitHub.JPMikkers.DHCP;
+using System.Linq;
 
 namespace DHCPServerApp
 {
     [Serializable()]
-    [XmlInclude(typeof(OptionConfigurationRouter))]
-    public abstract class OptionConfigurationAdresses : OptionConfiguration
+    public class OptionConfigurationNetworkTimeProtocolServers : OptionConfigurationAddresses
     {
-        [XmlArrayItem("Address")]
-        public List<XmlSerializableIPAddress> Adresses { get; set; }
-
-        public OptionConfigurationAdresses()
+        public OptionConfigurationNetworkTimeProtocolServers()
         {
+        }
+
+        public override IDHCPOption ConstructDHCPOption()
+        {
+            return new DHCPOptionNetworkTimeProtocolServers() 
+            {
+                IPAddresses = Addresses
+                    .Where(x => x.Address != null)
+                    .Select(x => x.Address)
+            };
         }
     }
 }
