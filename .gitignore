@@ -11,3 +11,5 @@
 *.class
 **/bin/**
 .vs/
+/DHCPServer/Setup/Debug
+/DHCPServer/Setup/Release
