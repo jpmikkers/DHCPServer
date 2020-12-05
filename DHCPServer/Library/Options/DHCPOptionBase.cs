@@ -94,6 +94,7 @@ namespace GitHub.JPMikkers.DHCP
         BootFileName = 67,
 
         FullyQualifiedDomainName = 81,              // RFC4702
+        RelayAgentInformation = 82,                 // RFC3046, RFC6607
 
         ClientSystemArchitectureType = 93,          // RFC4578
         ClientNetworkInterfaceIdentifier = 94,      // RFC4578
