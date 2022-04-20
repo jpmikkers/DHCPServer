@@ -1,23 +1,12 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="12.0">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>8.0.50727</ProductVersion>
-    <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{4F2230EB-DADF-46E6-868D-B727C3FD52E5}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>GitHub.JPMikkers.DHCP</RootNamespace>
     <AssemblyName>DHCPLibrary</AssemblyName>
-    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
-    <FileUpgradeFlags>
-    </FileUpgradeFlags>
-    <UpgradeBackupLocation>
-    </UpgradeBackupLocation>
-    <OldToolsVersion>2.0</OldToolsVersion>
-    <TargetFrameworkProfile>
-    </TargetFrameworkProfile>
+    <TargetFramework>net48</TargetFramework>
+    <FileUpgradeFlags />
+    <UpgradeBackupLocation />
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
@@ -33,94 +22,34 @@
     <IsWebBootstrapper>false</IsWebBootstrapper>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
+    <AssemblyTitle>DHCPLibrary</AssemblyTitle>
+    <Company>JPMikkers</Company>
+    <Product>DHCPLibrary</Product>
+    <Description>Copyright (c) 2010-2019 Jean-Paul Mikkers
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software
+and associated documentation files (the \"Software\"), to deal in the Software without restriction
+including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense
+and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so,
+subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial
+portions of the Software.
+
+THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT
+NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. 
+IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, 
+WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</Description>
+    <Copyright>Copyright © Jean-Paul Mikkers 2010-2019</Copyright>
+    <AssemblyVersion>1.4.2.0</AssemblyVersion>
+    <FileVersion>1.4.2.0</FileVersion>
+    <OutputPath>bin\$(Configuration)\</OutputPath>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
-  <ItemGroup>
-    <Reference Include="System" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="AutoPumpQueue.cs" />
-    <Compile Include="DHCPClient.cs" />
-    <Compile Include="DHCPMessage.cs" />
-    <Compile Include="Options\DHCPOptionBootFileName.cs" />
-    <Compile Include="Options\DHCPOptionClientIdentifier.cs" />
-    <Compile Include="Options\DHCPOptionDomainNameServer.cs" />
-    <Compile Include="Options\DHCPOptionFixedLength.cs" />
-    <Compile Include="Options\DHCPOptionFullyQualifiedDomainName.cs" />
-    <Compile Include="Options\DHCPOptionGeneric.cs" />
-    <Compile Include="Options\DHCPOptionHostName.cs" />
-    <Compile Include="Options\DHCPOptionIPAddressLeaseTime.cs" />
-    <Compile Include="Options\DHCPOptionMaximumDHCPMessageSize.cs" />
-    <Compile Include="Options\DHCPOptionMessage.cs" />
-    <Compile Include="Options\DHCPOptionMessageType.cs" />
-    <Compile Include="Options\DHCPOptionNetworkTimeProtocolServers.cs" />
-    <Compile Include="Options\DHCPOptionOptionOverload.cs" />
-    <Compile Include="Options\DHCPOptionParameterRequestList.cs" />
-    <Compile Include="Options\DHCPOptionRebindingTimeValue.cs" />
-    <Compile Include="Options\DHCPOptionRenewalTimeValue.cs" />
-    <Compile Include="Options\DHCPOptionRequestedIPAddress.cs" />
-    <Compile Include="Options\DHCPOptionBase.cs" />
-    <Compile Include="Options\DHCPOptionRouter.cs" />
-    <Compile Include="Options\DHCPOptionServerIdentifier.cs" />
-    <Compile Include="Options\DHCPOptionServerListBase.cs" />
-    <Compile Include="Options\DHCPOptionSubnetMask.cs" />
-    <Compile Include="Options\DHCPOptionTFTPServerName.cs" />
-    <Compile Include="Options\DHCPOptionVendorClassIdentifier.cs" />
-    <Compile Include="Options\DHCPOptionVendorSpecificInformation.cs" />
-    <Compile Include="DHCPServer.cs" />
-    <Compile Include="IDHCPServer.cs" />
-    <Compile Include="IDHCPOption.cs" />
-    <Compile Include="ParseHelper.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="UDPSocket.cs" />
-    <Compile Include="Utils.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="DHCPClientInformation.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
-      <Visible>False</Visible>
-      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
-      <Install>false</Install>
-    </BootstrapperPackage>
-    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
-      <Visible>False</Visible>
-      <ProductName>.NET Framework 3.5 SP1</ProductName>
-      <Install>true</Install>
-    </BootstrapperPackage>
-    <BootstrapperPackage Include="Microsoft.Windows.Installer.3.1">
-      <Visible>False</Visible>
-      <ProductName>Windows Installer 3.1</ProductName>
-      <Install>true</Install>
-    </BootstrapperPackage>
-  </ItemGroup>
-  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
 </Project>
