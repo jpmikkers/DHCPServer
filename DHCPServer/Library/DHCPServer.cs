@@ -53,6 +53,7 @@ namespace GitHub.JPMikkers.DHCP
         private TimeSpan m_LeaseTime = TimeSpan.FromDays(1);
         private bool m_Active = false;
         private List<OptionItem> m_Options = new List<OptionItem>();
+        private List<IDHCPMessageInterceptor> m_Interceptors= new List<IDHCPMessageInterceptor>();
         private List<ReservationItem> m_Reservations = new List<ReservationItem>();
         private int m_MinimumPacketSize = 576;
         private AutoPumpQueue<int> m_UpdateClientInfoQueue;
@@ -193,6 +194,18 @@ namespace GitHub.JPMikkers.DHCP
             set
             {
                 m_Options = value;
+            }
+        }
+
+        public List<IDHCPMessageInterceptor> Interceptors
+        {
+            get
+            {
+                return m_Interceptors;
+            }
+            set
+            {
+                m_Interceptors = value;
             }
         }
 
@@ -439,6 +452,11 @@ namespace GitHub.JPMikkers.DHCP
                         targetMsg.Options.Add(optionItem.Option);
                     }
                 }
+            }
+
+            foreach(IDHCPMessageInterceptor interceptor in m_Interceptors)
+            {
+                interceptor.Apply(sourceMsg, targetMsg);
             }
         }
 
