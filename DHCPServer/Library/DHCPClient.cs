@@ -29,7 +29,6 @@ using System.Net;
 using System.Text;
 using System.Net.Sockets;
 using System.Net.NetworkInformation;
-using System.Net.Configuration;
 using System.Xml.Serialization;
 
 namespace GitHub.JPMikkers.DHCP
