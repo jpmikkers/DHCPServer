@@ -21,7 +21,7 @@
     <UpdateRequired>false</UpdateRequired>
     <MapFileExtensions>true</MapFileExtensions>
     <ApplicationRevision>0</ApplicationRevision>
-    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <ApplicationVersion>1.0.0.*</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
     <AssemblyTitle>DHCPServer</AssemblyTitle>
@@ -161,9 +161,5 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</Description>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Library\Library.csproj" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Remove="Resources\Visual Studio 2005\Visualizers\autoexp.cs" />
-    <Compile Remove="Resources\Visual Studio 2005\Visualizers\autoexpce.cs" />
   </ItemGroup>
 </Project>
