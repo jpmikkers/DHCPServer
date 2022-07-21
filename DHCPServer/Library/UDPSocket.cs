@@ -136,7 +136,13 @@ namespace GitHub.JPMikkers.DHCP
             _socket.Bind(localEndPoint);
             _localEndPoint = _socket.LocalEndPoint;
 
-            _socket.IOControl((IOControlCode)SIO_UDP_CONNRESET, new byte[] { 0, 0, 0, 0 }, null);
+            try
+            {
+                _socket.IOControl((IOControlCode)SIO_UDP_CONNRESET, new byte[] { 0, 0, 0, 0 }, null);
+            }
+            catch(PlatformNotSupportedException)
+            {
+            }
 
             BeginReceive();
         }
