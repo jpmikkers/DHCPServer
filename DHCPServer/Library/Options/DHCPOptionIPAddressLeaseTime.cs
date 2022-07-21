@@ -28,7 +28,7 @@ namespace GitHub.JPMikkers.DHCP
 {
     public class DHCPOptionIPAddressLeaseTime : DHCPOptionBase
     {
-        private TimeSpan m_LeaseTime;
+        private TimeSpan _leaseTime;
 
         #region IDHCPOption Members
 
@@ -36,7 +36,7 @@ namespace GitHub.JPMikkers.DHCP
         {
             get
             {
-                return m_LeaseTime;
+                return _leaseTime;
             }
         }
 
@@ -44,13 +44,13 @@ namespace GitHub.JPMikkers.DHCP
         {
             DHCPOptionIPAddressLeaseTime result = new DHCPOptionIPAddressLeaseTime();
             if (s.Length != 4) throw new IOException("Invalid DHCP option length");
-            result.m_LeaseTime = TimeSpan.FromSeconds(ParseHelper.ReadUInt32(s));
+            result._leaseTime = TimeSpan.FromSeconds(ParseHelper.ReadUInt32(s));
             return result;
         }
 
         public override void ToStream(Stream s)
         {
-            ParseHelper.WriteUInt32(s, (uint)m_LeaseTime.TotalSeconds);
+            ParseHelper.WriteUInt32(s, (uint)_leaseTime.TotalSeconds);
         }
 
         #endregion
@@ -63,16 +63,16 @@ namespace GitHub.JPMikkers.DHCP
         public DHCPOptionIPAddressLeaseTime(TimeSpan leaseTime)
             : base(TDHCPOption.IPAddressLeaseTime)
         {
-            m_LeaseTime = leaseTime;
-            if (m_LeaseTime > Utils.InfiniteTimeSpan)
+            _leaseTime = leaseTime;
+            if (_leaseTime > Utils.InfiniteTimeSpan)
             {
-                m_LeaseTime = Utils.InfiniteTimeSpan;
+                _leaseTime = Utils.InfiniteTimeSpan;
             }
         }
 
         public override string ToString()
         {
-            return string.Format("Option(name=[{0}],value=[{1}])", OptionType, m_LeaseTime == Utils.InfiniteTimeSpan ? "Infinite" : m_LeaseTime.ToString());
+            return $"Option(name=[{OptionType}],value=[{(_leaseTime == Utils.InfiniteTimeSpan ? "Infinite" : _leaseTime.ToString())}])";
         }
     }
 }

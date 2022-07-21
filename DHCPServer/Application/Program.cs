@@ -31,7 +31,7 @@ namespace DHCPServerApp
         public static string GetClientInfoPath(string serverName,string serverAddress)
         {
             string configurationPath = GetConfigurationPath();
-            return Path.Combine(Path.GetDirectoryName(GetConfigurationPath()), string.Format("{0}_{1}.xml", serverName, serverAddress.Replace('.', '_')));
+            return Path.Combine(Path.GetDirectoryName(GetConfigurationPath()), $"{serverName}_{serverAddress.Replace('.', '_')}.xml");
         }
 
         public static string GetMacTastePath()
@@ -89,7 +89,7 @@ namespace DHCPServerApp
                 }
                 catch (Exception ex)
                 {
-                    System.Diagnostics.Trace.WriteLine(String.Format("Exception: {0}", ex));
+                    System.Diagnostics.Trace.WriteLine($"Exception: {ex}");
                 }
             }
         }
@@ -113,7 +113,7 @@ namespace DHCPServerApp
                 }
                 catch (Exception ex)
                 {
-                    System.Diagnostics.Trace.WriteLine(String.Format("Exception: {0}", ex));
+                    System.Diagnostics.Trace.WriteLine($"Exception: {ex}");
                 }
             }
         }

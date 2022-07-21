@@ -40,7 +40,7 @@ namespace GitHub.JPMikkers.DHCP
 
     public class DHCPOptionMessageType : DHCPOptionBase
     {
-        private TDHCPMessageType m_MessageType;
+        private TDHCPMessageType _messageType;
 
         #region IDHCPOption Members
 
@@ -48,7 +48,7 @@ namespace GitHub.JPMikkers.DHCP
         {
             get
             {
-                return m_MessageType;
+                return _messageType;
             }
         }
 
@@ -56,13 +56,13 @@ namespace GitHub.JPMikkers.DHCP
         {
             DHCPOptionMessageType result = new DHCPOptionMessageType();
             if (s.Length != 1) throw new IOException("Invalid DHCP option length");
-            result.m_MessageType = (TDHCPMessageType)s.ReadByte();
+            result._messageType = (TDHCPMessageType)s.ReadByte();
             return result;
         }
 
         public override void ToStream(Stream s)
         {
-            s.WriteByte((byte)m_MessageType);
+            s.WriteByte((byte)_messageType);
         }
 
         #endregion
@@ -75,12 +75,12 @@ namespace GitHub.JPMikkers.DHCP
         public DHCPOptionMessageType(TDHCPMessageType messageType)
             : base(TDHCPOption.MessageType)
         {
-            m_MessageType = messageType;
+            _messageType = messageType;
         }
 
         public override string ToString()
         {
-            return string.Format("Option(name=[{0}],value=[{1}])", OptionType, m_MessageType);
+            return $"Option(name=[{OptionType}],value=[{_messageType}])";
         }
     }
 }

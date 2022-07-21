@@ -30,17 +30,17 @@ namespace GitHub.JPMikkers.DHCP
 {
     public abstract class DHCPOptionServerListBase : DHCPOptionBase
     {
-        private List<IPAddress> m_IPAddresses = new List<IPAddress>();
+        private List<IPAddress> _IPAddresses = new List<IPAddress>();
 
         public IEnumerable<IPAddress> IPAddresses
         {
             get
             {
-                return m_IPAddresses;
+                return _IPAddresses;
             }
             set
             {
-                m_IPAddresses = value.ToList();
+                _IPAddresses = value.ToList();
             }
         }
 
@@ -56,7 +56,7 @@ namespace GitHub.JPMikkers.DHCP
 
             for(int t=0;t<s.Length;t+=4)
             {
-                result.m_IPAddresses.Add(ParseHelper.ReadIPAddress(s));
+                result._IPAddresses.Add(ParseHelper.ReadIPAddress(s));
             }
 
             return result;
@@ -64,7 +64,7 @@ namespace GitHub.JPMikkers.DHCP
 
         public override void ToStream(Stream s)
         {
-            foreach (var ipAddress in m_IPAddresses)
+            foreach (var ipAddress in _IPAddresses)
             {
                 ParseHelper.WriteIPAddress(s, ipAddress);
             }
@@ -79,7 +79,7 @@ namespace GitHub.JPMikkers.DHCP
 
         public override string ToString()
         {
-            return $"Option(name=[{OptionType}],value=[{string.Join(",", m_IPAddresses.Select(x => x.ToString()))}])";
+            return $"Option(name=[{OptionType}],value=[{string.Join(",", _IPAddresses.Select(x => x.ToString()))}])";
         }
     }
 }

@@ -27,7 +27,7 @@ namespace GitHub.JPMikkers.DHCP
 {
     public class DHCPOptionMaximumDHCPMessageSize : DHCPOptionBase
     {
-        private ushort m_MaxSize;
+        private ushort _maxSize;
 
         #region IDHCPOption Members
 
@@ -35,7 +35,7 @@ namespace GitHub.JPMikkers.DHCP
         {
             get
             {
-                return m_MaxSize;
+                return _maxSize;
             }
         }
 
@@ -43,13 +43,13 @@ namespace GitHub.JPMikkers.DHCP
         {
             DHCPOptionMaximumDHCPMessageSize result = new DHCPOptionMaximumDHCPMessageSize();
             if (s.Length != 2) throw new IOException("Invalid DHCP option length");
-            result.m_MaxSize = ParseHelper.ReadUInt16(s);
+            result._maxSize = ParseHelper.ReadUInt16(s);
             return result;
         }
 
         public override void ToStream(Stream s)
         {
-            ParseHelper.WriteUInt16(s,m_MaxSize);
+            ParseHelper.WriteUInt16(s,_maxSize);
         }
 
         #endregion
@@ -62,12 +62,12 @@ namespace GitHub.JPMikkers.DHCP
         public DHCPOptionMaximumDHCPMessageSize(ushort maxSize)
             : base(TDHCPOption.MaximumDHCPMessageSize)
         {
-            m_MaxSize = maxSize;
+            _maxSize = maxSize;
         }
 
         public override string ToString()
         {
-            return string.Format("Option(name=[{0}],value=[{1}])", OptionType, m_MaxSize);
+            return $"Option(name=[{OptionType}],value=[{_maxSize}])";
         }
     }
 }

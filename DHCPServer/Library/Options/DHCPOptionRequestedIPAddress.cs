@@ -28,7 +28,7 @@ namespace GitHub.JPMikkers.DHCP
 {
     public class DHCPOptionRequestedIPAddress : DHCPOptionBase
     {
-        private IPAddress m_IPAddress;
+        private IPAddress _IPAddress;
 
         #region IDHCPOption Members
 
@@ -36,7 +36,7 @@ namespace GitHub.JPMikkers.DHCP
         {
             get
             {
-                return m_IPAddress;
+                return _IPAddress;
             }
         }
 
@@ -44,13 +44,13 @@ namespace GitHub.JPMikkers.DHCP
         {
             DHCPOptionRequestedIPAddress result = new DHCPOptionRequestedIPAddress();
             if (s.Length != 4) throw new IOException("Invalid DHCP option length");
-            result.m_IPAddress = ParseHelper.ReadIPAddress(s);
+            result._IPAddress = ParseHelper.ReadIPAddress(s);
             return result;
         }
 
         public override void ToStream(Stream s)
         {
-            ParseHelper.WriteIPAddress(s, m_IPAddress);
+            ParseHelper.WriteIPAddress(s, _IPAddress);
         }
 
         #endregion
@@ -63,12 +63,12 @@ namespace GitHub.JPMikkers.DHCP
         public DHCPOptionRequestedIPAddress(IPAddress ipAddress)
             : base(TDHCPOption.RequestedIPAddress)
         {
-            m_IPAddress = ipAddress;
+            _IPAddress = ipAddress;
         }
 
         public override string ToString()
         {
-            return string.Format("Option(name=[{0}],value=[{1}])", OptionType, m_IPAddress.ToString());
+            return $"Option(name=[{OptionType}],value=[{_IPAddress}])";
         }
     }
 }

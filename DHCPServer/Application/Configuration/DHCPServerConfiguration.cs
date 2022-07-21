@@ -30,32 +30,32 @@ namespace DHCPServerApp
     [Serializable()]
     public class DHCPServerConfiguration
     {
-        private string m_Name;
-        private IPAddress m_Address;
-        private IPAddress m_NetMask;
-        private IPAddress m_PoolStart;
-        private IPAddress m_PoolEnd;
-        private int m_LeaseTime;
-        private int m_OfferTime;
-        private int m_MinimumPacketSize;
-        private List<OptionConfiguration> m_Options;
-        private List<ReservationConfiguration> m_Reservations;
+        private string _name;
+        private IPAddress _address;
+        private IPAddress _netMask;
+        private IPAddress _poolStart;
+        private IPAddress _poolEnd;
+        private int _leaseTime;
+        private int _offerTime;
+        private int _minimumPacketSize;
+        private List<OptionConfiguration> _options;
+        private List<ReservationConfiguration> _reservations;
 
         public string Name
         {
-            get { return m_Name; } 
-            set { m_Name = value; }
+            get { return _name; } 
+            set { _name = value; }
         }
 
         public string Address
         {
             get
             {
-                return m_Address.ToString();
+                return _address.ToString();
             }
             set
             {
-                m_Address = IPAddress.Parse(value);
+                _address = IPAddress.Parse(value);
             }
         }
 
@@ -63,11 +63,11 @@ namespace DHCPServerApp
         {
             get
             {
-                return m_NetMask.ToString();
+                return _netMask.ToString();
             }
             set
             {
-                m_NetMask = IPAddress.Parse(value);
+                _netMask = IPAddress.Parse(value);
             }
         }
 
@@ -75,11 +75,11 @@ namespace DHCPServerApp
         {
             get
             {
-                return m_PoolStart.ToString();
+                return _poolStart.ToString();
             }
             set
             {
-                m_PoolStart = IPAddress.Parse(value);
+                _poolStart = IPAddress.Parse(value);
             }
         }
 
@@ -87,11 +87,11 @@ namespace DHCPServerApp
         {
             get
             {
-                return m_PoolEnd.ToString();
+                return _poolEnd.ToString();
             }
             set
             {
-                m_PoolEnd = IPAddress.Parse(value);
+                _poolEnd = IPAddress.Parse(value);
             }
         }
 
@@ -99,11 +99,11 @@ namespace DHCPServerApp
         {
             get
             {
-                return m_LeaseTime;
+                return _leaseTime;
             }
             set
             {
-                m_LeaseTime = value;
+                _leaseTime = value;
             }
         }
 
@@ -111,11 +111,11 @@ namespace DHCPServerApp
         {
             get
             {
-                return m_OfferTime;
+                return _offerTime;
             }
             set
             {
-                m_OfferTime = value;
+                _offerTime = value;
             }
         }
 
@@ -123,11 +123,11 @@ namespace DHCPServerApp
         {
             get
             {
-                return m_MinimumPacketSize;
+                return _minimumPacketSize;
             }
             set
             {
-                m_MinimumPacketSize = value;
+                _minimumPacketSize = value;
             }
         }
 
@@ -135,11 +135,11 @@ namespace DHCPServerApp
         {
             get
             {
-                return m_Options;
+                return _options;
             }
             set
             {
-                m_Options = value;
+                _options = value;
             }
         }
 
@@ -147,11 +147,11 @@ namespace DHCPServerApp
         {
             get
             {
-                return m_Reservations;
+                return _reservations;
             }
             set
             {
-                m_Reservations = value;
+                _reservations = value;
             }
         }
 

@@ -39,11 +39,11 @@ namespace DHCPServerApp
 {
     public partial class FormPickAdapter : Form
     {
-        private IPAddress m_Address = IPAddress.Loopback;
+        private IPAddress _address = IPAddress.Loopback;
 
         public IPAddress Address
         {
-            get { return m_Address; }
+            get { return _address; }
         }
 
         public FormPickAdapter()
@@ -101,7 +101,7 @@ namespace DHCPServerApp
         {
             if (comboBoxUnicast.SelectedIndex >= 0)
             {
-                m_Address = (IPAddress)comboBoxUnicast.SelectedItem;
+                _address = (IPAddress)comboBoxUnicast.SelectedItem;
             }
         }
     }

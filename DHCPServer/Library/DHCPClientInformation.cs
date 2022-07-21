@@ -36,7 +36,7 @@ namespace GitHub.JPMikkers.DHCP
     [Serializable()]
     public class DHCPClientInformation
     {
-        private List<DHCPClient> m_Clients = new List<DHCPClient>();
+        private List<DHCPClient> _clients = new List<DHCPClient>();
 
         public DateTime TimeStamp
         {
@@ -53,15 +53,15 @@ namespace GitHub.JPMikkers.DHCP
         {
             get
             {
-                return m_Clients;
+                return _clients;
             }
             set
             {
-                m_Clients = value;
+                _clients = value;
             }
         }
 
-        private static XmlSerializer serializer = new XmlSerializer(typeof(DHCPClientInformation));
+        private static XmlSerializer s_serializer = new XmlSerializer(typeof(DHCPClientInformation));
 
         public static DHCPClientInformation Read(string file)
         {
@@ -71,7 +71,7 @@ namespace GitHub.JPMikkers.DHCP
             {
                 using (Stream s = File.OpenRead(file))
                 {
-                    result = (DHCPClientInformation)serializer.Deserialize(s);
+                    result = (DHCPClientInformation)s_serializer.Deserialize(s);
                 }
             }
             else
@@ -93,7 +93,7 @@ namespace GitHub.JPMikkers.DHCP
 
             using (Stream s = File.Open(file, FileMode.Create, FileAccess.ReadWrite, FileShare.None))
             {
-                serializer.Serialize(s, this);
+                s_serializer.Serialize(s, this);
                 s.Flush();
             }
         }

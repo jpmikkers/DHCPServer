@@ -31,9 +31,9 @@ namespace DHCPServerApp
     [Serializable()]
     public class ReservationConfiguration
     {
-        private IPAddress m_PoolStart;
-        private IPAddress m_PoolEnd;
-        private bool m_Preempt;
+        private IPAddress _poolStart;
+        private IPAddress _poolEnd;
+        private bool _preempt;
 
         public string MacTaste
         {
@@ -51,11 +51,11 @@ namespace DHCPServerApp
         {
             get
             {
-                return m_PoolStart.ToString();
+                return _poolStart.ToString();
             }
             set
             {
-                m_PoolStart = IPAddress.Parse(value);
+                _poolStart = IPAddress.Parse(value);
             }
         }
 
@@ -63,11 +63,11 @@ namespace DHCPServerApp
         {
             get
             {
-                return m_PoolEnd.ToString();
+                return _poolEnd.ToString();
             }
             set
             {
-                m_PoolEnd = IPAddress.Parse(value);
+                _poolEnd = IPAddress.Parse(value);
             }
         }
 
@@ -76,11 +76,11 @@ namespace DHCPServerApp
         {
             get
             {
-                return m_Preempt;
+                return _preempt;
             }
             set
             {
-                m_Preempt = value;
+                _preempt = value;
             }
         }
 
@@ -90,9 +90,9 @@ namespace DHCPServerApp
             { 
                 HostName = this.HostName, 
                 MacTaste = this.MacTaste, 
-                PoolStart = m_PoolStart, 
-                PoolEnd = m_PoolEnd,
-                Preempt = m_Preempt,
+                PoolStart = _poolStart, 
+                PoolEnd = _poolEnd,
+                Preempt = _preempt,
             };
         }
     }

@@ -37,34 +37,34 @@ namespace DHCPServerApp
 {
     public partial class DHCPService : ServiceBase
     {
-        private EventLog m_EventLog;
-        private DHCPServerConfigurationList m_Configuration;
-        private List<DHCPServerResurrector> m_Servers;
+        private EventLog _eventLog;
+        private DHCPServerConfigurationList _configuration;
+        private List<DHCPServerResurrector> _servers;
 
         public DHCPService()
         {
             InitializeComponent();
-            m_EventLog = new EventLog(Program.CustomEventLog, ".", Program.CustomEventSource);
+            _eventLog = new EventLog(Program.CustomEventLog, ".", Program.CustomEventSource);
         }
 
         protected override void OnStart(string[] args)
         {
-            m_Configuration = DHCPServerConfigurationList.Read(Program.GetConfigurationPath());
-            m_Servers = new List<DHCPServerResurrector>();
+            _configuration = DHCPServerConfigurationList.Read(Program.GetConfigurationPath());
+            _servers = new List<DHCPServerResurrector>();
 
-            foreach (DHCPServerConfiguration config in m_Configuration)
+            foreach (DHCPServerConfiguration config in _configuration)
             {
-                m_Servers.Add(new DHCPServerResurrector(config, m_EventLog));
+                _servers.Add(new DHCPServerResurrector(config, _eventLog));
             }
         }
 
         protected override void OnStop()
         {
-            foreach (DHCPServerResurrector server in m_Servers)
+            foreach (DHCPServerResurrector server in _servers)
             {
                 server.Dispose();
             }
-            m_Servers.Clear();
+            _servers.Clear();
         }
 
         protected override void OnCustomCommand(int command)

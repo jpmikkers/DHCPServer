@@ -32,32 +32,32 @@ namespace GitHub.JPMikkers.DHCP
     {
         public delegate void DataDelegate(AutoPumpQueue<T> sender, T data);
 
-        private readonly object m_QueueSync = new object();
-        private readonly object m_DispatchSync = new object();
-        private readonly Queue<T> m_Queue;
-        private DataDelegate m_DataDelegate;
+        private readonly object _queueSync = new object();
+        private readonly object _dispatchSync = new object();
+        private readonly Queue<T> _queue;
+        private readonly DataDelegate _dataDelegate;
 
         /// <summary>
         /// Constructor
         /// </summary>
         public AutoPumpQueue(DataDelegate dataDelegate)
         {
-            m_Queue = new Queue<T>();
-            m_DataDelegate = dataDelegate;
+            _queue = new Queue<T>();
+            _dataDelegate = dataDelegate;
         }
 
         private void WaitCallback(object state)
         {
-            lock (m_DispatchSync)    // ensures individual invokes are serialized
+            lock (_dispatchSync)    // ensures individual invokes are serialized
             {
                 bool empty = false;
                 T data = default(T);
 
                 while (!empty)
                 {
-                    lock (m_QueueSync)
+                    lock (_queueSync)
                     {
-                        if (m_Queue.Count == 0)
+                        if (_queue.Count == 0)
                         {
                             // no data
                             empty = true;
@@ -65,7 +65,7 @@ namespace GitHub.JPMikkers.DHCP
                         else
                         {
                             // there are commands;
-                            data = m_Queue.Dequeue();
+                            data = _queue.Dequeue();
                             empty = false;
                         }
                     }
@@ -74,7 +74,7 @@ namespace GitHub.JPMikkers.DHCP
                     {
                         try
                         {
-                            m_DataDelegate(this, data);
+                            _dataDelegate(this, data);
                         }
                         catch
                         {
@@ -88,10 +88,10 @@ namespace GitHub.JPMikkers.DHCP
         {
             bool queueWasEmpty;
 
-            lock (m_QueueSync)
+            lock (_queueSync)
             {
-                queueWasEmpty = (m_Queue.Count == 0);
-                m_Queue.Enqueue(data);
+                queueWasEmpty = (_queue.Count == 0);
+                _queue.Enqueue(data);
             }
 
             if (queueWasEmpty)

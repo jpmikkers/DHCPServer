@@ -123,7 +123,7 @@ namespace GitHub.JPMikkers.DHCP
                     }
                 }
             }
-            throw new ArgumentException(string.Format("Can't find subnetmask for IP address '{0}'", address));
+            throw new ArgumentException($"Can't find subnetmask for IP address '{address}'");
         }
 
         public static IPAddress UInt32ToIPAddress(UInt32 address)

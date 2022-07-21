@@ -27,7 +27,7 @@ namespace GitHub.JPMikkers.DHCP
 {
     public class DHCPOptionTFTPServerName : DHCPOptionBase
     {
-        private string m_Name;
+        private string _name;
 
         #region IDHCPOption Members
 
@@ -35,20 +35,20 @@ namespace GitHub.JPMikkers.DHCP
         {
             get
             {
-                return m_Name;
+                return _name;
             }
         }
 
         public override IDHCPOption FromStream(Stream s)
         {
             DHCPOptionTFTPServerName result = new DHCPOptionTFTPServerName();
-            result.m_Name = ParseHelper.ReadString(s);
+            result._name = ParseHelper.ReadString(s);
             return result;
         }
 
         public override void ToStream(Stream s)
         {
-            ParseHelper.WriteString(s, ZeroTerminatedStrings, m_Name);
+            ParseHelper.WriteString(s, ZeroTerminatedStrings, _name);
         }
 
         #endregion
@@ -61,12 +61,12 @@ namespace GitHub.JPMikkers.DHCP
         public DHCPOptionTFTPServerName(string name)
             : base(TDHCPOption.TFTPServerName)
         {
-            m_Name = name;
+            _name = name;
         }
 
         public override string ToString()
         {
-            return string.Format("Option(name=[{0}],value=[{1}])", OptionType, m_Name);
+            return $"Option(name=[{OptionType}],value=[{_name}])";
         }
     }
 }

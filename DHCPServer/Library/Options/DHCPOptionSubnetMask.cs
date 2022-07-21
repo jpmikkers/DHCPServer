@@ -28,7 +28,7 @@ namespace GitHub.JPMikkers.DHCP
 {
     public class DHCPOptionSubnetMask : DHCPOptionBase
     {
-        private IPAddress m_SubnetMask;
+        private IPAddress _subnetMask;
 
         #region IDHCPOption Members
 
@@ -36,7 +36,7 @@ namespace GitHub.JPMikkers.DHCP
         {
             get
             {
-                return m_SubnetMask;
+                return _subnetMask;
             }
         }
 
@@ -44,13 +44,13 @@ namespace GitHub.JPMikkers.DHCP
         {
             DHCPOptionSubnetMask result = new DHCPOptionSubnetMask();
             if (s.Length != 4) throw new IOException("Invalid DHCP option length");
-            result.m_SubnetMask = ParseHelper.ReadIPAddress(s);
+            result._subnetMask = ParseHelper.ReadIPAddress(s);
             return result;
         }
 
         public override void ToStream(Stream s)
         {
-            ParseHelper.WriteIPAddress(s, m_SubnetMask);
+            ParseHelper.WriteIPAddress(s, _subnetMask);
         }
 
         #endregion
@@ -63,12 +63,12 @@ namespace GitHub.JPMikkers.DHCP
         public DHCPOptionSubnetMask(IPAddress subnetMask)
             : base(TDHCPOption.SubnetMask)
         {
-            m_SubnetMask = subnetMask;
+            _subnetMask = subnetMask;
         }
 
         public override string ToString()
         {
-            return string.Format("Option(name=[{0}],value=[{1}])", OptionType, m_SubnetMask.ToString());
+            return $"Option(name=[{OptionType}],value=[{_subnetMask}])";
         }
     }
 }

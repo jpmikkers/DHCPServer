@@ -9,8 +9,8 @@ namespace DHCPServerApp
 {
     public class MACTaster
     {
-        private static readonly Regex regex = new Regex(@"^(?<mac>([0-9a-fA-F][0-9a-fA-F][:\-\.]?)+)(?<netmask>/[0-9]+)?\s*(?<id>\w*)\s*(?<comment>#.*)?", RegexOptions.Compiled | RegexOptions.ExplicitCapture);
-        private List<PrefixItem> m_PrefixItems = new List<PrefixItem>();
+        private static readonly Regex s_regex = new Regex(@"^(?<mac>([0-9a-fA-F][0-9a-fA-F][:\-\.]?)+)(?<netmask>/[0-9]+)?\s*(?<id>\w*)\s*(?<comment>#.*)?", RegexOptions.Compiled | RegexOptions.ExplicitCapture);
+        private List<PrefixItem> _prefixItems = new List<PrefixItem>();
 
         private struct PrefixItem
         {
@@ -37,7 +37,7 @@ namespace DHCPServerApp
                     {
                         try
                         {
-                            Match match = regex.Match(line);
+                            Match match = s_regex.Match(line);
                             if (match.Success && match.Groups["mac"].Success && match.Groups["id"].Success)
                             {
                                 byte[] prefix = Utils.HexStringToBytes(match.Groups["mac"].Value);
@@ -49,7 +49,7 @@ namespace DHCPServerApp
                                     prefixBits = Int32.Parse(match.Groups["netmask"].Value.Substring(1));
                                 }
 
-                                m_PrefixItems.Add(new PrefixItem(prefix, prefixBits, id));
+                                _prefixItems.Add(new PrefixItem(prefix, prefixBits, id));
                             }
                         }
                         catch
@@ -85,7 +85,7 @@ namespace DHCPServerApp
 
         public string Taste(byte[] macAddress)
         {
-            foreach(PrefixItem prefixItem in m_PrefixItems)
+            foreach(PrefixItem prefixItem in _prefixItems)
             {
                 if(MacMatch(macAddress,prefixItem.Prefix,prefixItem.PrefixBits))
                 {

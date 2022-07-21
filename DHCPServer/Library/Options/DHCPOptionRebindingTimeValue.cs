@@ -28,7 +28,7 @@ namespace GitHub.JPMikkers.DHCP
 {
     public class DHCPOptionRebindingTimeValue : DHCPOptionBase
     {
-        private TimeSpan m_TimeSpan;
+        private TimeSpan _timeSpan;
 
         #region IDHCPOption Members
 
@@ -36,7 +36,7 @@ namespace GitHub.JPMikkers.DHCP
         {
             get
             {
-                return m_TimeSpan;
+                return _timeSpan;
             }
         }
 
@@ -44,13 +44,13 @@ namespace GitHub.JPMikkers.DHCP
         {
             DHCPOptionRebindingTimeValue result = new DHCPOptionRebindingTimeValue();
             if (s.Length != 4) throw new IOException("Invalid DHCP option length");
-            result.m_TimeSpan = TimeSpan.FromSeconds(ParseHelper.ReadUInt32(s));
+            result._timeSpan = TimeSpan.FromSeconds(ParseHelper.ReadUInt32(s));
             return result;
         }
 
         public override void ToStream(Stream s)
         {
-            ParseHelper.WriteUInt32(s, (uint)m_TimeSpan.TotalSeconds);
+            ParseHelper.WriteUInt32(s, (uint)_timeSpan.TotalSeconds);
         }
 
         #endregion
@@ -63,12 +63,12 @@ namespace GitHub.JPMikkers.DHCP
         public DHCPOptionRebindingTimeValue(TimeSpan timeSpan)
             : base(TDHCPOption.RebindingTimeValue)
         {
-            m_TimeSpan = timeSpan;
+            _timeSpan = timeSpan;
         }
 
         public override string ToString()
         {
-            return string.Format("Option(name=[{0}],value=[{1}])", OptionType, m_TimeSpan.ToString());
+            return $"Option(name=[{OptionType}],value=[{_timeSpan}])";
         }
     }
 }

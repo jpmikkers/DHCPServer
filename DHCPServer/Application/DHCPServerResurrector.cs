@@ -34,21 +34,21 @@ namespace DHCPServerApp
     public class DHCPServerResurrector : IDisposable
     {
         private const int RetryTime = 30000;
-        private readonly object m_Lock;
-        private bool m_Disposed;
-        private DHCPServerConfiguration m_Config;
-        private EventLog m_EventLog;
+        private readonly object _lock;
+        private bool _disposed;
+        private DHCPServerConfiguration _config;
+        private EventLog _eventLog;
 
-        private DHCPServer m_Server;
-        private Timer m_RetryTimer;
+        private DHCPServer _server;
+        private Timer _retryTimer;
 
         public DHCPServerResurrector(DHCPServerConfiguration config, EventLog eventLog)
         {
-            m_Lock = new object();
-            m_Disposed = false;
-            m_Config = config;
-            m_EventLog = eventLog;
-            m_RetryTimer = new Timer(new TimerCallback(Resurrect));
+            _lock = new object();
+            _disposed = false;
+            _config = config;
+            _eventLog = eventLog;
+            _retryTimer = new Timer(new TimerCallback(Resurrect));
             Resurrect(null);
         }
 
@@ -66,38 +66,38 @@ namespace DHCPServerApp
 
         private void Resurrect(object state)
         {
-            lock (m_Lock)
+            lock (_lock)
             {
-                if (!m_Disposed)
+                if (!_disposed)
                 {
                     try
                     {
-                        m_Server = new DHCPServer(Program.GetClientInfoPath(m_Config.Name,m_Config.Address));
-                        m_Server.EndPoint = new IPEndPoint(IPAddress.Parse(m_Config.Address),67);
-                        m_Server.SubnetMask = IPAddress.Parse(m_Config.NetMask);
-                        m_Server.PoolStart = IPAddress.Parse(m_Config.PoolStart);
-                        m_Server.PoolEnd = IPAddress.Parse(m_Config.PoolEnd);
-                        m_Server.LeaseTime = (m_Config.LeaseTime>0) ? TimeSpan.FromSeconds(m_Config.LeaseTime) : Utils.InfiniteTimeSpan;
-                        m_Server.OfferExpirationTime = TimeSpan.FromSeconds(Math.Max(1, m_Config.OfferTime));
-                        m_Server.MinimumPacketSize = m_Config.MinimumPacketSize;
+                        _server = new DHCPServer(Program.GetClientInfoPath(_config.Name,_config.Address));
+                        _server.EndPoint = new IPEndPoint(IPAddress.Parse(_config.Address),67);
+                        _server.SubnetMask = IPAddress.Parse(_config.NetMask);
+                        _server.PoolStart = IPAddress.Parse(_config.PoolStart);
+                        _server.PoolEnd = IPAddress.Parse(_config.PoolEnd);
+                        _server.LeaseTime = (_config.LeaseTime>0) ? TimeSpan.FromSeconds(_config.LeaseTime) : Utils.InfiniteTimeSpan;
+                        _server.OfferExpirationTime = TimeSpan.FromSeconds(Math.Max(1, _config.OfferTime));
+                        _server.MinimumPacketSize = _config.MinimumPacketSize;
 
                         List <OptionItem> options = new List<OptionItem>();
-                        foreach(OptionConfiguration optionConfiguration in m_Config.Options)
+                        foreach(OptionConfiguration optionConfiguration in _config.Options)
                         {
                             options.Add(optionConfiguration.ConstructOptionItem());
                         }
-                        m_Server.Options = options;
+                        _server.Options = options;
 
                         List<ReservationItem> reservations = new List<ReservationItem>();
-                        foreach (ReservationConfiguration reservationConfiguration in m_Config.Reservations)
+                        foreach (ReservationConfiguration reservationConfiguration in _config.Reservations)
                         {
                             reservations.Add(reservationConfiguration.ConstructReservationItem());
                         }
-                        m_Server.Reservations = reservations;
+                        _server.Reservations = reservations;
                         
-                        m_Server.OnStatusChange += server_OnStatusChange;
-                        m_Server.OnTrace += server_OnTrace;
-                        m_Server.Start();
+                        _server.OnStatusChange += server_OnStatusChange;
+                        _server.OnTrace += server_OnTrace;
+                        _server.Start();
                     }
                     catch (Exception)
                     {
@@ -109,7 +109,7 @@ namespace DHCPServerApp
 
         private void Log(EventLogEntryType entryType, string msg)
         {
-            m_EventLog.WriteEntry(string.Format("{0} : {1}",m_Config.Name,msg),entryType);
+            _eventLog.WriteEntry($"{_config.Name} : {msg}",entryType);
         }
 
         private void server_OnTrace(object sender, DHCPTraceEventArgs e)
@@ -129,7 +129,7 @@ namespace DHCPServerApp
             {
                 if (e.Reason != null)
                 {
-                    Log(EventLogEntryType.Error, string.Format("Stopped, reason: {0}", e.Reason));
+                    Log(EventLogEntryType.Error, $"Stopped, reason: {e.Reason}");
                 }
                 CleanupAndRetry();
             }
@@ -137,20 +137,20 @@ namespace DHCPServerApp
 
         private void CleanupAndRetry()
         {
-            lock (m_Lock)
+            lock (_lock)
             {
-                if (!m_Disposed)
+                if (!_disposed)
                 {
                     // stop server
-                    if (m_Server != null)
+                    if (_server != null)
                     {
-                        m_Server.OnStatusChange -= server_OnStatusChange;
-                        m_Server.OnTrace -= server_OnTrace;
-                        m_Server.Dispose();
-                        m_Server = null;
+                        _server.OnStatusChange -= server_OnStatusChange;
+                        _server.OnTrace -= server_OnTrace;
+                        _server.Dispose();
+                        _server = null;
                     }
                     // initiate retry timer
-                    m_RetryTimer.Change(RetryTime, Timeout.Infinite);
+                    _retryTimer.Change(RetryTime, Timeout.Infinite);
                 }
             }
         }
@@ -159,21 +159,21 @@ namespace DHCPServerApp
         {
             if (disposing)
             {
-                lock (m_Lock)
+                lock (_lock)
                 {
-                    if (!m_Disposed)
+                    if (!_disposed)
                     {
-                        m_Disposed = true;
+                        _disposed = true;
 
-                        m_RetryTimer.Change(Timeout.Infinite, Timeout.Infinite);
-                        m_RetryTimer.Dispose();
+                        _retryTimer.Change(Timeout.Infinite, Timeout.Infinite);
+                        _retryTimer.Dispose();
 
-                        if (m_Server != null)
+                        if (_server != null)
                         {
-                            m_Server.OnStatusChange -= server_OnStatusChange;
-                            m_Server.Dispose();
-                            m_Server.OnTrace -= server_OnTrace;
-                            m_Server = null;
+                            _server.OnStatusChange -= server_OnStatusChange;
+                            _server.Dispose();
+                            _server.OnTrace -= server_OnTrace;
+                            _server = null;
                         }
                     }
                 }

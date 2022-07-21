@@ -40,23 +40,23 @@ namespace DHCPServerApp
 
         private class DeepCopyContext
         {
-            private static readonly Func<object, object> CloneMethod;
-            private readonly Dictionary<Object, Object> m_Visited;
-            private readonly Dictionary<Type, FieldInfo[]> m_NonShallowFieldCache;
+            private static readonly Func<object, object> s_cloneMethod;
+            private readonly Dictionary<Object, Object> _visited;
+            private readonly Dictionary<Type, FieldInfo[]> _nonShallowFieldCache;
 
             static DeepCopyContext()
             {
                 MethodInfo cloneMethod = typeof(Object).GetMethod("MemberwiseClone", BindingFlags.NonPublic | BindingFlags.Instance);
                 var p1 = Expression.Parameter(typeof(object));
                 var body = Expression.Call(p1, cloneMethod);
-                CloneMethod = Expression.Lambda<Func<object, object>>(body, p1).Compile();
+                s_cloneMethod = Expression.Lambda<Func<object, object>>(body, p1).Compile();
                 //Console.WriteLine("typeof(object) contains {0} nonshallow fields", NonShallowFields(typeof(object)).Count());
             }
 
             public DeepCopyContext()
             {
-                m_Visited = new Dictionary<object, object>(new ReferenceEqualityComparer());
-                m_NonShallowFieldCache = new Dictionary<Type, FieldInfo[]>();
+                _visited = new Dictionary<object, object>(new ReferenceEqualityComparer());
+                _nonShallowFieldCache = new Dictionary<Type, FieldInfo[]>();
             }
 
             private static bool IsPrimitiveOrImmutable(Type type)
@@ -90,14 +90,14 @@ namespace DHCPServerApp
                 if (includeInObjectGraph)
                 {
                     object result;
-                    if (m_Visited.TryGetValue(originalObject, out result)) return result;
+                    if (_visited.TryGetValue(originalObject, out result)) return result;
                 }
 
-                var cloneObject = CloneMethod(originalObject);
+                var cloneObject = s_cloneMethod(originalObject);
 
                 if (includeInObjectGraph)
                 {
-                    m_Visited.Add(originalObject, cloneObject);
+                    _visited.Add(originalObject, cloneObject);
                 }
 
                 if (typeToReflect.IsArray)
@@ -182,10 +182,10 @@ namespace DHCPServerApp
             {
                 FieldInfo[] result;
 
-                if (!m_NonShallowFieldCache.TryGetValue(typeToReflect, out result))
+                if (!_nonShallowFieldCache.TryGetValue(typeToReflect, out result))
                 {
                     result = NonShallowFields(typeToReflect).ToArray();
-                    m_NonShallowFieldCache[typeToReflect] = result;
+                    _nonShallowFieldCache[typeToReflect] = result;
                 }
 
                 return result;

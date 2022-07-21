@@ -43,25 +43,25 @@ namespace GitHub.JPMikkers.DHCP
             Assigned
         }
 
-        private byte[] m_Identifier = new byte[0];
-        private byte[] m_HardwareAddress = new byte[0];
-        private string m_HostName = "";
-        private TState m_State = TState.Released;
-        private IPAddress m_IPAddress = IPAddress.Any;
-        private DateTime m_OfferedTime;
-        private DateTime m_LeaseStartTime;
-        private TimeSpan m_LeaseDuration;
+        private byte[] _identifier = new byte[0];
+        private byte[] _hardwareAddress = new byte[0];
+        private string _hostName = "";
+        private TState _state = TState.Released;
+        private IPAddress _IPAddress = IPAddress.Any;
+        private DateTime _offeredTime;
+        private DateTime _leaseStartTime;
+        private TimeSpan _leaseDuration;
 
         [XmlElement(DataType = "hexBinary")]
         public byte[] Identifier
         {
             get
             {
-                return m_Identifier;
+                return _identifier;
             }
             set
             {
-                m_Identifier = value;
+                _identifier = value;
             }
         }
 
@@ -70,11 +70,11 @@ namespace GitHub.JPMikkers.DHCP
         {
             get
             {
-                return m_HardwareAddress;
+                return _hardwareAddress;
             }
             set
             {
-                m_HardwareAddress = value;
+                _hardwareAddress = value;
             }
         }
 
@@ -82,11 +82,11 @@ namespace GitHub.JPMikkers.DHCP
         {
             get
             {
-                return m_HostName;
+                return _hostName;
             }
             set
             {
-                m_HostName = value;
+                _hostName = value;
             }
         }
 
@@ -94,49 +94,49 @@ namespace GitHub.JPMikkers.DHCP
         {
             get
             {
-                return m_State;
+                return _state;
             }
             set
             {
-                m_State = value;
+                _state = value;
             }
         }
 
         [XmlIgnore]
         internal DateTime OfferedTime
         {
-            get { return m_OfferedTime; }
-            set { m_OfferedTime = value; }
+            get { return _offeredTime; }
+            set { _offeredTime = value; }
         }
 
         public DateTime LeaseStartTime
         {
-            get { return m_LeaseStartTime; }
-            set { m_LeaseStartTime = value; }
+            get { return _leaseStartTime; }
+            set { _leaseStartTime = value; }
         }
 
         [XmlIgnore]
         public TimeSpan LeaseDuration
         {
-            get { return m_LeaseDuration; }
-            set { m_LeaseDuration = Utils.SanitizeTimeSpan(value); }
+            get { return _leaseDuration; }
+            set { _leaseDuration = Utils.SanitizeTimeSpan(value); }
         }
 
         public DateTime LeaseEndTime
         {
             get
             {
-                return Utils.IsInfiniteTimeSpan(m_LeaseDuration) ? DateTime.MaxValue : (m_LeaseStartTime + m_LeaseDuration);
+                return Utils.IsInfiniteTimeSpan(_leaseDuration) ? DateTime.MaxValue : (_leaseStartTime + _leaseDuration);
             }
             set
             {
                 if (value >= DateTime.MaxValue)
                 {
-                    m_LeaseDuration = Utils.InfiniteTimeSpan;
+                    _leaseDuration = Utils.InfiniteTimeSpan;
                 }
                 else
                 {
-                    m_LeaseDuration = value - m_LeaseStartTime;
+                    _leaseDuration = value - _leaseStartTime;
                 }
             }
         }
@@ -144,15 +144,15 @@ namespace GitHub.JPMikkers.DHCP
         [XmlIgnore]
         public IPAddress IPAddress
         {
-            get { return m_IPAddress; }
-            set { m_IPAddress = value; }
+            get { return _IPAddress; }
+            set { _IPAddress = value; }
         }
 
         [XmlElement(ElementName = "IPAddress")]
         public string IPAddressAsString
         {
-            get { return m_IPAddress.ToString(); }
-            set { m_IPAddress = IPAddress.Parse(value); }
+            get { return _IPAddress.ToString(); }
+            set { _IPAddress = IPAddress.Parse(value); }
         }
 
         public DHCPClient()
@@ -162,38 +162,38 @@ namespace GitHub.JPMikkers.DHCP
         public DHCPClient Clone()
         {
             DHCPClient result=new DHCPClient();
-            result.m_Identifier = this.m_Identifier;
-            result.m_HardwareAddress = this.m_HardwareAddress;
-            result.m_HostName = this.m_HostName;
-            result.m_State = this.m_State;
-            result.m_IPAddress = this.m_IPAddress;
-            result.m_OfferedTime = this.m_OfferedTime;
-            result.m_LeaseStartTime = this.m_LeaseStartTime;
-            result.m_LeaseDuration = this.m_LeaseDuration;
+            result._identifier = this._identifier;
+            result._hardwareAddress = this._hardwareAddress;
+            result._hostName = this._hostName;
+            result._state = this._state;
+            result._IPAddress = this._IPAddress;
+            result._offeredTime = this._offeredTime;
+            result._leaseStartTime = this._leaseStartTime;
+            result._leaseDuration = this._leaseDuration;
             return result;
         }
 
         internal static DHCPClient CreateFromMessage(DHCPMessage message)
         {
             DHCPClient result = new DHCPClient();
-            result.m_HardwareAddress = message.ClientHardwareAddress;
+            result._hardwareAddress = message.ClientHardwareAddress;
 
             DHCPOptionHostName dhcpOptionHostName = (DHCPOptionHostName)message.GetOption(TDHCPOption.HostName);
 
             if (dhcpOptionHostName != null)
             {
-                result.m_HostName = dhcpOptionHostName.HostName;
+                result._hostName = dhcpOptionHostName.HostName;
             }
 
             DHCPOptionClientIdentifier dhcpOptionClientIdentifier = (DHCPOptionClientIdentifier)message.GetOption(TDHCPOption.ClientIdentifier);
 
             if (dhcpOptionClientIdentifier != null)
             {
-                result.m_Identifier = dhcpOptionClientIdentifier.Data;
+                result._identifier = dhcpOptionClientIdentifier.Data;
             }
             else
             {
-                result.m_Identifier = message.ClientHardwareAddress;
+                result._identifier = message.ClientHardwareAddress;
             }
 
             return result;
@@ -211,21 +211,21 @@ namespace GitHub.JPMikkers.DHCP
             unchecked
             {
                 int result = 0;
-                foreach (byte b in m_Identifier) result = (result * 31) ^ b;
+                foreach (byte b in _identifier) result = (result * 31) ^ b;
                 return result;
             }
         }
 
         public bool Equals(DHCPClient other)
         {
-            return (other != null && Utils.ByteArraysAreEqual(m_Identifier, other.m_Identifier));
+            return (other != null && Utils.ByteArraysAreEqual(_identifier, other._identifier));
         }
 
         #endregion
 
         public override string ToString()
         {
-            return string.Format("{0} ({1})", Utils.BytesToHexString(this.m_Identifier, "-"), this.HostName);
+            return $"{Utils.BytesToHexString(this._identifier, "-")} ({this.HostName})";
         }
     }
 }

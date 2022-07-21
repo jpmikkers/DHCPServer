@@ -27,12 +27,12 @@ namespace GitHub.JPMikkers.DHCP
 {
     public class DHCPOptionVendorSpecificInformation : DHCPOptionBase
     {
-        private byte[] m_Data;
+        private byte[] _data;
 
         public byte[] Data
         {
-            get { return m_Data; }
-            set { m_Data = value; }
+            get { return _data; }
+            set { _data = value; }
         }
 
         #region IDHCPOption Members
@@ -40,14 +40,14 @@ namespace GitHub.JPMikkers.DHCP
         public override IDHCPOption FromStream(Stream s)
         {
             DHCPOptionVendorSpecificInformation result = new DHCPOptionVendorSpecificInformation();
-            result.m_Data = new byte[s.Length];
-            s.Read(result.m_Data, 0, result.m_Data.Length);
+            result._data = new byte[s.Length];
+            s.Read(result._data, 0, result._data.Length);
             return result;
         }
 
         public override void ToStream(Stream s)
         {
-            s.Write(m_Data, 0, m_Data.Length);
+            s.Write(_data, 0, _data.Length);
         }
 
         #endregion
@@ -55,13 +55,13 @@ namespace GitHub.JPMikkers.DHCP
         public DHCPOptionVendorSpecificInformation()
             : base(TDHCPOption.VendorSpecificInformation)
         {
-            m_Data = new byte[0];
+            _data = new byte[0];
         }
 
         public DHCPOptionVendorSpecificInformation(byte[] data)
             : base(TDHCPOption.VendorSpecificInformation)
         {
-            m_Data = data;
+            _data = data;
         }
 
         public DHCPOptionVendorSpecificInformation(string data)
@@ -70,12 +70,12 @@ namespace GitHub.JPMikkers.DHCP
             MemoryStream ms = new MemoryStream();
             ParseHelper.WriteString(ms, ZeroTerminatedStrings, data);
             ms.Flush();
-            m_Data = ms.ToArray();
+            _data = ms.ToArray();
         }
 
         public override string ToString()
         {
-            return string.Format("Option(name=[{0}],value=[{1}])", OptionType, Utils.BytesToHexString(m_Data, " "));
+            return $"Option(name=[{OptionType}],value=[{Utils.BytesToHexString(_data, " ")}])";
         }
     }
 }

@@ -36,17 +36,17 @@ namespace DHCPServerApp
 {
     public partial class FormSettings : Form
     {
-        private DHCPServerConfiguration m_Configuration;
+        private DHCPServerConfiguration _configuration;
 
         public DHCPServerConfiguration Configuration
         {
             get
             {
-                return m_Configuration.Clone();
+                return _configuration.Clone();
             }
             set
             {
-                m_Configuration = value.Clone();
+                _configuration = value.Clone();
                 Bind();
             }
         }
@@ -71,7 +71,7 @@ namespace DHCPServerApp
             textBoxLeaseTime.DataBindings.Clear();
             textBoxOfferTime.DataBindings.Clear();
             textBoxMinimumPacketSize.DataBindings.Clear();
-            var bs = new BindingSource(m_Configuration, null);
+            var bs = new BindingSource(_configuration, null);
             textBoxName.DataBindings.Add("Text", bs, "Name");
             textBoxAddress.DataBindings.Add("Text", bs, "Address");
             textBoxNetMask.DataBindings.Add("Text", bs, "NetMask");
@@ -90,10 +90,10 @@ namespace DHCPServerApp
                 IPAddress address = f.Address;
                 IPAddress netmask = Utils.GetSubnetMask(f.Address);
 
-                m_Configuration.Address = address.ToString();
-                m_Configuration.NetMask = netmask.ToString();
-                m_Configuration.PoolStart = Utils.UInt32ToIPAddress(Utils.IPAddressToUInt32(address) & Utils.IPAddressToUInt32(netmask)).ToString();
-                m_Configuration.PoolEnd = Utils.UInt32ToIPAddress(
+                _configuration.Address = address.ToString();
+                _configuration.NetMask = netmask.ToString();
+                _configuration.PoolStart = Utils.UInt32ToIPAddress(Utils.IPAddressToUInt32(address) & Utils.IPAddressToUInt32(netmask)).ToString();
+                _configuration.PoolEnd = Utils.UInt32ToIPAddress(
                     (Utils.IPAddressToUInt32(address) & Utils.IPAddressToUInt32(netmask)) |
                     ~Utils.IPAddressToUInt32(netmask)).ToString();
                 Bind();

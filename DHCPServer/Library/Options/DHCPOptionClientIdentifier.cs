@@ -27,19 +27,19 @@ namespace GitHub.JPMikkers.DHCP
 {
     public class DHCPOptionClientIdentifier : DHCPOptionBase
     {
-        private DHCPMessage.THardwareType m_HardwareType;
-        private byte[] m_Data;
+        private DHCPMessage.THardwareType _hardwareType;
+        private byte[] _data;
 
         public DHCPMessage.THardwareType HardwareType
         {
-            get { return m_HardwareType; }
-            set { m_HardwareType = value; }   
+            get { return _hardwareType; }
+            set { _hardwareType = value; }   
         }
 
         public byte[] Data
         {
-            get { return m_Data; }
-            set { m_Data = value; }
+            get { return _data; }
+            set { _data = value; }
         }
 
         #region IDHCPOption Members
@@ -47,16 +47,16 @@ namespace GitHub.JPMikkers.DHCP
         public override IDHCPOption FromStream(Stream s)
         {
             DHCPOptionClientIdentifier result = new DHCPOptionClientIdentifier();
-            m_HardwareType = (DHCPMessage.THardwareType)ParseHelper.ReadUInt8(s);
-            result.m_Data = new byte[s.Length - s.Position];
-            s.Read(result.m_Data, 0, result.m_Data.Length);
+            _hardwareType = (DHCPMessage.THardwareType)ParseHelper.ReadUInt8(s);
+            result._data = new byte[s.Length - s.Position];
+            s.Read(result._data, 0, result._data.Length);
             return result;
         }
 
         public override void ToStream(Stream s)
         {
-            ParseHelper.WriteUInt8(s, (byte)m_HardwareType);
-            s.Write(m_Data, 0, m_Data.Length);
+            ParseHelper.WriteUInt8(s, (byte)_hardwareType);
+            s.Write(_data, 0, _data.Length);
         }
 
         #endregion
@@ -64,20 +64,20 @@ namespace GitHub.JPMikkers.DHCP
         public DHCPOptionClientIdentifier()
             : base(TDHCPOption.ClientIdentifier)
         {
-            m_HardwareType = DHCPMessage.THardwareType.Unknown;
-            m_Data = new byte[0];
+            _hardwareType = DHCPMessage.THardwareType.Unknown;
+            _data = new byte[0];
         }
 
         public DHCPOptionClientIdentifier(DHCPMessage.THardwareType hardwareType,byte[] data)
             : base(TDHCPOption.ClientIdentifier)
         {
-            m_HardwareType = hardwareType;
-            m_Data = data;
+            _hardwareType = hardwareType;
+            _data = data;
         }
 
         public override string ToString()
         {
-            return string.Format("Option(name=[{0}],htype=[{1}],value=[{2}])", OptionType, m_HardwareType, Utils.BytesToHexString(m_Data," "));
+            return $"Option(name=[{OptionType}],htype=[{_hardwareType}],value=[{Utils.BytesToHexString(_data, " ")}])";
         }
     }
 }

@@ -144,13 +144,13 @@ namespace GitHub.JPMikkers.DHCP
 
     public abstract class DHCPOptionBase : IDHCPOption
     {
-        protected TDHCPOption m_OptionType;
+        protected TDHCPOption _optionType;
 
         public TDHCPOption OptionType
         {
             get
             {
-                return m_OptionType;
+                return _optionType;
             }
         }
 
@@ -161,7 +161,7 @@ namespace GitHub.JPMikkers.DHCP
 
         protected DHCPOptionBase(TDHCPOption optionType)
         {
-            m_OptionType = optionType;
+            _optionType = optionType;
         }
     }
 }

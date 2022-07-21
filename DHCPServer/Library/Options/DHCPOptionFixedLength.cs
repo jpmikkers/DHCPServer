@@ -46,7 +46,7 @@ namespace GitHub.JPMikkers.DHCP
 
         public override string ToString()
         {
-            return string.Format("Option(name=[{0}],value=[])", m_OptionType);
+            return $"Option(name=[{_optionType}],value=[])";
         }
     }
 }

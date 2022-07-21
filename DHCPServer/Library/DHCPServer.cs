@@ -38,26 +38,26 @@ namespace GitHub.JPMikkers.DHCP
     {
         private const int ClientInformationWriteRetries = 10;
 
-        private object m_Sync = new object();
-        private IPEndPoint m_EndPoint = new IPEndPoint(IPAddress.Loopback,67);
-        private UDPSocket m_Socket;
-        private IPAddress m_SubnetMask = IPAddress.Any;
-        private IPAddress m_PoolStart = IPAddress.Any;
-        private IPAddress m_PoolEnd = IPAddress.Broadcast;
+        private readonly object _sync = new object();
+        private IPEndPoint _endPoint = new IPEndPoint(IPAddress.Loopback,67);
+        private UDPSocket _socket;
+        private IPAddress _subnetMask = IPAddress.Any;
+        private IPAddress _poolStart = IPAddress.Any;
+        private IPAddress _poolEnd = IPAddress.Broadcast;
 
-        private string m_ClientInfoPath;
-        private string m_HostName;
-        private Dictionary<DHCPClient,DHCPClient> m_Clients = new Dictionary<DHCPClient, DHCPClient>();
-        private Timer m_Timer;
-        private TimeSpan m_OfferExpirationTime = TimeSpan.FromSeconds(30.0);
-        private TimeSpan m_LeaseTime = TimeSpan.FromDays(1);
-        private bool m_Active = false;
-        private List<OptionItem> m_Options = new List<OptionItem>();
-        private List<IDHCPMessageInterceptor> m_Interceptors= new List<IDHCPMessageInterceptor>();
-        private List<ReservationItem> m_Reservations = new List<ReservationItem>();
-        private int m_MinimumPacketSize = 576;
-        private AutoPumpQueue<int> m_UpdateClientInfoQueue;
-        private Random m_Random = new Random();
+        private readonly string _clientInfoPath;
+        private readonly string _hostName;
+        private readonly Dictionary<DHCPClient,DHCPClient> _clients = new Dictionary<DHCPClient, DHCPClient>();
+        private Timer _timer;
+        private TimeSpan _offerExpirationTime = TimeSpan.FromSeconds(30.0);
+        private TimeSpan _leaseTime = TimeSpan.FromDays(1);
+        private bool _active = false;
+        private List<OptionItem> _options = new List<OptionItem>();
+        private List<IDHCPMessageInterceptor> _interceptors= new List<IDHCPMessageInterceptor>();
+        private List<ReservationItem> _reservations = new List<ReservationItem>();
+        private int _minimumPacketSize = 576;
+        private readonly AutoPumpQueue<int> m_UpdateClientInfoQueue;
+        private readonly Random m_Random = new Random();
 
         #region IDHCPServer Members
 
@@ -68,11 +68,11 @@ namespace GitHub.JPMikkers.DHCP
         {
             get
             {
-                return m_EndPoint;
+                return _endPoint;
             }
             set
             {
-                m_EndPoint = value;
+                _endPoint = value;
             }
         }
 
@@ -80,11 +80,11 @@ namespace GitHub.JPMikkers.DHCP
         {
             get
             {
-                return m_SubnetMask;
+                return _subnetMask;
             }
             set
             {
-                m_SubnetMask = value;
+                _subnetMask = value;
             }
         }
 
@@ -92,11 +92,11 @@ namespace GitHub.JPMikkers.DHCP
         {
             get
             {
-                return m_PoolStart;
+                return _poolStart;
             }
             set
             {
-                m_PoolStart = value;
+                _poolStart = value;
             }
         }
 
@@ -104,11 +104,11 @@ namespace GitHub.JPMikkers.DHCP
         {
             get
             {
-                return m_PoolEnd;
+                return _poolEnd;
             }
             set
             {
-                m_PoolEnd = value;
+                _poolEnd = value;
             }
         }
 
@@ -116,11 +116,11 @@ namespace GitHub.JPMikkers.DHCP
         {
             get
             {
-                return m_OfferExpirationTime;
+                return _offerExpirationTime;
             }
             set
             {
-                m_OfferExpirationTime = value;
+                _offerExpirationTime = value;
             }
         }
 
@@ -128,12 +128,12 @@ namespace GitHub.JPMikkers.DHCP
         {
             get
             {
-                return m_LeaseTime;
+                return _leaseTime;
             }
             set
             {
                 // sanitize timespan.
-                m_LeaseTime = Utils.SanitizeTimeSpan(value);
+                _leaseTime = Utils.SanitizeTimeSpan(value);
             }
         }
 
@@ -141,11 +141,11 @@ namespace GitHub.JPMikkers.DHCP
         {
             get
             {
-                return m_MinimumPacketSize;
+                return _minimumPacketSize;
             }
             set
             {
-                m_MinimumPacketSize = Math.Max(value,312);
+                _minimumPacketSize = Math.Max(value,312);
             }
         }
 
@@ -154,7 +154,7 @@ namespace GitHub.JPMikkers.DHCP
         {
             get
             {
-                return m_HostName;
+                return _hostName;
             }
         }
 
@@ -162,10 +162,10 @@ namespace GitHub.JPMikkers.DHCP
         {
             get
             {
-                lock(m_Clients)
+                lock(_clients)
                 {
                     List<DHCPClient> clients = new List<DHCPClient>();
-                    foreach(DHCPClient client in m_Clients.Values)
+                    foreach(DHCPClient client in _clients.Values)
                     {
                         clients.Add(client.Clone());
                     }
@@ -178,9 +178,9 @@ namespace GitHub.JPMikkers.DHCP
         {
             get
             {
-                lock (m_Sync)
+                lock (_sync)
                 {
-                    return m_Active;
+                    return _active;
                 }
             }
         }
@@ -189,11 +189,11 @@ namespace GitHub.JPMikkers.DHCP
         {
             get
             {
-                return m_Options;
+                return _options;
             }
             set
             {
-                m_Options = value;
+                _options = value;
             }
         }
 
@@ -201,11 +201,11 @@ namespace GitHub.JPMikkers.DHCP
         {
             get
             {
-                return m_Interceptors;
+                return _interceptors;
             }
             set
             {
-                m_Interceptors = value;
+                _interceptors = value;
             }
         }
 
@@ -213,11 +213,11 @@ namespace GitHub.JPMikkers.DHCP
         {
             get
             {
-                return m_Reservations;
+                return _reservations;
             }
             set
             {
-                m_Reservations = value;
+                _reservations = value;
             }
         }
 
@@ -238,7 +238,7 @@ namespace GitHub.JPMikkers.DHCP
                     {
                         try
                         {
-                            clientInformation.Write(m_ClientInfoPath);
+                            clientInformation.Write(_clientInfoPath);
                             break;
                         }
                         catch
@@ -257,7 +257,7 @@ namespace GitHub.JPMikkers.DHCP
                 }
                 catch (Exception e)
                 {
-                    Trace(string.Format("Exception in OnUpdateClientInfo : {0}", e.ToString()));
+                    Trace($"Exception in OnUpdateClientInfo : {e}");
                 }
             }
         }
@@ -265,43 +265,43 @@ namespace GitHub.JPMikkers.DHCP
         public DHCPServer(string clientInfoPath)
         {
             m_UpdateClientInfoQueue = new AutoPumpQueue<int>(OnUpdateClientInfo);
-            m_ClientInfoPath = clientInfoPath;
-            m_HostName = System.Environment.MachineName;
+            _clientInfoPath = clientInfoPath;
+            _hostName = System.Environment.MachineName;
         }
 
         public void Start()
         {
-            lock (m_Sync)
+            lock (_sync)
             {
                 try
                 {
-                    DHCPClientInformation clientInformation = DHCPClientInformation.Read(m_ClientInfoPath);
+                    DHCPClientInformation clientInformation = DHCPClientInformation.Read(_clientInfoPath);
 
                     foreach (DHCPClient client in clientInformation.Clients
                         .Where(c => c.State != DHCPClient.TState.Offered)   // Forget offered clients.
                         .Where(c => IsIPAddressInPoolRange(c.IPAddress)))   // Forget clients no longer in ip range.
                     {
-                        m_Clients.Add(client, client);
+                        _clients.Add(client, client);
                     }
                 }
                 catch (Exception)
                 {
                 }
 
-                if (!m_Active)
+                if (!_active)
                 {
                     try
                     {
-                        Trace(string.Format("Starting DHCP server '{0}'", m_EndPoint));
-                        m_Active = true;
-                        m_Socket = new UDPSocket(m_EndPoint, 2048, true, 10, OnReceive, OnStop);
-                        m_Timer = new Timer(new TimerCallback(OnTimer), null, TimeSpan.FromSeconds(1.0), TimeSpan.FromSeconds(1.0));
+                        Trace($"Starting DHCP server '{_endPoint}'");
+                        _active = true;
+                        _socket = new UDPSocket(_endPoint, 2048, true, 10, OnReceive, OnStop);
+                        _timer = new Timer(new TimerCallback(OnTimer), null, TimeSpan.FromSeconds(1.0), TimeSpan.FromSeconds(1.0));
                         Trace("DHCP Server start succeeded");
                     }
                     catch (Exception e)
                     {
-                        Trace(string.Format("DHCP Server start failed, reason '{0}'", e));
-                        m_Active = false;
+                        Trace($"DHCP Server start failed, reason '{e}'");
+                        _active = false;
                         throw;
                     }
                 }
@@ -368,14 +368,14 @@ namespace GitHub.JPMikkers.DHCP
         {
             bool notify = false;
 
-            lock (m_Sync)
+            lock (_sync)
             {
-                if (m_Active)
+                if (_active)
                 {
-                    Trace(string.Format("Stopping DHCP server '{0}'", m_EndPoint));
-                    m_Active = false;
+                    Trace($"Stopping DHCP server '{_endPoint}'");
+                    _active = false;
                     notify = true;
-                    m_Socket.Dispose();
+                    _socket.Dispose();
                     Trace("Stopped");
                 }
             }
@@ -392,12 +392,12 @@ namespace GitHub.JPMikkers.DHCP
         {
             bool modified = false;
 
-            lock (m_Clients)
+            lock (_clients)
             {
                 List<DHCPClient> clientsToRemove = new List<DHCPClient>();
-                foreach (DHCPClient client in m_Clients.Keys)
+                foreach (DHCPClient client in _clients.Keys)
                 {
-                    if (client.State == DHCPClient.TState.Offered && (DateTime.Now - client.OfferedTime) > m_OfferExpirationTime)
+                    if (client.State == DHCPClient.TState.Offered && (DateTime.Now - client.OfferedTime) > _offerExpirationTime)
                     {
                         clientsToRemove.Add(client);
                     }
@@ -410,7 +410,7 @@ namespace GitHub.JPMikkers.DHCP
 
                 foreach (DHCPClient client in clientsToRemove)
                 {
-                    m_Clients.Remove(client);
+                    _clients.Remove(client);
                     modified = true;
                 }
             }
@@ -423,27 +423,27 @@ namespace GitHub.JPMikkers.DHCP
 
         private void RemoveClient(DHCPClient client)
         {
-            lock (m_Clients)
+            lock (_clients)
             {
-                if (m_Clients.Remove(client))
+                if (_clients.Remove(client))
                 {
-                    Trace(string.Format("Removed client '{0}' from client table", client));
+                    Trace($"Removed client '{client}' from client table");
                 }
             }
         }
 
         private void SendMessage(DHCPMessage msg, IPEndPoint endPoint)
         {
-            Trace(string.Format("==== Sending response to {0} ====", endPoint));
+            Trace($"==== Sending response to {endPoint} ====");
             Trace(Utils.PrefixLines(msg.ToString(), "s->c "));
             MemoryStream m = new MemoryStream();
-            msg.ToStream(m, m_MinimumPacketSize);
-            m_Socket.Send(endPoint, new ArraySegment<byte>(m.ToArray()));
+            msg.ToStream(m, _minimumPacketSize);
+            _socket.Send(endPoint, new ArraySegment<byte>(m.ToArray()));
         }
 
         private void AppendConfiguredOptions(DHCPMessage sourceMsg,DHCPMessage targetMsg)
         {
-            foreach (OptionItem optionItem in m_Options)
+            foreach (OptionItem optionItem in _options)
             {
                 if (optionItem.Mode == OptionMode.Force || sourceMsg.IsRequestedParameter(optionItem.Option.OptionType))
                 {
@@ -454,7 +454,7 @@ namespace GitHub.JPMikkers.DHCP
                 }
             }
 
-            foreach(IDHCPMessageInterceptor interceptor in m_Interceptors)
+            foreach(IDHCPMessageInterceptor interceptor in _interceptors)
             {
                 interceptor.Apply(sourceMsg, targetMsg);
             }
@@ -508,8 +508,8 @@ namespace GitHub.JPMikkers.DHCP
             //All others                MAY          
 
             response.Options.Add(new DHCPOptionIPAddressLeaseTime(leaseTime));
-            response.Options.Add(new DHCPOptionServerIdentifier(((IPEndPoint)m_Socket.LocalEndPoint).Address));
-            if (sourceMsg.IsRequestedParameter(TDHCPOption.SubnetMask)) response.Options.Add(new DHCPOptionSubnetMask(this.m_SubnetMask));
+            response.Options.Add(new DHCPOptionServerIdentifier(((IPEndPoint)_socket.LocalEndPoint).Address));
+            if (sourceMsg.IsRequestedParameter(TDHCPOption.SubnetMask)) response.Options.Add(new DHCPOptionSubnetMask(this._subnetMask));
             AppendConfiguredOptions(sourceMsg, response);
             SendOfferOrAck(sourceMsg, response);
         }
@@ -546,8 +546,8 @@ namespace GitHub.JPMikkers.DHCP
             response.RelayAgentIPAddress = sourceMsg.RelayAgentIPAddress;
             response.ClientHardwareAddress = sourceMsg.ClientHardwareAddress;
             response.MessageType = TDHCPMessageType.NAK;
-            response.Options.Add(new DHCPOptionServerIdentifier(((IPEndPoint)m_Socket.LocalEndPoint).Address));
-            if (sourceMsg.IsRequestedParameter(TDHCPOption.SubnetMask)) response.Options.Add(new DHCPOptionSubnetMask(this.m_SubnetMask));
+            response.Options.Add(new DHCPOptionServerIdentifier(((IPEndPoint)_socket.LocalEndPoint).Address));
+            if (sourceMsg.IsRequestedParameter(TDHCPOption.SubnetMask)) response.Options.Add(new DHCPOptionSubnetMask(this._subnetMask));
 
             if (!sourceMsg.RelayAgentIPAddress.Equals(IPAddress.Any))
             {
@@ -612,8 +612,8 @@ namespace GitHub.JPMikkers.DHCP
             //All others                MAY                
 
             response.Options.Add(new DHCPOptionIPAddressLeaseTime(leaseTime));
-            response.Options.Add(new DHCPOptionServerIdentifier(((IPEndPoint)m_Socket.LocalEndPoint).Address));
-            if (sourceMsg.IsRequestedParameter(TDHCPOption.SubnetMask)) response.Options.Add(new DHCPOptionSubnetMask(this.m_SubnetMask));
+            response.Options.Add(new DHCPOptionServerIdentifier(((IPEndPoint)_socket.LocalEndPoint).Address));
+            if (sourceMsg.IsRequestedParameter(TDHCPOption.SubnetMask)) response.Options.Add(new DHCPOptionSubnetMask(this._subnetMask));
             AppendConfiguredOptions(sourceMsg, response);
             SendOfferOrAck(sourceMsg, response);
         }
@@ -671,8 +671,8 @@ namespace GitHub.JPMikkers.DHCP
             //Maximum message size      MUST NOT              : ok
             //All others                MAY                
 
-            response.Options.Add(new DHCPOptionServerIdentifier(((IPEndPoint)m_Socket.LocalEndPoint).Address));
-            if (sourceMsg.IsRequestedParameter(TDHCPOption.SubnetMask)) response.Options.Add(new DHCPOptionSubnetMask(this.m_SubnetMask));
+            response.Options.Add(new DHCPOptionServerIdentifier(((IPEndPoint)_socket.LocalEndPoint).Address));
+            if (sourceMsg.IsRequestedParameter(TDHCPOption.SubnetMask)) response.Options.Add(new DHCPOptionSubnetMask(this._subnetMask));
             AppendConfiguredOptions(sourceMsg, response);
             SendMessage(response, new IPEndPoint(sourceMsg.ClientIPAddress, 68));
         }
@@ -725,7 +725,7 @@ namespace GitHub.JPMikkers.DHCP
                 }
                 else
                 {
-                    Trace(string.Format("Client sent message with non-matching server identifier '{0}' -> ignored", dhcpOptionServerIdentifier.IPAddress));
+                    Trace($"Client sent message with non-matching server identifier '{dhcpOptionServerIdentifier.IPAddress}' -> ignored");
                 }
             }
             else
@@ -748,19 +748,19 @@ namespace GitHub.JPMikkers.DHCP
         /// <returns>true when the ip address matches one of the known pool ranges</returns>
         private bool IsIPAddressInPoolRange(IPAddress address)
         {
-            return IsIPAddressInRange(address, m_PoolStart, m_PoolEnd) || m_Reservations.Any(r => IsIPAddressInRange(address, r.PoolStart, r.PoolEnd));
+            return IsIPAddressInRange(address, _poolStart, _poolEnd) || _reservations.Any(r => IsIPAddressInRange(address, r.PoolStart, r.PoolEnd));
         }
 
         private bool IPAddressIsInSubnet(IPAddress address)
         {
-            return ((Utils.IPAddressToUInt32(address) & Utils.IPAddressToUInt32(m_SubnetMask)) == (Utils.IPAddressToUInt32(m_EndPoint.Address) & Utils.IPAddressToUInt32(m_SubnetMask)));
+            return ((Utils.IPAddressToUInt32(address) & Utils.IPAddressToUInt32(_subnetMask)) == (Utils.IPAddressToUInt32(_endPoint.Address) & Utils.IPAddressToUInt32(_subnetMask)));
         }
 
         private bool IPAddressIsFree(IPAddress address, bool reuseReleased)
         {
             if (!IPAddressIsInSubnet(address)) return false;
-            if (address.Equals(m_EndPoint.Address)) return false;
-            foreach(DHCPClient client in m_Clients.Keys)
+            if (address.Equals(_endPoint.Address)) return false;
+            foreach(DHCPClient client in _clients.Keys)
             {
                 if(client.IPAddress.Equals(address))
                 {
@@ -781,8 +781,8 @@ namespace GitHub.JPMikkers.DHCP
         private IPAddress SanitizeHostRange(IPAddress startend)
         {
             return Utils.UInt32ToIPAddress(
-                (Utils.IPAddressToUInt32(m_EndPoint.Address) & Utils.IPAddressToUInt32(m_SubnetMask)) |
-                (Utils.IPAddressToUInt32(startend) & ~Utils.IPAddressToUInt32(m_SubnetMask))
+                (Utils.IPAddressToUInt32(_endPoint.Address) & Utils.IPAddressToUInt32(_subnetMask)) |
+                (Utils.IPAddressToUInt32(startend) & ~Utils.IPAddressToUInt32(_subnetMask))
             );
         }
 
@@ -790,7 +790,7 @@ namespace GitHub.JPMikkers.DHCP
         {
             DHCPOptionRequestedIPAddress dhcpOptionRequestedIPAddress = (DHCPOptionRequestedIPAddress)dhcpMessage.GetOption(TDHCPOption.RequestedIPAddress);
 
-            var reservation = m_Reservations.FirstOrDefault(x => x.Match(dhcpMessage));
+            var reservation = _reservations.FirstOrDefault(x => x.Match(dhcpMessage));
 
             if (reservation != null)
             {
@@ -823,7 +823,7 @@ namespace GitHub.JPMikkers.DHCP
             }
 
             // first try to find a free address without reusing released ones
-            for(UInt32 host = Utils.IPAddressToUInt32(SanitizeHostRange(m_PoolStart)); host <= Utils.IPAddressToUInt32(SanitizeHostRange(m_PoolEnd)); host++)
+            for(UInt32 host = Utils.IPAddressToUInt32(SanitizeHostRange(_poolStart)); host <= Utils.IPAddressToUInt32(SanitizeHostRange(_poolEnd)); host++)
             {
                 IPAddress testIPAddress = Utils.UInt32ToIPAddress(host);
                 if(IPAddressIsFree(testIPAddress,false))
@@ -833,7 +833,7 @@ namespace GitHub.JPMikkers.DHCP
             }
 
             // nothing found.. now start allocating released ones as well
-            for (UInt32 host = Utils.IPAddressToUInt32(SanitizeHostRange(m_PoolStart)); host <= Utils.IPAddressToUInt32(SanitizeHostRange(m_PoolEnd)); host++)
+            for (UInt32 host = Utils.IPAddressToUInt32(SanitizeHostRange(_poolStart)); host <= Utils.IPAddressToUInt32(SanitizeHostRange(_poolEnd)); host++)
             {
                 IPAddress testIPAddress = Utils.UInt32ToIPAddress(host);
                 if (IPAddressIsFree(testIPAddress, true))
@@ -848,12 +848,12 @@ namespace GitHub.JPMikkers.DHCP
 
         private void OfferClient(DHCPMessage dhcpMessage, DHCPClient client)
         {
-            lock (m_Clients)
+            lock (_clients)
             {
                 client.State = DHCPClient.TState.Offered;
                 client.OfferedTime = DateTime.Now;
-                if (!m_Clients.ContainsKey(client)) m_Clients.Add(client, client);
-                SendOFFER(dhcpMessage, client.IPAddress, m_LeaseTime);
+                if (!_clients.ContainsKey(client)) _clients.Add(client, client);
+                SendOFFER(dhcpMessage, client.IPAddress, _leaseTime);
             }
         }
 
@@ -871,21 +871,21 @@ namespace GitHub.JPMikkers.DHCP
                 if (dhcpMessage.Opcode == DHCPMessage.TOpcode.BootRequest)
                 {
                     DHCPClient client = DHCPClient.CreateFromMessage(dhcpMessage);
-                    Trace(string.Format("Client {0} sent {1}", client, dhcpMessage.MessageType));
+                    Trace($"Client {client} sent {dhcpMessage.MessageType}");
 
                     switch (dhcpMessage.MessageType)
                     {
                         // DHCPDISCOVER - client to server
                         // broadcast to locate available servers
                         case TDHCPMessageType.DISCOVER:
-                            lock(m_Clients)
+                            lock(_clients)
                             {
                                 // is it a known client?
-                                DHCPClient knownClient = m_Clients.ContainsKey(client) ? m_Clients[client] : null;
+                                DHCPClient knownClient = _clients.ContainsKey(client) ? _clients[client] : null;
                                 
                                 if(knownClient!=null)
                                 {
-                                    Trace(string.Format("Client is known, in state {0}",knownClient.State));
+                                    Trace($"Client is known, in state {knownClient.State}");
 
                                     if (knownClient.State == DHCPClient.TState.Offered || knownClient.State == DHCPClient.TState.Assigned)
                                     {
@@ -939,10 +939,10 @@ namespace GitHub.JPMikkers.DHCP
                         // (b) confirming correctness of previously allocated address after e.g. system reboot, or
                         // (c) extending the lease on a particular network address
                         case TDHCPMessageType.REQUEST:
-                            lock (m_Clients)
+                            lock (_clients)
                             {
                                 // is it a known client?
-                                DHCPClient knownClient = m_Clients.ContainsKey(client) ? m_Clients[client] : null;
+                                DHCPClient knownClient = _clients.ContainsKey(client) ? _clients[client] : null;
 
                                 // is there a server identifier?
                                 DHCPOptionServerIdentifier dhcpOptionServerIdentifier = (DHCPOptionServerIdentifier) dhcpMessage.GetOption(TDHCPOption.ServerIdentifier);
@@ -951,7 +951,7 @@ namespace GitHub.JPMikkers.DHCP
                                 if (dhcpOptionServerIdentifier != null)
                                 {
                                     // there is a server identifier: the message is in response to a DHCPOFFER
-                                    if(dhcpOptionServerIdentifier.IPAddress.Equals(m_EndPoint.Address))
+                                    if(dhcpOptionServerIdentifier.IPAddress.Equals(_endPoint.Address))
                                     {         
                                         // it's a response to OUR offer.
                                         // but did we actually offer one?
@@ -966,16 +966,12 @@ namespace GitHub.JPMikkers.DHCP
                                                     Trace("Client request matches offered address -> ACK");
                                                     knownClient.State = DHCPClient.TState.Assigned;
                                                     knownClient.LeaseStartTime = DateTime.Now;
-                                                    knownClient.LeaseDuration = m_LeaseTime;
+                                                    knownClient.LeaseDuration = _leaseTime;
                                                     SendACK(dhcpMessage, knownClient.IPAddress, knownClient.LeaseDuration);
                                                 }
                                                 else
                                                 {
-                                                    Trace(
-                                                        string.Format(
-                                                            "Client sent request for IP address '{0}', but it does not match the offered address '{1}' -> NAK",
-                                                            dhcpOptionRequestedIPAddress.IPAddress,
-                                                            knownClient.IPAddress));
+                                                    Trace($"Client sent request for IP address '{dhcpOptionRequestedIPAddress.IPAddress}', but it does not match the offered address '{knownClient.IPAddress}' -> NAK");
                                                     SendNAK(dhcpMessage);
                                                     RemoveClient(knownClient);
                                                 }
@@ -996,10 +992,7 @@ namespace GitHub.JPMikkers.DHCP
                                     }
                                     else
                                     {
-                                        Trace(
-                                            string.Format(
-                                                "Client requests IP address that was offered by another DHCP server at '{0}' -> drop offer",
-                                                dhcpOptionServerIdentifier.IPAddress));
+                                        Trace($"Client requests IP address that was offered by another DHCP server at '{dhcpOptionServerIdentifier.IPAddress}' -> drop offer");
                                         // it's a response to another DHCP server.
                                         // if we sent an OFFER to this client earlier, remove it.
                                         if(knownClient!=null)
@@ -1027,7 +1020,7 @@ namespace GitHub.JPMikkers.DHCP
                                         {
                                             // known, assigned, and IP address matches administration. ACK
                                             knownClient.LeaseStartTime = DateTime.Now;
-                                            knownClient.LeaseDuration = m_LeaseTime;
+                                            knownClient.LeaseDuration = _leaseTime;
                                             SendACK(dhcpMessage, dhcpMessage.ClientIPAddress, knownClient.LeaseDuration);
                                         }
                                         else
@@ -1042,8 +1035,8 @@ namespace GitHub.JPMikkers.DHCP
                                                 client.IPAddress = dhcpMessage.ClientIPAddress;
                                                 client.State = DHCPClient.TState.Assigned;
                                                 client.LeaseStartTime = DateTime.Now;
-                                                client.LeaseDuration = m_LeaseTime;
-                                                m_Clients.Add(client, client);
+                                                client.LeaseDuration = _leaseTime;
+                                                _clients.Add(client, client);
                                                 SendACK(dhcpMessage, dhcpMessage.ClientIPAddress, client.LeaseDuration);
                                             }
                                             else
@@ -1066,12 +1059,12 @@ namespace GitHub.JPMikkers.DHCP
                                                     Trace("Client request matches cached address -> ACK");
                                                     // known, assigned, and IP address matches administration. ACK
                                                     knownClient.LeaseStartTime = DateTime.Now;
-                                                    knownClient.LeaseDuration = m_LeaseTime;
+                                                    knownClient.LeaseDuration = _leaseTime;
                                                     SendACK(dhcpMessage, dhcpOptionRequestedIPAddress.IPAddress, knownClient.LeaseDuration);
                                                 }
                                                 else
                                                 {
-                                                    Trace(string.Format("Client sent request for IP address '{0}', but it does not match cached address '{1}' -> NAK", dhcpOptionRequestedIPAddress.IPAddress, knownClient.IPAddress));
+                                                    Trace($"Client sent request for IP address '{dhcpOptionRequestedIPAddress.IPAddress}', but it does not match cached address '{knownClient.IPAddress}' -> NAK");
                                                     SendNAK(dhcpMessage);
                                                     RemoveClient(knownClient);
                                                 }
@@ -1101,12 +1094,12 @@ namespace GitHub.JPMikkers.DHCP
                             // address is already in use.  The server MUST mark the network address
                             // as not available and SHOULD notify the local system administrator of
                             // a possible configuration problem.
-                            lock(m_Clients)
+                            lock(_clients)
                             {
                                 if (ServerIdentifierPrecondition(dhcpMessage))
                                 {
                                     // is it a known client?
-                                    DHCPClient knownClient = m_Clients.ContainsKey(client) ? m_Clients[client] : null;
+                                    DHCPClient knownClient = _clients.ContainsKey(client) ? _clients[client] : null;
 
                                     if(knownClient!=null)
                                     {
@@ -1140,12 +1133,12 @@ namespace GitHub.JPMikkers.DHCP
                             // address as not allocated.  The server SHOULD retain a record of the
                             // client's initialization parameters for possible reuse in response to
                             // subsequent requests from the client.
-                            lock(m_Clients)
+                            lock(_clients)
                             {
                                 if (ServerIdentifierPrecondition(dhcpMessage))
                                 {
                                     // is it a known client?
-                                    DHCPClient knownClient = m_Clients.ContainsKey(client) ? m_Clients[client] : null;
+                                    DHCPClient knownClient = _clients.ContainsKey(client) ? _clients[client] : null;
 
                                     if ( knownClient!=null /* && knownClient.State == DHCPClient.TState.Assigned */ )
                                     {
@@ -1182,7 +1175,7 @@ namespace GitHub.JPMikkers.DHCP
                             break;
 
                         default:
-                            Trace(string.Format("Invalid message from client, ignored"));
+                            Trace("Invalid message from client, ignored");
                             break;
                     }
 

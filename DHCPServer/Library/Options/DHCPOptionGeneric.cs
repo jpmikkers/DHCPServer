@@ -27,44 +27,44 @@ namespace GitHub.JPMikkers.DHCP
 {
     public class DHCPOptionGeneric : DHCPOptionBase
     {
-        private byte[] m_Data;
+        private byte[] _data;
 
         public byte[] Data
         {
-            get { return m_Data; }
-            set { m_Data = value; }
+            get { return _data; }
+            set { _data = value; }
         }
 
         #region IDHCPOption Members
 
         public override IDHCPOption FromStream(Stream s)
         {
-            DHCPOptionGeneric result = new DHCPOptionGeneric(m_OptionType);
-            result.m_Data = new byte[s.Length];
-            s.Read(result.m_Data, 0, result.m_Data.Length);
+            DHCPOptionGeneric result = new DHCPOptionGeneric(_optionType);
+            result._data = new byte[s.Length];
+            s.Read(result._data, 0, result._data.Length);
             return result;
         }
 
         public override void ToStream(Stream s)
         {
-            s.Write(m_Data, 0, m_Data.Length);
+            s.Write(_data, 0, _data.Length);
         }
 
         #endregion
 
         public DHCPOptionGeneric(TDHCPOption option) : base(option)
         {
-            m_Data = new byte[0];
+            _data = new byte[0];
         }
 
         public DHCPOptionGeneric(TDHCPOption option, byte[] data) : base(option)
         {
-            m_Data = data;
+            _data = data;
         }
 
         public override string ToString()
         {
-            return string.Format("Option(name=[{0}],value=[{1}])", m_OptionType, Utils.BytesToHexString(m_Data," "));
+            return $"Option(name=[{_optionType}],value=[{Utils.BytesToHexString(_data, " ")}])";
         }
     }
 }

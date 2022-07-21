@@ -27,7 +27,7 @@ namespace GitHub.JPMikkers.DHCP
 {
     public class DHCPOptionMessage : DHCPOptionBase
     {
-        private string m_Message;
+        private string _message;
 
         #region IDHCPOption Members
 
@@ -35,20 +35,20 @@ namespace GitHub.JPMikkers.DHCP
         {
             get
             {
-                return m_Message;
+                return _message;
             }
         }
 
         public override IDHCPOption FromStream(Stream s)
         {
             DHCPOptionMessage result = new DHCPOptionMessage();
-            result.m_Message = ParseHelper.ReadString(s);
+            result._message = ParseHelper.ReadString(s);
             return result;
         }
 
         public override void ToStream(Stream s)
         {
-            ParseHelper.WriteString(s, ZeroTerminatedStrings, m_Message);
+            ParseHelper.WriteString(s, ZeroTerminatedStrings, _message);
         }
 
         #endregion
@@ -61,12 +61,12 @@ namespace GitHub.JPMikkers.DHCP
         public DHCPOptionMessage(string message)
             : base(TDHCPOption.Message)
         {
-            m_Message = message;
+            _message = message;
         }
 
         public override string ToString()
         {
-            return string.Format("Option(name=[{0}],value=[{1}])", OptionType, m_Message);
+            return $"Option(name=[{OptionType}],value=[{_message}])";
         }
     }
 }

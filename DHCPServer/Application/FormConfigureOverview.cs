@@ -14,16 +14,16 @@ namespace DHCPServerApp
 {
     public partial class FormConfigureOverview : Form
     {
-        private string m_ConfigurationPath;
-        private DHCPServerConfigurationList m_ConfigurationList;
+        private string _configurationPath;
+        private DHCPServerConfigurationList _configurationList;
 
         public FormConfigureOverview(string configurationPath)
         {
             InitializeComponent();
-            m_ConfigurationPath = configurationPath;
-            m_ConfigurationList = DHCPServerConfigurationList.Read(m_ConfigurationPath);
+            _configurationPath = configurationPath;
+            _configurationList = DHCPServerConfigurationList.Read(_configurationPath);
             dataGridView1.AutoGenerateColumns = false;
-            dataGridView1.DataSource = m_ConfigurationList;
+            dataGridView1.DataSource = _configurationList;
             UpdateButtonStatus();
         }
 
@@ -81,8 +81,8 @@ namespace DHCPServerApp
             DHCPServerConfiguration result = EditConfiguration(-1,new DHCPServerConfiguration());
             if (result != null)
             {
-                m_ConfigurationList.Add(result);
-                SelectRow(m_ConfigurationList.Count - 1);
+                _configurationList.Add(result);
+                SelectRow(_configurationList.Count - 1);
                 UpdateButtonStatus();
             }
         }
@@ -106,7 +106,7 @@ namespace DHCPServerApp
                     currentIndex--;
                     SelectRow(currentIndex);
                 }             
-                m_ConfigurationList.RemoveAt(x);
+                _configurationList.RemoveAt(x);
             }
             UpdateButtonStatus();
         }
@@ -134,7 +134,7 @@ namespace DHCPServerApp
 
         private void buttonOK_Click(object sender, EventArgs e)
         {
-            m_ConfigurationList.Write(m_ConfigurationPath);
+            _configurationList.Write(_configurationPath);
         }
 
         private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
@@ -159,24 +159,24 @@ namespace DHCPServerApp
 
         private void EditConfiguration(int index)
         {
-            if (index >= 0 && index < m_ConfigurationList.Count)
+            if (index >= 0 && index < _configurationList.Count)
             {
-                DHCPServerConfiguration result = EditConfiguration(index,m_ConfigurationList[index]);
+                DHCPServerConfiguration result = EditConfiguration(index,_configurationList[index]);
                 if (result != null)
                 {
-                    m_ConfigurationList.Insert(index, result);
-                    m_ConfigurationList.RemoveAt(index + 1);
+                    _configurationList.Insert(index, result);
+                    _configurationList.RemoveAt(index + 1);
                 }
             }
         }
 
         private bool ConfigurationCollides(int index,DHCPServerConfiguration config)
         {
-            for (int t = 0; t < m_ConfigurationList.Count; t++)
+            for (int t = 0; t < _configurationList.Count; t++)
             {
-                if (t != index && config.Address == m_ConfigurationList[t].Address)
+                if (t != index && config.Address == _configurationList[t].Address)
                 {
-                    System.Diagnostics.Debug.WriteLine(string.Format("item {0} collides with {1}",t,index));
+                    System.Diagnostics.Debug.WriteLine($"item {t} collides with {index}");
                     return true;
                 }
             }
@@ -192,7 +192,7 @@ namespace DHCPServerApp
 
             while(dialogResult == DialogResult.OK && ConfigurationCollides(index,f.Configuration))
             {
-                MessageBox.Show(string.Format("There already is a DHCP server configuration for address {0}.\r\nPlease select another address.", f.Configuration.Address), "Validation error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show($"There already is a DHCP server configuration for address {f.Configuration.Address}.\r\nPlease select another address.", "Validation error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 dialogResult = f.ShowDialog(this);
             }
 

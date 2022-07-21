@@ -41,16 +41,16 @@ namespace DHCPServerApp
 {
     public partial class FormMain : Form
     {
-        private bool m_HasAdministrativeRight;
-        private ServiceController m_Service;
-        private DateTime m_TimeFilter;
-        private MACTaster m_MACTaster;
+        private bool _hasAdministrativeRight;
+        private ServiceController _service;
+        private DateTime _timeFilter;
+        private MACTaster _MACTaster;
 
         public FormMain(ServiceController service)
         {
-            m_Service = service;
-            m_HasAdministrativeRight = Program.HasAdministrativeRight();
-            m_MACTaster = new MACTaster(Program.GetMacTastePath());
+            _service = service;
+            _hasAdministrativeRight = Program.HasAdministrativeRight();
+            _MACTaster = new MACTaster(Program.GetMacTastePath());
             InitializeComponent();
             UpdateServiceStatus();
             timerServiceWatcher.Enabled = true;
@@ -64,7 +64,7 @@ namespace DHCPServerApp
 
         private void UpdateServiceStatus()
         {
-            m_Service.Refresh();
+            _service.Refresh();
             //System.Diagnostics.Debug.WriteLine(m_Service.Status.ToString());
             if (!Program.HasAdministrativeRight())
             {
@@ -75,20 +75,20 @@ namespace DHCPServerApp
             }
             else
             {
-                buttonStart.Enabled = (m_Service.Status == ServiceControllerStatus.Stopped);
-                buttonStop.Enabled = (m_Service.Status == ServiceControllerStatus.Running);
+                buttonStart.Enabled = (_service.Status == ServiceControllerStatus.Stopped);
+                buttonStop.Enabled = (_service.Status == ServiceControllerStatus.Running);
                 buttonConfigure.Enabled = true;
                 buttonElevate.Enabled = false;
             }
 
-            toolStripStatusLabel.Text = string.Format("Service status: {0}",m_Service.Status);
+            toolStripStatusLabel.Text = $"Service status: {_service.Status}";
         }
 
         private void StartService()
         {
             try
             {
-                m_Service.Start();
+                _service.Start();
             }
             catch (Exception)
             {
@@ -100,7 +100,7 @@ namespace DHCPServerApp
         {
             try
             {
-                m_Service.Stop();
+                _service.Stop();
             }
             catch (Exception)
             {
@@ -143,14 +143,14 @@ namespace DHCPServerApp
             if (f.ShowDialog(this) == DialogResult.OK)
             {
                 UpdateServiceStatus();
-                if(m_HasAdministrativeRight && m_Service.Status == ServiceControllerStatus.Running)
+                if(_hasAdministrativeRight && _service.Status == ServiceControllerStatus.Running)
                 {
                     if (MessageBox.Show("The DHCP Service has to be restarted to enable the new settings.\r\n" +
                         "Are you sure you want to continue?", "Warning", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.Yes)
                     {
-                        m_Service.Stop();
-                        m_Service.WaitForStatus(ServiceControllerStatus.Stopped, TimeSpan.FromSeconds(30.0));
-                        m_Service.Start();
+                        _service.Stop();
+                        _service.WaitForStatus(ServiceControllerStatus.Stopped, TimeSpan.FromSeconds(30.0));
+                        _service.Start();
                     }
                 }
             }
@@ -171,7 +171,7 @@ namespace DHCPServerApp
 
         private void AddEventLogEntry(EventLogEntry entry)
         {
-            if (entry.TimeGenerated > m_TimeFilter)
+            if (entry.TimeGenerated > _timeFilter)
             {
                 string entryType;
                 switch (entry.EntryType)
@@ -215,7 +215,7 @@ namespace DHCPServerApp
         {
             try
             {
-                SetTimeFilter(m_TimeFilter.AddDays(-1));
+                SetTimeFilter(_timeFilter.AddDays(-1));
             }
             catch (Exception)
             {
@@ -226,7 +226,7 @@ namespace DHCPServerApp
         {
             try
             {
-                SetTimeFilter(m_TimeFilter.AddHours(-1));
+                SetTimeFilter(_timeFilter.AddHours(-1));
             }
             catch (Exception)
             {
@@ -235,14 +235,14 @@ namespace DHCPServerApp
 
         private void SetTimeFilter(DateTime filter)
         {
-            m_TimeFilter = filter;
-            if (m_TimeFilter == DateTime.MinValue)
+            _timeFilter = filter;
+            if (_timeFilter == DateTime.MinValue)
             {
-                labelFilter.Text = string.Format("Showing all logging");
+                labelFilter.Text = "Showing all logging";
             }
             else
             {
-                labelFilter.Text = string.Format("Showing log starting at: {0}", filter.ToString("yyyy-MM-dd HH:mm:ss.fff"));
+                labelFilter.Text = $"Showing log starting at: {filter:yyyy-MM-dd HH:mm:ss.fff}";
             }
             RebuildLog();
         }
@@ -271,7 +271,7 @@ namespace DHCPServerApp
 
                         foreach (DHCPClient client in clientInformation.Clients)
                         {
-                            bindingList.Add(new DHCPClientDisplayItem(configuration.Name,configuration.Address,client, m_MACTaster.Taste(client.HardwareAddress)));
+                            bindingList.Add(new DHCPClientDisplayItem(configuration.Name,configuration.Address,client, _MACTaster.Taste(client.HardwareAddress)));
                         }
                     }
                     catch(Exception)

@@ -62,34 +62,34 @@ namespace GitHub.JPMikkers.DHCP
 
     public class ReservationItem
     {
-        private static readonly Regex regex = new Regex(@"^(?<mac>([0-9a-fA-F][0-9a-fA-F][:\-\.]?)+)(?<netmask>/[0-9]+)?", RegexOptions.Compiled | RegexOptions.ExplicitCapture);
-        private string m_MacTaste;
-        private byte[] m_Prefix;
-        private int m_PrefixBits;
+        private static readonly Regex s_regex = new Regex(@"^(?<mac>([0-9a-fA-F][0-9a-fA-F][:\-\.]?)+)(?<netmask>/[0-9]+)?", RegexOptions.Compiled | RegexOptions.ExplicitCapture);
+        private string _macTaste;
+        private byte[] _prefix;
+        private int _prefixBits;
 
         public string MacTaste 
         {
-            get { return m_MacTaste; }
+            get { return _macTaste; }
 
             set
             {
-                m_MacTaste = value;
-                m_Prefix = null;
-                m_PrefixBits = 0;
+                _macTaste = value;
+                _prefix = null;
+                _prefixBits = 0;
 
                 if (!string.IsNullOrWhiteSpace(MacTaste))
                 {
                     try
                     {
-                        Match match = regex.Match(m_MacTaste);
+                        Match match = s_regex.Match(_macTaste);
                         if (match.Success && match.Groups["mac"].Success)
                         {
-                            m_Prefix = Utils.HexStringToBytes(match.Groups["mac"].Value);
-                            m_PrefixBits = m_Prefix.Length * 8;
+                            _prefix = Utils.HexStringToBytes(match.Groups["mac"].Value);
+                            _prefixBits = _prefix.Length * 8;
 
                             if (match.Groups["netmask"].Success)
                             {
-                                m_PrefixBits = Int32.Parse(match.Groups["netmask"].Value.Substring(1));
+                                _prefixBits = Int32.Parse(match.Groups["netmask"].Value.Substring(1));
                             }
                         }
                     }
@@ -128,9 +128,9 @@ namespace GitHub.JPMikkers.DHCP
         {
             var client = DHCPClient.CreateFromMessage(message);
 
-            if (!string.IsNullOrWhiteSpace(MacTaste) && m_Prefix!=null)
+            if (!string.IsNullOrWhiteSpace(MacTaste) && _prefix!=null)
             {
-                return MacMatch(client.HardwareAddress, m_Prefix, m_PrefixBits);
+                return MacMatch(client.HardwareAddress, _prefix, _prefixBits);
             }
             else if (!string.IsNullOrWhiteSpace(HostName))
             {

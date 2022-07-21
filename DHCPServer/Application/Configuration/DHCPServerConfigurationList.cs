@@ -31,7 +31,7 @@ namespace DHCPServerApp
     [Serializable()]
     public class DHCPServerConfigurationList : BindingList<DHCPServerConfiguration>
     {
-        private static XmlSerializer serializer = new XmlSerializer(typeof(DHCPServerConfigurationList));
+        private static XmlSerializer s_serializer = new XmlSerializer(typeof(DHCPServerConfigurationList));
 
         public static DHCPServerConfigurationList Read(string file)
         {
@@ -41,7 +41,7 @@ namespace DHCPServerApp
             {
                 using (Stream s = File.OpenRead(file))
                 {
-                    result = (DHCPServerConfigurationList)serializer.Deserialize(s);
+                    result = (DHCPServerConfigurationList)s_serializer.Deserialize(s);
                 }
             }
             else
@@ -63,7 +63,7 @@ namespace DHCPServerApp
 
             using(Stream s = File.Open(file,FileMode.Create))
             {
-                serializer.Serialize(s, this);
+                s_serializer.Serialize(s, this);
             }
         }
     }
