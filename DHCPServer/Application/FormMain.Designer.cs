@@ -54,8 +54,6 @@ namespace DHCPServerApp
             this.tabPage2 = new System.Windows.Forms.TabPage();
             this.panel4 = new System.Windows.Forms.Panel();
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
-            this.panel5 = new System.Windows.Forms.Panel();
-            this.buttonRefresh = new System.Windows.Forms.Button();
             this.ColumnNetMask = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.IPAddress = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.LeaseStart = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -65,6 +63,8 @@ namespace DHCPServerApp
             this.MACTaste = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.ColumnName = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.ColumnAddress = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.panel5 = new System.Windows.Forms.Panel();
+            this.buttonRefresh = new System.Windows.Forms.Button();
             this.panel1.SuspendLayout();
             this.panel2.SuspendLayout();
             this.panel3.SuspendLayout();
@@ -80,9 +80,10 @@ namespace DHCPServerApp
             // 
             // buttonStart
             // 
-            this.buttonStart.Location = new System.Drawing.Point(8, 12);
+            this.buttonStart.Location = new System.Drawing.Point(11, 15);
+            this.buttonStart.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.buttonStart.Name = "buttonStart";
-            this.buttonStart.Size = new System.Drawing.Size(75, 23);
+            this.buttonStart.Size = new System.Drawing.Size(100, 28);
             this.buttonStart.TabIndex = 0;
             this.buttonStart.Text = "&Start";
             this.buttonStart.UseVisualStyleBackColor = true;
@@ -90,9 +91,10 @@ namespace DHCPServerApp
             // 
             // buttonStop
             // 
-            this.buttonStop.Location = new System.Drawing.Point(89, 12);
+            this.buttonStop.Location = new System.Drawing.Point(119, 15);
+            this.buttonStop.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.buttonStop.Name = "buttonStop";
-            this.buttonStop.Size = new System.Drawing.Size(75, 23);
+            this.buttonStop.Size = new System.Drawing.Size(100, 28);
             this.buttonStop.TabIndex = 1;
             this.buttonStop.Text = "S&top";
             this.buttonStop.UseVisualStyleBackColor = true;
@@ -100,9 +102,10 @@ namespace DHCPServerApp
             // 
             // buttonElevate
             // 
-            this.buttonElevate.Location = new System.Drawing.Point(251, 12);
+            this.buttonElevate.Location = new System.Drawing.Point(335, 15);
+            this.buttonElevate.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.buttonElevate.Name = "buttonElevate";
-            this.buttonElevate.Size = new System.Drawing.Size(75, 23);
+            this.buttonElevate.Size = new System.Drawing.Size(100, 28);
             this.buttonElevate.TabIndex = 3;
             this.buttonElevate.Text = "&Elevate";
             this.buttonElevate.UseVisualStyleBackColor = true;
@@ -116,9 +119,10 @@ namespace DHCPServerApp
             // 
             // buttonConfigure
             // 
-            this.buttonConfigure.Location = new System.Drawing.Point(170, 12);
+            this.buttonConfigure.Location = new System.Drawing.Point(227, 15);
+            this.buttonConfigure.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.buttonConfigure.Name = "buttonConfigure";
-            this.buttonConfigure.Size = new System.Drawing.Size(75, 23);
+            this.buttonConfigure.Size = new System.Drawing.Size(100, 28);
             this.buttonConfigure.TabIndex = 2;
             this.buttonConfigure.Text = "&Configure";
             this.buttonConfigure.UseVisualStyleBackColor = true;
@@ -127,9 +131,10 @@ namespace DHCPServerApp
             // buttonAbout
             // 
             this.buttonAbout.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonAbout.Location = new System.Drawing.Point(856, 7);
+            this.buttonAbout.Location = new System.Drawing.Point(1141, 9);
+            this.buttonAbout.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.buttonAbout.Name = "buttonAbout";
-            this.buttonAbout.Size = new System.Drawing.Size(63, 32);
+            this.buttonAbout.Size = new System.Drawing.Size(84, 39);
             this.buttonAbout.TabIndex = 4;
             this.buttonAbout.Text = "About";
             this.buttonAbout.UseVisualStyleBackColor = true;
@@ -139,20 +144,22 @@ namespace DHCPServerApp
             // 
             this.textBox1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.textBox1.Font = new System.Drawing.Font("Courier New", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.textBox1.Location = new System.Drawing.Point(8, 0);
+            this.textBox1.Location = new System.Drawing.Point(11, 0);
+            this.textBox1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.textBox1.Multiline = true;
             this.textBox1.Name = "textBox1";
             this.textBox1.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.textBox1.Size = new System.Drawing.Size(897, 271);
+            this.textBox1.Size = new System.Drawing.Size(1198, 337);
             this.textBox1.TabIndex = 0;
             this.textBox1.WordWrap = false;
             // 
             // buttonHistoryOneDay
             // 
             this.buttonHistoryOneDay.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonHistoryOneDay.Location = new System.Drawing.Point(722, 9);
+            this.buttonHistoryOneDay.Location = new System.Drawing.Point(966, 11);
+            this.buttonHistoryOneDay.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.buttonHistoryOneDay.Name = "buttonHistoryOneDay";
-            this.buttonHistoryOneDay.Size = new System.Drawing.Size(57, 23);
+            this.buttonHistoryOneDay.Size = new System.Drawing.Size(76, 28);
             this.buttonHistoryOneDay.TabIndex = 3;
             this.buttonHistoryOneDay.Text = "+1 day";
             this.buttonHistoryOneDay.UseVisualStyleBackColor = true;
@@ -161,9 +168,10 @@ namespace DHCPServerApp
             // buttonClear
             // 
             this.buttonClear.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonClear.Location = new System.Drawing.Point(848, 9);
+            this.buttonClear.Location = new System.Drawing.Point(1134, 11);
+            this.buttonClear.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.buttonClear.Name = "buttonClear";
-            this.buttonClear.Size = new System.Drawing.Size(57, 23);
+            this.buttonClear.Size = new System.Drawing.Size(76, 28);
             this.buttonClear.TabIndex = 5;
             this.buttonClear.Text = "Clear";
             this.buttonClear.UseVisualStyleBackColor = true;
@@ -178,8 +186,9 @@ namespace DHCPServerApp
             this.panel1.Controls.Add(this.buttonElevate);
             this.panel1.Dock = System.Windows.Forms.DockStyle.Top;
             this.panel1.Location = new System.Drawing.Point(0, 0);
+            this.panel1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(927, 46);
+            this.panel1.Size = new System.Drawing.Size(1236, 57);
             this.panel1.TabIndex = 0;
             // 
             // panel2
@@ -191,36 +200,40 @@ namespace DHCPServerApp
             this.panel2.Controls.Add(this.buttonHistoryOneDay);
             this.panel2.Controls.Add(this.buttonClear);
             this.panel2.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.panel2.Location = new System.Drawing.Point(3, 274);
+            this.panel2.Location = new System.Drawing.Point(4, 341);
+            this.panel2.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(913, 39);
+            this.panel2.Size = new System.Drawing.Size(1220, 48);
             this.panel2.TabIndex = 2;
             // 
             // label1
             // 
             this.label1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(586, 14);
+            this.label1.Location = new System.Drawing.Point(784, 17);
+            this.label1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(67, 13);
+            this.label1.Size = new System.Drawing.Size(83, 16);
             this.label1.TabIndex = 1;
             this.label1.Text = "More history:";
             // 
             // labelFilter
             // 
             this.labelFilter.AutoSize = true;
-            this.labelFilter.Location = new System.Drawing.Point(5, 14);
+            this.labelFilter.Location = new System.Drawing.Point(7, 17);
+            this.labelFilter.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.labelFilter.Name = "labelFilter";
-            this.labelFilter.Size = new System.Drawing.Size(117, 13);
+            this.labelFilter.Size = new System.Drawing.Size(143, 16);
             this.labelFilter.TabIndex = 0;
             this.labelFilter.Text = "Showing log starting at:";
             // 
             // buttonHistoryAll
             // 
             this.buttonHistoryAll.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonHistoryAll.Location = new System.Drawing.Point(785, 9);
+            this.buttonHistoryAll.Location = new System.Drawing.Point(1050, 11);
+            this.buttonHistoryAll.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.buttonHistoryAll.Name = "buttonHistoryAll";
-            this.buttonHistoryAll.Size = new System.Drawing.Size(57, 23);
+            this.buttonHistoryAll.Size = new System.Drawing.Size(76, 28);
             this.buttonHistoryAll.TabIndex = 4;
             this.buttonHistoryAll.Text = "All";
             this.buttonHistoryAll.UseVisualStyleBackColor = true;
@@ -229,9 +242,10 @@ namespace DHCPServerApp
             // buttonHistoryOneHour
             // 
             this.buttonHistoryOneHour.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonHistoryOneHour.Location = new System.Drawing.Point(659, 9);
+            this.buttonHistoryOneHour.Location = new System.Drawing.Point(882, 11);
+            this.buttonHistoryOneHour.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.buttonHistoryOneHour.Name = "buttonHistoryOneHour";
-            this.buttonHistoryOneHour.Size = new System.Drawing.Size(57, 23);
+            this.buttonHistoryOneHour.Size = new System.Drawing.Size(76, 28);
             this.buttonHistoryOneHour.TabIndex = 2;
             this.buttonHistoryOneHour.Text = "+1 hour";
             this.buttonHistoryOneHour.UseVisualStyleBackColor = true;
@@ -241,31 +255,33 @@ namespace DHCPServerApp
             // 
             this.panel3.Controls.Add(this.textBox1);
             this.panel3.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panel3.Location = new System.Drawing.Point(3, 3);
+            this.panel3.Location = new System.Drawing.Point(4, 4);
+            this.panel3.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.panel3.Name = "panel3";
-            this.panel3.Padding = new System.Windows.Forms.Padding(8, 0, 8, 0);
-            this.panel3.Size = new System.Drawing.Size(913, 271);
+            this.panel3.Padding = new System.Windows.Forms.Padding(11, 0, 11, 0);
+            this.panel3.Size = new System.Drawing.Size(1220, 337);
             this.panel3.TabIndex = 1;
             // 
             // statusStrip1
             // 
+            this.statusStrip1.ImageScalingSize = new System.Drawing.Size(20, 20);
             this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripStatusLabel});
-            this.statusStrip1.Location = new System.Drawing.Point(0, 388);
+            this.statusStrip1.Location = new System.Drawing.Point(0, 479);
             this.statusStrip1.Name = "statusStrip1";
-            this.statusStrip1.Size = new System.Drawing.Size(927, 22);
+            this.statusStrip1.Padding = new System.Windows.Forms.Padding(1, 0, 19, 0);
+            this.statusStrip1.Size = new System.Drawing.Size(1236, 26);
             this.statusStrip1.TabIndex = 3;
             this.statusStrip1.Text = "statusStrip1";
             // 
             // toolStripStatusLabel
             // 
             this.toolStripStatusLabel.Name = "toolStripStatusLabel";
-            this.toolStripStatusLabel.Size = new System.Drawing.Size(90, 17);
+            this.toolStripStatusLabel.Size = new System.Drawing.Size(117, 20);
             this.toolStripStatusLabel.Text = "Service Status : -";
             // 
             // eventLog1
             // 
-            this.eventLog1.EnableRaisingEvents = true;
             this.eventLog1.Log = "DHCPServerLog";
             this.eventLog1.SynchronizingObject = this;
             this.eventLog1.EntryWritten += new System.Diagnostics.EntryWrittenEventHandler(this.eventLog1_EntryWritten);
@@ -275,20 +291,22 @@ namespace DHCPServerApp
             this.tabControl1.Controls.Add(this.tabPage1);
             this.tabControl1.Controls.Add(this.tabPage2);
             this.tabControl1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tabControl1.Location = new System.Drawing.Point(0, 46);
+            this.tabControl1.Location = new System.Drawing.Point(0, 57);
+            this.tabControl1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(927, 342);
+            this.tabControl1.Size = new System.Drawing.Size(1236, 422);
             this.tabControl1.TabIndex = 4;
             // 
             // tabPage1
             // 
             this.tabPage1.Controls.Add(this.panel3);
             this.tabPage1.Controls.Add(this.panel2);
-            this.tabPage1.Location = new System.Drawing.Point(4, 22);
+            this.tabPage1.Location = new System.Drawing.Point(4, 25);
+            this.tabPage1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.tabPage1.Name = "tabPage1";
-            this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(919, 316);
+            this.tabPage1.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.tabPage1.Size = new System.Drawing.Size(1228, 393);
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "Log";
             this.tabPage1.UseVisualStyleBackColor = true;
@@ -297,10 +315,11 @@ namespace DHCPServerApp
             // 
             this.tabPage2.Controls.Add(this.panel4);
             this.tabPage2.Controls.Add(this.panel5);
-            this.tabPage2.Location = new System.Drawing.Point(4, 22);
+            this.tabPage2.Location = new System.Drawing.Point(4, 25);
+            this.tabPage2.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.tabPage2.Name = "tabPage2";
-            this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(919, 316);
+            this.tabPage2.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.tabPage2.Size = new System.Drawing.Size(1228, 392);
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "Clients";
             this.tabPage2.UseVisualStyleBackColor = true;
@@ -309,10 +328,11 @@ namespace DHCPServerApp
             // 
             this.panel4.Controls.Add(this.dataGridView1);
             this.panel4.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panel4.Location = new System.Drawing.Point(3, 3);
+            this.panel4.Location = new System.Drawing.Point(4, 4);
+            this.panel4.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.panel4.Name = "panel4";
-            this.panel4.Padding = new System.Windows.Forms.Padding(10);
-            this.panel4.Size = new System.Drawing.Size(832, 310);
+            this.panel4.Padding = new System.Windows.Forms.Padding(13, 12, 13, 12);
+            this.panel4.Size = new System.Drawing.Size(1112, 384);
             this.panel4.TabIndex = 2;
             // 
             // dataGridView1
@@ -332,108 +352,131 @@ namespace DHCPServerApp
             this.ColumnName,
             this.ColumnAddress});
             this.dataGridView1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.dataGridView1.Location = new System.Drawing.Point(10, 10);
+            this.dataGridView1.Location = new System.Drawing.Point(13, 12);
+            this.dataGridView1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.dataGridView1.MultiSelect = false;
             this.dataGridView1.Name = "dataGridView1";
             this.dataGridView1.ReadOnly = true;
+            this.dataGridView1.RowHeadersWidth = 51;
             this.dataGridView1.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.dataGridView1.ShowEditingIcon = false;
-            this.dataGridView1.Size = new System.Drawing.Size(812, 290);
+            this.dataGridView1.Size = new System.Drawing.Size(1086, 360);
             this.dataGridView1.TabIndex = 1;
             this.dataGridView1.CellFormatting += new System.Windows.Forms.DataGridViewCellFormattingEventHandler(this.dataGridView1_CellFormatting);
-            // 
-            // panel5
-            // 
-            this.panel5.Controls.Add(this.buttonRefresh);
-            this.panel5.Dock = System.Windows.Forms.DockStyle.Right;
-            this.panel5.Location = new System.Drawing.Point(835, 3);
-            this.panel5.Name = "panel5";
-            this.panel5.Size = new System.Drawing.Size(81, 310);
-            this.panel5.TabIndex = 3;
-            // 
-            // buttonRefresh
-            // 
-            this.buttonRefresh.Location = new System.Drawing.Point(3, 10);
-            this.buttonRefresh.Name = "buttonRefresh";
-            this.buttonRefresh.Size = new System.Drawing.Size(75, 23);
-            this.buttonRefresh.TabIndex = 0;
-            this.buttonRefresh.Text = "Refresh";
-            this.buttonRefresh.UseVisualStyleBackColor = true;
-            this.buttonRefresh.Click += new System.EventHandler(this.buttonRefresh_Click);
             // 
             // ColumnNetMask
             // 
             this.ColumnNetMask.DataPropertyName = "IdentifierAsString";
             this.ColumnNetMask.HeaderText = "Client ID";
+            this.ColumnNetMask.MinimumWidth = 6;
             this.ColumnNetMask.Name = "ColumnNetMask";
             this.ColumnNetMask.ReadOnly = true;
+            this.ColumnNetMask.Width = 125;
             // 
             // IPAddress
             // 
             this.IPAddress.DataPropertyName = "Client.IPAddress";
             this.IPAddress.HeaderText = "IP Address";
+            this.IPAddress.MinimumWidth = 6;
             this.IPAddress.Name = "IPAddress";
             this.IPAddress.ReadOnly = true;
+            this.IPAddress.Width = 125;
             // 
             // LeaseStart
             // 
             this.LeaseStart.DataPropertyName = "LeaseStartTimeAsString";
             this.LeaseStart.HeaderText = "Lease Start";
+            this.LeaseStart.MinimumWidth = 6;
             this.LeaseStart.Name = "LeaseStart";
             this.LeaseStart.ReadOnly = true;
+            this.LeaseStart.Width = 125;
             // 
             // LeaseEnd
             // 
             this.LeaseEnd.DataPropertyName = "LeaseEndTimeAsString";
             this.LeaseEnd.HeaderText = "Lease End";
+            this.LeaseEnd.MinimumWidth = 6;
             this.LeaseEnd.Name = "LeaseEnd";
             this.LeaseEnd.ReadOnly = true;
+            this.LeaseEnd.Width = 125;
             // 
             // State
             // 
             this.State.DataPropertyName = "Client.State";
             this.State.HeaderText = "State";
+            this.State.MinimumWidth = 6;
             this.State.Name = "State";
             this.State.ReadOnly = true;
+            this.State.Width = 125;
             // 
             // HWAddress
             // 
             this.HWAddress.DataPropertyName = "HardwareAddressAsString";
             this.HWAddress.HeaderText = "HW Address";
+            this.HWAddress.MinimumWidth = 6;
             this.HWAddress.Name = "HWAddress";
             this.HWAddress.ReadOnly = true;
+            this.HWAddress.Width = 125;
             // 
             // MACTaste
             // 
             this.MACTaste.DataPropertyName = "MACTaste";
             this.MACTaste.HeaderText = "MAC Taste";
+            this.MACTaste.MinimumWidth = 6;
             this.MACTaste.Name = "MACTaste";
             this.MACTaste.ReadOnly = true;
+            this.MACTaste.Width = 125;
             // 
             // ColumnName
             // 
             this.ColumnName.DataPropertyName = "ServerName";
             this.ColumnName.HeaderText = "Srv Name";
+            this.ColumnName.MinimumWidth = 6;
             this.ColumnName.Name = "ColumnName";
             this.ColumnName.ReadOnly = true;
+            this.ColumnName.Width = 125;
             // 
             // ColumnAddress
             // 
             this.ColumnAddress.DataPropertyName = "ServerIPAddress";
             this.ColumnAddress.HeaderText = "Srv Address";
+            this.ColumnAddress.MinimumWidth = 6;
             this.ColumnAddress.Name = "ColumnAddress";
             this.ColumnAddress.ReadOnly = true;
+            this.ColumnAddress.Width = 125;
+            // 
+            // panel5
+            // 
+            this.panel5.Controls.Add(this.buttonRefresh);
+            this.panel5.Dock = System.Windows.Forms.DockStyle.Right;
+            this.panel5.Location = new System.Drawing.Point(1116, 4);
+            this.panel5.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.panel5.Name = "panel5";
+            this.panel5.Size = new System.Drawing.Size(108, 384);
+            this.panel5.TabIndex = 3;
+            // 
+            // buttonRefresh
+            // 
+            this.buttonRefresh.Location = new System.Drawing.Point(4, 12);
+            this.buttonRefresh.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.buttonRefresh.Name = "buttonRefresh";
+            this.buttonRefresh.Size = new System.Drawing.Size(100, 28);
+            this.buttonRefresh.TabIndex = 0;
+            this.buttonRefresh.Text = "Refresh";
+            this.buttonRefresh.UseVisualStyleBackColor = true;
+            this.buttonRefresh.Click += new System.EventHandler(this.buttonRefresh_Click);
             // 
             // FormMain
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(927, 410);
+            this.ClientSize = new System.Drawing.Size(1236, 505);
             this.Controls.Add(this.tabControl1);
             this.Controls.Add(this.panel1);
             this.Controls.Add(this.statusStrip1);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-            this.MinimumSize = new System.Drawing.Size(420, 200);
+            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.MinimumSize = new System.Drawing.Size(554, 235);
             this.Name = "FormMain";
             this.Text = "DHCP Server";
             this.panel1.ResumeLayout(false);

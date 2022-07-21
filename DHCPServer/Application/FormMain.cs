@@ -55,6 +55,7 @@ namespace DHCPServerApp
             UpdateServiceStatus();
             timerServiceWatcher.Enabled = true;
             SetTimeFilter(DateTime.Now);
+            eventLog1.EnableRaisingEvents = true;
         }
 
         protected override void OnHandleCreated(EventArgs e)
