@@ -20,7 +20,7 @@ namespace GitHub.JPMikkers.DHCP
         public override IDHCPOption FromStream(Stream s)
         {
             DHCPOptionRebindingTimeValue result = new DHCPOptionRebindingTimeValue();
-            if (s.Length != 4) throw new IOException("Invalid DHCP option length");
+            if(s.Length != 4) throw new IOException("Invalid DHCP option length");
             result._timeSpan = TimeSpan.FromSeconds(ParseHelper.ReadUInt32(s));
             return result;
         }

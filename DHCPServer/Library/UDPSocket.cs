@@ -13,7 +13,7 @@ namespace GitHub.JPMikkers.DHCP
         const uint IOC_VENDOR = 0x18000000;
         const uint SIO_UDP_CONNRESET = IOC_IN | IOC_VENDOR | 12;
 
-        public delegate void OnReceiveDelegate(UDPSocket sender,IPEndPoint endPoint,ArraySegment<byte> data);
+        public delegate void OnReceiveDelegate(UDPSocket sender, IPEndPoint endPoint, ArraySegment<byte> data);
         public delegate void OnStopDelegate(UDPSocket sender, Exception reason);
 
         #region private types, members
@@ -29,7 +29,7 @@ namespace GitHub.JPMikkers.DHCP
 
         private readonly Queue<PacketBuffer> _sendFifo;             // queue of the outgoing packets
         private bool _sendPending;                         // true => an asynchronous send is in progress
-        private int _receivePending;   
+        private int _receivePending;
 
         private readonly AutoPumpQueue<PacketBuffer> _receiveFifo;  // queue of the incoming packets
         private readonly int _packetSize;                           // size of packets we'll try to receive
@@ -54,7 +54,7 @@ namespace GitHub.JPMikkers.DHCP
         {
             get
             {
-                lock (_sync)
+                lock(_sync)
                 {
                     return _sendPending || _sendFifo.Count > 0;
                 }
@@ -80,16 +80,16 @@ namespace GitHub.JPMikkers.DHCP
             _sendFifo = new Queue<PacketBuffer>();
 
             _receiveFifo = new AutoPumpQueue<PacketBuffer>(
-                (sender, data) => 
+                (sender, data) =>
                 {
                     bool isDisposed = false;
 
-                    lock (_sync)
+                    lock(_sync)
                     {
                         isDisposed = _disposed;
                     }
 
-                    if (!isDisposed)
+                    if(!isDisposed)
                     {
                         _onReceive(this, (IPEndPoint)data.EndPoint, data.Data);
                     }
@@ -106,7 +106,7 @@ namespace GitHub.JPMikkers.DHCP
             _socket.SendBufferSize = 65536;
             _socket.ReceiveBufferSize = 65536;
             if(!_IPv6) _socket.DontFragment = dontFragment;
-            if (ttl >= 0)
+            if(ttl >= 0)
             {
                 _socket.Ttl = ttl;
             }
@@ -126,14 +126,14 @@ namespace GitHub.JPMikkers.DHCP
 
         ~UDPSocket()
         {
-			try
-			{
-	            Dispose(false);
-			}
+            try
+            {
+                Dispose(false);
+            }
             catch
-			{
+            {
                 // never let any exception escape the finalizer, or else your process will be killed.
-			}			
+            }
         }
 
         #endregion
@@ -145,20 +145,20 @@ namespace GitHub.JPMikkers.DHCP
         /// </summary>
         /// <param name="endPoint">Target for the data</param>
         /// <param name="msg">Data to send</param>
-        public void Send(IPEndPoint endPoint,ArraySegment<byte> msg)
+        public void Send(IPEndPoint endPoint, ArraySegment<byte> msg)
         {
             try
             {
-                lock (_sync)
+                lock(_sync)
                 {
-                    if (!_disposed)
+                    if(!_disposed)
                     {
                         _sendFifo.Enqueue(new PacketBuffer(endPoint, msg));
                         BeginSend();
                     }
                 }
             }
-            catch (Exception e)
+            catch(Exception e)
             {
                 Stop(e);
             }
@@ -185,9 +185,9 @@ namespace GitHub.JPMikkers.DHCP
         {
             bool notifyStop = false;
 
-            lock (_sync)
+            lock(_sync)
             {
-                if (!_disposed)
+                if(!_disposed)
                 {
                     notifyStop = true;
                     _disposed = true;
@@ -197,14 +197,14 @@ namespace GitHub.JPMikkers.DHCP
                         _socket.Shutdown(SocketShutdown.Both);
                         _socket.Close();
                     }
-                    catch (Exception)
+                    catch(Exception)
                     {
                         // socket tends to complain a lot during close. just eat those exceptions.
                     }
                 }
             }
 
-            if (notifyStop)
+            if(notifyStop)
             {
                 _onStop(this, reason);
             }
@@ -215,11 +215,11 @@ namespace GitHub.JPMikkers.DHCP
         /// </summary>
         private void BeginSend()
         {
-            lock (_sync)
+            lock(_sync)
             {
-                if (!_disposed && !_sendPending)
+                if(!_disposed && !_sendPending)
                 {
-                    if (_sendFifo.Count > 0)
+                    if(_sendFifo.Count > 0)
                     {
                         _sendPending = true;   // !! MUST BE DONE BEFORE CALLING BEGINSEND. Sometimes beginsend will call the SendDone routine synchronously!!
                         PacketBuffer sendPacket = _sendFifo.Dequeue();
@@ -228,7 +228,7 @@ namespace GitHub.JPMikkers.DHCP
                         {
                             _socket.BeginSendTo(sendPacket.Data.Array, sendPacket.Data.Offset, sendPacket.Data.Count, SocketFlags.None, sendPacket.EndPoint, new AsyncCallback(SendDone), sendPacket);
                         }
-                        catch (Exception)
+                        catch(Exception)
                         {
                             // don't care about any exceptions here because the TFTP protocol will take care of retrying to send the packet
                         }
@@ -247,15 +247,15 @@ namespace GitHub.JPMikkers.DHCP
         /// <param name="ar">Represents the status of an asynchronous operation</param>
         private void SendDone(IAsyncResult ar)
         {
-            lock (_sync)
+            lock(_sync)
             {
-                if (!_disposed)
+                if(!_disposed)
                 {
                     try
                     {
                         _socket.EndSendTo(ar);
                     }
-                    catch (Exception)
+                    catch(Exception)
                     {
                         // don't care about any exceptions here because the TFTP protocol will take care of retrying to send the packet
                     }
@@ -271,7 +271,7 @@ namespace GitHub.JPMikkers.DHCP
         private void BeginReceive()
         {
             // just one pending receive for now. Anything more causes packet reordering at ReceiveDone (even on loopback connections) which doesn't feel right.
-            while (_receivePending < 1)
+            while(_receivePending < 1)
             {
                 _receivePending++;
                 PacketBuffer receivePacket = new PacketBuffer(new IPEndPoint(_IPv6 ? IPAddress.IPv6Any : IPAddress.Any, 0), new ArraySegment<byte>(new byte[_packetSize], 0, _packetSize));
@@ -287,9 +287,9 @@ namespace GitHub.JPMikkers.DHCP
         {
             try
             {
-                lock (_sync)
+                lock(_sync)
                 {
-                    if (!_disposed)
+                    if(!_disposed)
                     {
                         try
                         {
@@ -301,16 +301,16 @@ namespace GitHub.JPMikkers.DHCP
                             }
                             finally
                             {
-                            _receivePending--;
+                                _receivePending--;
                             }
                             buf.Data = new ArraySegment<byte>(buf.Data.Array, 0, packetSize);
                             _receiveFifo.Enqueue(buf);
                             // BeginReceive should check state again because Stop() could have been called synchronously at NotifyReceive()
                             BeginReceive();
                         }
-                        catch (SocketException e)
+                        catch(SocketException e)
                         {
-                            switch (e.SocketErrorCode)
+                            switch(e.SocketErrorCode)
                             {
                                 case SocketError.ConnectionReset:
                                     // ConnectionReset is reported when the remote port wasn't listening.
@@ -332,17 +332,17 @@ namespace GitHub.JPMikkers.DHCP
                     }
                 }
             }
-            catch (Exception e)
+            catch(Exception e)
             {
                 // it's only safe to Stop() the socket if this method wasn't called recursively (because in that case the lock will be taken!)
                 // rethrow the exception until the stack unwinds to the top-level ReceiveDone.
-                if (ar.CompletedSynchronously) throw; else Stop(e);
+                if(ar.CompletedSynchronously) throw; else Stop(e);
             }
         }
 
         protected virtual void Dispose(bool disposing)
         {
-            if (disposing)
+            if(disposing)
             {
                 Stop(null);
             }

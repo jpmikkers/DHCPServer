@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Text;
@@ -61,7 +59,7 @@ namespace GitHub.JPMikkers.DHCP
         {
             StringBuilder sb = new StringBuilder();
             int c = s.ReadByte();
-            while (c>0)
+            while(c > 0)
             {
                 sb.Append((char)c);
                 c = s.ReadByte();
@@ -79,7 +77,7 @@ namespace GitHub.JPMikkers.DHCP
 
         public static void WriteZString(Stream s, string msg, int length)
         {
-            if (msg.Length >= length)
+            if(msg.Length >= length)
             {
                 msg = msg.Substring(0, length - 1);
             }
@@ -89,7 +87,7 @@ namespace GitHub.JPMikkers.DHCP
             tw.Flush();
 
             // write terminating and padding zero's
-            for (int t = msg.Length; t < length; t++)
+            for(int t = msg.Length; t < length; t++)
             {
                 s.WriteByte(0);
             }
@@ -99,7 +97,7 @@ namespace GitHub.JPMikkers.DHCP
         {
             StringBuilder sb = new StringBuilder();
             int c = s.ReadByte();
-            while (c > 0 && sb.Length < maxLength)
+            while(c > 0 && sb.Length < maxLength)
             {
                 sb.Append((char)c);
                 c = s.ReadByte();
@@ -109,7 +107,7 @@ namespace GitHub.JPMikkers.DHCP
 
         public static string ReadString(Stream s)
         {
-            return ReadString(s, 16*1024);
+            return ReadString(s, 16 * 1024);
         }
 
         public static void WriteString(Stream s, string msg)

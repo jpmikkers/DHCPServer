@@ -11,7 +11,7 @@ namespace DHCPServerApp
         public List<XmlSerializableIPAddress> Addresses { get; set; }
 
         public OptionConfigurationAddresses()
-        { 
+        {
             Addresses = new List<XmlSerializableIPAddress>();
         }
     }

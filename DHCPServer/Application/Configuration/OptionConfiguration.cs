@@ -1,7 +1,7 @@
-﻿using System;
+﻿using GitHub.JPMikkers.DHCP;
+using System;
 using System.Runtime.Serialization;
 using System.Xml.Serialization;
-using GitHub.JPMikkers.DHCP;
 
 namespace DHCPServerApp
 {

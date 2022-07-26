@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.Threading;
 
 namespace GitHub.JPMikkers.DHCP
@@ -25,16 +23,16 @@ namespace GitHub.JPMikkers.DHCP
 
         private void WaitCallback(object state)
         {
-            lock (_dispatchSync)    // ensures individual invokes are serialized
+            lock(_dispatchSync)    // ensures individual invokes are serialized
             {
                 bool empty = false;
                 T data = default(T);
 
-                while (!empty)
+                while(!empty)
                 {
-                    lock (_queueSync)
+                    lock(_queueSync)
                     {
-                        if (_queue.Count == 0)
+                        if(_queue.Count == 0)
                         {
                             // no data
                             empty = true;
@@ -47,7 +45,7 @@ namespace GitHub.JPMikkers.DHCP
                         }
                     }
 
-                    if (!empty)
+                    if(!empty)
                     {
                         try
                         {
@@ -65,13 +63,13 @@ namespace GitHub.JPMikkers.DHCP
         {
             bool queueWasEmpty;
 
-            lock (_queueSync)
+            lock(_queueSync)
             {
                 queueWasEmpty = (_queue.Count == 0);
                 _queue.Enqueue(data);
             }
 
-            if (queueWasEmpty)
+            if(queueWasEmpty)
             {
                 ThreadPool.QueueUserWorkItem(WaitCallback);
             }

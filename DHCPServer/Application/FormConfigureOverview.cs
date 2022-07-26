@@ -1,21 +1,15 @@
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Windows.Forms;
-using GitHub.JPMikkers.DHCP;
 using System.Reflection;
-using System.IO;
+using System.Windows.Forms;
 
 namespace DHCPServerApp
 {
     public partial class FormConfigureOverview : Form
     {
-        private string _configurationPath;
-        private DHCPServerConfigurationList _configurationList;
+        private readonly string _configurationPath;
+        private readonly DHCPServerConfigurationList _configurationList;
 
         public FormConfigureOverview(string configurationPath)
         {
@@ -29,7 +23,7 @@ namespace DHCPServerApp
 
         private void dataGridView1_CellFormatting(object sender, DataGridViewCellFormattingEventArgs e)
         {
-            if ((dataGridView1.Rows[e.RowIndex].DataBoundItem != null) &&
+            if((dataGridView1.Rows[e.RowIndex].DataBoundItem != null) &&
                 (dataGridView1.Columns[e.ColumnIndex].DataPropertyName.Contains(".")))
             {
                 e.Value = BindProperty(dataGridView1.Rows[e.RowIndex].DataBoundItem,
@@ -44,7 +38,7 @@ namespace DHCPServerApp
         {
             string retValue = "";
 
-            if (propertyName.Contains("."))
+            if(propertyName.Contains("."))
             {
                 PropertyInfo[] arrayProperties;
                 string leftPropertyName;
@@ -52,9 +46,9 @@ namespace DHCPServerApp
                 leftPropertyName = propertyName.Substring(0, propertyName.IndexOf("."));
                 arrayProperties = property.GetType().GetProperties();
 
-                foreach (PropertyInfo propertyInfo in arrayProperties)
+                foreach(PropertyInfo propertyInfo in arrayProperties)
                 {
-                    if (propertyInfo.Name == leftPropertyName)
+                    if(propertyInfo.Name == leftPropertyName)
                     {
                         retValue = BindProperty(
                           propertyInfo.GetValue(property, null),
@@ -78,8 +72,8 @@ namespace DHCPServerApp
 
         private void buttonAdd_Click(object sender, EventArgs e)
         {
-            DHCPServerConfiguration result = EditConfiguration(-1,new DHCPServerConfiguration());
-            if (result != null)
+            DHCPServerConfiguration result = EditConfiguration(-1, new DHCPServerConfiguration());
+            if(result != null)
             {
                 _configurationList.Add(result);
                 SelectRow(_configurationList.Count - 1);
@@ -89,23 +83,23 @@ namespace DHCPServerApp
 
         private void buttonRemove_Click(object sender, EventArgs e)
         {
-            List<int> rowsToRemove = new List<int>();            
+            List<int> rowsToRemove = new List<int>();
             foreach(DataGridViewRow row in dataGridView1.SelectedRows)
             {
-                rowsToRemove.Add(row.Index);   
+                rowsToRemove.Add(row.Index);
             }
             rowsToRemove.Sort();
             rowsToRemove.Reverse();
-            
+
             int currentIndex = dataGridView1.CurrentRow.Index;
 
-            foreach (int x in rowsToRemove)
+            foreach(int x in rowsToRemove)
             {
-                if (currentIndex == x && currentIndex>0)
+                if(currentIndex == x && currentIndex > 0)
                 {
                     currentIndex--;
                     SelectRow(currentIndex);
-                }             
+                }
                 _configurationList.RemoveAt(x);
             }
             UpdateButtonStatus();
@@ -147,7 +141,7 @@ namespace DHCPServerApp
 
         private void SelectRow(int index)
         {
-            if (index >= 0 && index < dataGridView1.Rows.Count)
+            if(index >= 0 && index < dataGridView1.Rows.Count)
             {
                 dataGridView1.ClearSelection();
                 DataGridViewRow rowToSelect = dataGridView1.Rows[index];
@@ -159,10 +153,10 @@ namespace DHCPServerApp
 
         private void EditConfiguration(int index)
         {
-            if (index >= 0 && index < _configurationList.Count)
+            if(index >= 0 && index < _configurationList.Count)
             {
-                DHCPServerConfiguration result = EditConfiguration(index,_configurationList[index]);
-                if (result != null)
+                DHCPServerConfiguration result = EditConfiguration(index, _configurationList[index]);
+                if(result != null)
                 {
                     _configurationList.Insert(index, result);
                     _configurationList.RemoveAt(index + 1);
@@ -170,11 +164,11 @@ namespace DHCPServerApp
             }
         }
 
-        private bool ConfigurationCollides(int index,DHCPServerConfiguration config)
+        private bool ConfigurationCollides(int index, DHCPServerConfiguration config)
         {
-            for (int t = 0; t < _configurationList.Count; t++)
+            for(int t = 0; t < _configurationList.Count; t++)
             {
-                if (t != index && config.Address == _configurationList[t].Address)
+                if(t != index && config.Address == _configurationList[t].Address)
                 {
                     System.Diagnostics.Debug.WriteLine($"item {t} collides with {index}");
                     return true;
@@ -183,14 +177,14 @@ namespace DHCPServerApp
             return false;
         }
 
-        private DHCPServerConfiguration EditConfiguration(int index,DHCPServerConfiguration input)
+        private DHCPServerConfiguration EditConfiguration(int index, DHCPServerConfiguration input)
         {
             FormSettings f = new FormSettings();
             f.Configuration = input;
 
             DialogResult dialogResult = f.ShowDialog(this);
 
-            while(dialogResult == DialogResult.OK && ConfigurationCollides(index,f.Configuration))
+            while(dialogResult == DialogResult.OK && ConfigurationCollides(index, f.Configuration))
             {
                 MessageBox.Show($"There already is a DHCP server configuration for address {f.Configuration.Address}.\r\nPlease select another address.", "Validation error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 dialogResult = f.ShowDialog(this);

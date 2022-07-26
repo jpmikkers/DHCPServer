@@ -1,11 +1,6 @@
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.IO;
-using System.Net;
-using System.Text;
-using System.Net.Sockets;
-using System.Net.NetworkInformation;
 using System.Xml.Serialization;
 
 namespace GitHub.JPMikkers.DHCP
@@ -38,15 +33,15 @@ namespace GitHub.JPMikkers.DHCP
             }
         }
 
-        private static XmlSerializer s_serializer = new XmlSerializer(typeof(DHCPClientInformation));
+        private static readonly XmlSerializer s_serializer = new XmlSerializer(typeof(DHCPClientInformation));
 
         public static DHCPClientInformation Read(string file)
         {
             DHCPClientInformation result;
 
-            if (File.Exists(file))
+            if(File.Exists(file))
             {
-                using (Stream s = File.OpenRead(file))
+                using(Stream s = File.OpenRead(file))
                 {
                     result = (DHCPClientInformation)s_serializer.Deserialize(s);
                 }
@@ -63,12 +58,12 @@ namespace GitHub.JPMikkers.DHCP
         {
             string dirName = Path.GetDirectoryName(file);
 
-            if (!string.IsNullOrEmpty(dirName) && !Directory.Exists(dirName))
+            if(!string.IsNullOrEmpty(dirName) && !Directory.Exists(dirName))
             {
                 Directory.CreateDirectory(dirName);
             }
 
-            using (Stream s = File.Open(file, FileMode.Create, FileAccess.ReadWrite, FileShare.None))
+            using(Stream s = File.Open(file, FileMode.Create, FileAccess.ReadWrite, FileShare.None))
             {
                 s_serializer.Serialize(s, this);
                 s.Flush();

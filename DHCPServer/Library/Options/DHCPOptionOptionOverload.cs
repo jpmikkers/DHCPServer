@@ -19,7 +19,7 @@ namespace GitHub.JPMikkers.DHCP
         public override IDHCPOption FromStream(Stream s)
         {
             DHCPOptionOptionOverload result = new DHCPOptionOptionOverload();
-            if (s.Length != 1) throw new IOException("Invalid DHCP option length");
+            if(s.Length != 1) throw new IOException("Invalid DHCP option length");
             result._overload = (byte)s.ReadByte();
             return result;
         }

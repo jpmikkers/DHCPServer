@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using System.Text;
-using System.IO;
 
 namespace GitHub.JPMikkers.DHCP
 {
@@ -24,14 +24,14 @@ namespace GitHub.JPMikkers.DHCP
 
         public static bool ByteArraysAreEqual(byte[] array1, byte[] array2)
         {
-            if (array1.Length != array2.Length)
+            if(array1.Length != array2.Length)
             {
                 return false;
             }
 
-            for (int i = 0; i < array1.Length; i++)
+            for(int i = 0; i < array1.Length; i++)
             {
-                if (array1[i] != array2[i])
+                if(array1[i] != array2[i])
                 {
                     return false;
                 }
@@ -40,13 +40,13 @@ namespace GitHub.JPMikkers.DHCP
             return true;
         }
 
-        public static string BytesToHexString(byte[] data,string separator)
+        public static string BytesToHexString(byte[] data, string separator)
         {
             StringBuilder sb = new StringBuilder();
-            for (int t = 0; t < data.Length; t++)
+            for(int t = 0; t < data.Length; t++)
             {
                 sb.AppendFormat("{0:X2}", data[t]);
-                if(t<(data.Length-1))
+                if(t < (data.Length - 1))
                 {
                     sb.Append(separator);
                 }
@@ -68,34 +68,34 @@ namespace GitHub.JPMikkers.DHCP
 
             StringBuilder number = new StringBuilder();
 
-            while((c=sr.Read())>0)
+            while((c = sr.Read()) > 0)
             {
-               if( (c>='0' && c<='9') || (c>='a' && c<='f') || (c>='A' && c<='F'))
-               {
-                   number.Append((char) c);
+                if((c >= '0' && c <= '9') || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F'))
+                {
+                    number.Append((char)c);
 
-                   if(number.Length>=2)
-                   {
-                       result.Add(Convert.ToByte(number.ToString(), 16));
-                       number.Length = 0;
-                   }
-               }
+                    if(number.Length >= 2)
+                    {
+                        result.Add(Convert.ToByte(number.ToString(), 16));
+                        number.Length = 0;
+                    }
+                }
             }
             return result.ToArray();
         }
 
         public static IPAddress GetSubnetMask(IPAddress address)
         {
-            foreach (NetworkInterface adapter in NetworkInterface.GetAllNetworkInterfaces())
+            foreach(NetworkInterface adapter in NetworkInterface.GetAllNetworkInterfaces())
             {
-                foreach (UnicastIPAddressInformation unicastIPAddressInformation in adapter.GetIPProperties().UnicastAddresses)
+                foreach(UnicastIPAddressInformation unicastIPAddressInformation in adapter.GetIPProperties().UnicastAddresses)
                 {
-                    if (unicastIPAddressInformation.Address.AddressFamily == AddressFamily.InterNetwork)
+                    if(unicastIPAddressInformation.Address.AddressFamily == AddressFamily.InterNetwork)
                     {
-                        if (address.Equals(unicastIPAddressInformation.Address))
+                        if(address.Equals(unicastIPAddressInformation.Address))
                         {
                             // the following mask can be null.. return 255.255.255.0 in that case
-                            return unicastIPAddressInformation.IPv4Mask ?? new IPAddress(new byte[] {255, 255, 255, 0});
+                            return unicastIPAddressInformation.IPv4Mask ?? new IPAddress(new byte[] { 255, 255, 255, 0 });
                         }
                     }
                 }
@@ -105,10 +105,10 @@ namespace GitHub.JPMikkers.DHCP
 
         public static IPAddress UInt32ToIPAddress(UInt32 address)
         {
-            return new IPAddress(new byte[] { 
+            return new IPAddress(new byte[] {
                 (byte)((address>>24) & 0xFF) ,
-                (byte)((address>>16) & 0xFF) , 
-                (byte)((address>>8)  & 0xFF) , 
+                (byte)((address>>16) & 0xFF) ,
+                (byte)((address>>8)  & 0xFF) ,
                 (byte)( address & 0xFF)});
         }
 
@@ -121,7 +121,7 @@ namespace GitHub.JPMikkers.DHCP
                 (((UInt32)address.GetAddressBytes()[3]));
         }
 
-        public static string PrefixLines(string src,string prefix)
+        public static string PrefixLines(string src, string prefix)
         {
             StringBuilder sb = new StringBuilder();
             MemoryStream ms = new MemoryStream();
@@ -131,7 +131,7 @@ namespace GitHub.JPMikkers.DHCP
             ms.Position = 0;
             StreamReader sr = new StreamReader(ms);
             string line;
-            while ((line = sr.ReadLine()) != null)
+            while((line = sr.ReadLine()) != null)
             {
                 sb.Append(prefix);
                 sb.AppendLine(line);

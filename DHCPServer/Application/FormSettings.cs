@@ -1,13 +1,7 @@
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Net;
-using System.Text;
-using System.Windows.Forms;
 using GitHub.JPMikkers.DHCP;
+using System;
+using System.Net;
+using System.Windows.Forms;
 
 namespace DHCPServerApp
 {
@@ -62,7 +56,7 @@ namespace DHCPServerApp
         private void buttonPickAddress_Click(object sender, EventArgs e)
         {
             FormPickAdapter f = new FormPickAdapter();
-            if (f.ShowDialog(this) == DialogResult.OK)
+            if(f.ShowDialog(this) == DialogResult.OK)
             {
                 IPAddress address = f.Address;
                 IPAddress netmask = Utils.GetSubnetMask(f.Address);

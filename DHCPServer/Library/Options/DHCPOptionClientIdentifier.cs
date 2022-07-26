@@ -11,7 +11,7 @@ namespace GitHub.JPMikkers.DHCP
         public DHCPMessage.THardwareType HardwareType
         {
             get { return _hardwareType; }
-            set { _hardwareType = value; }   
+            set { _hardwareType = value; }
         }
 
         public byte[] Data
@@ -46,7 +46,7 @@ namespace GitHub.JPMikkers.DHCP
             _data = new byte[0];
         }
 
-        public DHCPOptionClientIdentifier(DHCPMessage.THardwareType hardwareType,byte[] data)
+        public DHCPOptionClientIdentifier(DHCPMessage.THardwareType hardwareType, byte[] data)
             : base(TDHCPOption.ClientIdentifier)
         {
             _hardwareType = hardwareType;

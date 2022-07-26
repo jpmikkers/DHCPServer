@@ -1,6 +1,6 @@
 using System;
-using System.Net;
 using System.Collections.Generic;
+using System.Net;
 
 namespace DHCPServerApp
 {
@@ -20,7 +20,7 @@ namespace DHCPServerApp
 
         public string Name
         {
-            get { return _name; } 
+            get { return _name; }
             set { _name = value; }
         }
 

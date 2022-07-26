@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Net;
-using System.Xml.Serialization;
-using System.Xml.Schema;
 using System.Xml;
+using System.Xml.Schema;
+using System.Xml.Serialization;
 
 namespace DHCPServerApp
 {
@@ -26,7 +26,7 @@ namespace DHCPServerApp
             reader.MoveToContent();
             var isEmptyElement = reader.IsEmptyElement;
             reader.ReadStartElement();
-            if (!isEmptyElement)
+            if(!isEmptyElement)
             {
                 Address = IPAddress.Parse(reader.ReadContentAsString());
                 reader.ReadEndElement();
@@ -35,7 +35,7 @@ namespace DHCPServerApp
 
         public void WriteXml(XmlWriter writer)
         {
-            if(Address!=null) writer.WriteString(Address.ToString());
+            if(Address != null) writer.WriteString(Address.ToString());
         }
     }
 }

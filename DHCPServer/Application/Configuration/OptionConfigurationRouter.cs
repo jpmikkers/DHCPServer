@@ -1,5 +1,5 @@
-﻿using System;
-using GitHub.JPMikkers.DHCP;
+﻿using GitHub.JPMikkers.DHCP;
+using System;
 using System.Linq;
 
 namespace DHCPServerApp
@@ -13,11 +13,11 @@ namespace DHCPServerApp
 
         protected override IDHCPOption ConstructDHCPOption()
         {
-            return new DHCPOptionRouter() 
-            { 
+            return new DHCPOptionRouter()
+            {
                 IPAddresses = Addresses
-                    .Where(x => x.Address!=null)
-                    .Select(x => x.Address) 
+                    .Where(x => x.Address != null)
+                    .Select(x => x.Address)
             };
         }
     }

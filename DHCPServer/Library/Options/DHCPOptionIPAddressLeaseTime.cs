@@ -20,7 +20,7 @@ namespace GitHub.JPMikkers.DHCP
         public override IDHCPOption FromStream(Stream s)
         {
             DHCPOptionIPAddressLeaseTime result = new DHCPOptionIPAddressLeaseTime();
-            if (s.Length != 4) throw new IOException("Invalid DHCP option length");
+            if(s.Length != 4) throw new IOException("Invalid DHCP option length");
             result._leaseTime = TimeSpan.FromSeconds(ParseHelper.ReadUInt32(s));
             return result;
         }
@@ -41,7 +41,7 @@ namespace GitHub.JPMikkers.DHCP
             : base(TDHCPOption.IPAddressLeaseTime)
         {
             _leaseTime = leaseTime;
-            if (_leaseTime > Utils.InfiniteTimeSpan)
+            if(_leaseTime > Utils.InfiniteTimeSpan)
             {
                 _leaseTime = Utils.InfiniteTimeSpan;
             }

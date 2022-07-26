@@ -24,7 +24,7 @@ namespace GitHub.JPMikkers.DHCP
             while(true)
             {
                 int c = s.ReadByte();
-                if(c<0) break;
+                if(c < 0) break;
                 result._requestList.Add((TDHCPOption)c);
             }
             return result;
@@ -53,7 +53,7 @@ namespace GitHub.JPMikkers.DHCP
                 sb.Append(opt.ToString());
                 sb.Append(",");
             }
-            if(_requestList.Count>0) sb.Remove(sb.Length-1,1);
+            if(_requestList.Count > 0) sb.Remove(sb.Length - 1, 1);
             return $"Option(name=[{OptionType}],value=[{sb}])";
         }
     }

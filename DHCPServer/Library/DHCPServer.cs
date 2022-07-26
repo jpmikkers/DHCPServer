@@ -1,13 +1,9 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using System.Net;
-using System.Text;
-using System.Net.Sockets;
-using System.Net.NetworkInformation;
-using System.Threading;
 using System.Linq;
+using System.Net;
+using System.Threading;
 
 namespace GitHub.JPMikkers.DHCP
 {
@@ -16,7 +12,7 @@ namespace GitHub.JPMikkers.DHCP
         private const int ClientInformationWriteRetries = 10;
 
         private readonly object _sync = new object();
-        private IPEndPoint _endPoint = new IPEndPoint(IPAddress.Loopback,67);
+        private IPEndPoint _endPoint = new IPEndPoint(IPAddress.Loopback, 67);
         private UDPSocket _socket;
         private IPAddress _subnetMask = IPAddress.Any;
         private IPAddress _poolStart = IPAddress.Any;
@@ -24,13 +20,13 @@ namespace GitHub.JPMikkers.DHCP
 
         private readonly string _clientInfoPath;
         private readonly string _hostName;
-        private readonly Dictionary<DHCPClient,DHCPClient> _clients = new Dictionary<DHCPClient, DHCPClient>();
+        private readonly Dictionary<DHCPClient, DHCPClient> _clients = new Dictionary<DHCPClient, DHCPClient>();
         private Timer _timer;
         private TimeSpan _offerExpirationTime = TimeSpan.FromSeconds(30.0);
         private TimeSpan _leaseTime = TimeSpan.FromDays(1);
         private bool _active = false;
         private List<OptionItem> _options = new List<OptionItem>();
-        private List<IDHCPMessageInterceptor> _interceptors= new List<IDHCPMessageInterceptor>();
+        private List<IDHCPMessageInterceptor> _interceptors = new List<IDHCPMessageInterceptor>();
         private List<ReservationItem> _reservations = new List<ReservationItem>();
         private int _minimumPacketSize = 576;
         private readonly AutoPumpQueue<int> m_UpdateClientInfoQueue;
@@ -38,8 +34,8 @@ namespace GitHub.JPMikkers.DHCP
 
         #region IDHCPServer Members
 
-        public event EventHandler<DHCPTraceEventArgs> OnTrace = delegate(object sender, DHCPTraceEventArgs args) { };
-        public event EventHandler<DHCPStopEventArgs> OnStatusChange = delegate(object sender, DHCPStopEventArgs args) { };
+        public event EventHandler<DHCPTraceEventArgs> OnTrace = delegate (object sender, DHCPTraceEventArgs args) { };
+        public event EventHandler<DHCPStopEventArgs> OnStatusChange = delegate (object sender, DHCPStopEventArgs args) { };
 
         public IPEndPoint EndPoint
         {
@@ -122,7 +118,7 @@ namespace GitHub.JPMikkers.DHCP
             }
             set
             {
-                _minimumPacketSize = Math.Max(value,312);
+                _minimumPacketSize = Math.Max(value, 312);
             }
         }
 
@@ -155,7 +151,7 @@ namespace GitHub.JPMikkers.DHCP
         {
             get
             {
-                lock (_sync)
+                lock(_sync)
                 {
                     return _active;
                 }
@@ -200,18 +196,18 @@ namespace GitHub.JPMikkers.DHCP
 
         private void OnUpdateClientInfo(AutoPumpQueue<int> sender, int data)
         {
-            if (Active)
+            if(Active)
             {
                 try
                 {
                     DHCPClientInformation clientInformation = new DHCPClientInformation();
 
-                    foreach (DHCPClient client in Clients)
+                    foreach(DHCPClient client in Clients)
                     {
                         clientInformation.Clients.Add(client);
                     }
 
-                    for (int t = 0; t < ClientInformationWriteRetries; t++)
+                    for(int t = 0; t < ClientInformationWriteRetries; t++)
                     {
                         try
                         {
@@ -222,7 +218,7 @@ namespace GitHub.JPMikkers.DHCP
                         {
                         }
 
-                        if (t < ClientInformationWriteRetries)
+                        if(t < ClientInformationWriteRetries)
                         {
                             Thread.Sleep(m_Random.Next(500, 1000));
                         }
@@ -232,7 +228,7 @@ namespace GitHub.JPMikkers.DHCP
                         }
                     }
                 }
-                catch (Exception e)
+                catch(Exception e)
                 {
                     Trace($"Exception in OnUpdateClientInfo : {e}");
                 }
@@ -248,24 +244,24 @@ namespace GitHub.JPMikkers.DHCP
 
         public void Start()
         {
-            lock (_sync)
+            lock(_sync)
             {
                 try
                 {
                     DHCPClientInformation clientInformation = DHCPClientInformation.Read(_clientInfoPath);
 
-                    foreach (DHCPClient client in clientInformation.Clients
+                    foreach(DHCPClient client in clientInformation.Clients
                         .Where(c => c.State != DHCPClient.TState.Offered)   // Forget offered clients.
                         .Where(c => IsIPAddressInPoolRange(c.IPAddress)))   // Forget clients no longer in ip range.
                     {
                         _clients.Add(client, client);
                     }
                 }
-                catch (Exception)
+                catch(Exception)
                 {
                 }
 
-                if (!_active)
+                if(!_active)
                 {
                     try
                     {
@@ -275,7 +271,7 @@ namespace GitHub.JPMikkers.DHCP
                         _timer = new Timer(new TimerCallback(OnTimer), null, TimeSpan.FromSeconds(1.0), TimeSpan.FromSeconds(1.0));
                         Trace("DHCP Server start succeeded");
                     }
-                    catch (Exception e)
+                    catch(Exception e)
                     {
                         Trace($"DHCP Server start failed, reason '{e}'");
                         _active = false;
@@ -310,7 +306,7 @@ namespace GitHub.JPMikkers.DHCP
 
         protected void Dispose(bool disposing)
         {
-            if (disposing)
+            if(disposing)
             {
                 Stop();
             }
@@ -331,7 +327,7 @@ namespace GitHub.JPMikkers.DHCP
         private void HandleStatusChange(DHCPStopEventArgs data)
         {
             m_UpdateClientInfoQueue.Enqueue(0);
-            OnStatusChange(this, data);            
+            OnStatusChange(this, data);
         }
 
         internal void Trace(string msg)
@@ -345,9 +341,9 @@ namespace GitHub.JPMikkers.DHCP
         {
             bool notify = false;
 
-            lock (_sync)
+            lock(_sync)
             {
-                if (_active)
+                if(_active)
                 {
                     Trace($"Stopping DHCP server '{_endPoint}'");
                     _active = false;
@@ -357,7 +353,7 @@ namespace GitHub.JPMikkers.DHCP
                 }
             }
 
-            if (notify)
+            if(notify)
             {
                 DHCPStopEventArgs data = new DHCPStopEventArgs();
                 data.Reason = reason;
@@ -369,30 +365,30 @@ namespace GitHub.JPMikkers.DHCP
         {
             bool modified = false;
 
-            lock (_clients)
+            lock(_clients)
             {
                 List<DHCPClient> clientsToRemove = new List<DHCPClient>();
-                foreach (DHCPClient client in _clients.Keys)
+                foreach(DHCPClient client in _clients.Keys)
                 {
-                    if (client.State == DHCPClient.TState.Offered && (DateTime.Now - client.OfferedTime) > _offerExpirationTime)
+                    if(client.State == DHCPClient.TState.Offered && (DateTime.Now - client.OfferedTime) > _offerExpirationTime)
                     {
                         clientsToRemove.Add(client);
                     }
-                    else if (client.State == DHCPClient.TState.Assigned && (DateTime.Now > client.LeaseEndTime))
+                    else if(client.State == DHCPClient.TState.Assigned && (DateTime.Now > client.LeaseEndTime))
                     {
                         // lease expired. remove client
                         clientsToRemove.Add(client);
                     }
                 }
 
-                foreach (DHCPClient client in clientsToRemove)
+                foreach(DHCPClient client in clientsToRemove)
                 {
                     _clients.Remove(client);
                     modified = true;
                 }
             }
 
-            if (modified)
+            if(modified)
             {
                 HandleStatusChange(null);
             }
@@ -400,9 +396,9 @@ namespace GitHub.JPMikkers.DHCP
 
         private void RemoveClient(DHCPClient client)
         {
-            lock (_clients)
+            lock(_clients)
             {
-                if (_clients.Remove(client))
+                if(_clients.Remove(client))
                 {
                     Trace($"Removed client '{client}' from client table");
                 }
@@ -418,13 +414,13 @@ namespace GitHub.JPMikkers.DHCP
             _socket.Send(endPoint, new ArraySegment<byte>(m.ToArray()));
         }
 
-        private void AppendConfiguredOptions(DHCPMessage sourceMsg,DHCPMessage targetMsg)
+        private void AppendConfiguredOptions(DHCPMessage sourceMsg, DHCPMessage targetMsg)
         {
-            foreach (OptionItem optionItem in _options)
+            foreach(OptionItem optionItem in _options)
             {
-                if (optionItem.Mode == OptionMode.Force || sourceMsg.IsRequestedParameter(optionItem.Option.OptionType))
+                if(optionItem.Mode == OptionMode.Force || sourceMsg.IsRequestedParameter(optionItem.Option.OptionType))
                 {
-                    if(targetMsg.GetOption(optionItem.Option.OptionType)==null)
+                    if(targetMsg.GetOption(optionItem.Option.OptionType) == null)
                     {
                         targetMsg.Options.Add(optionItem.Option);
                     }
@@ -486,7 +482,7 @@ namespace GitHub.JPMikkers.DHCP
 
             response.Options.Add(new DHCPOptionIPAddressLeaseTime(leaseTime));
             response.Options.Add(new DHCPOptionServerIdentifier(((IPEndPoint)_socket.LocalEndPoint).Address));
-            if (sourceMsg.IsRequestedParameter(TDHCPOption.SubnetMask)) response.Options.Add(new DHCPOptionSubnetMask(this._subnetMask));
+            if(sourceMsg.IsRequestedParameter(TDHCPOption.SubnetMask)) response.Options.Add(new DHCPOptionSubnetMask(this._subnetMask));
             AppendConfiguredOptions(sourceMsg, response);
             SendOfferOrAck(sourceMsg, response);
         }
@@ -524,9 +520,9 @@ namespace GitHub.JPMikkers.DHCP
             response.ClientHardwareAddress = sourceMsg.ClientHardwareAddress;
             response.MessageType = TDHCPMessageType.NAK;
             response.Options.Add(new DHCPOptionServerIdentifier(((IPEndPoint)_socket.LocalEndPoint).Address));
-            if (sourceMsg.IsRequestedParameter(TDHCPOption.SubnetMask)) response.Options.Add(new DHCPOptionSubnetMask(this._subnetMask));
+            if(sourceMsg.IsRequestedParameter(TDHCPOption.SubnetMask)) response.Options.Add(new DHCPOptionSubnetMask(this._subnetMask));
 
-            if (!sourceMsg.RelayAgentIPAddress.Equals(IPAddress.Any))
+            if(!sourceMsg.RelayAgentIPAddress.Equals(IPAddress.Any))
             {
                 // If the 'giaddr' field in a DHCP message from a client is non-zero,
                 // the server sends any return messages to the 'DHCP server' port on the
@@ -537,7 +533,7 @@ namespace GitHub.JPMikkers.DHCP
             {
                 // In all cases, when 'giaddr' is zero, the server broadcasts any DHCPNAK
                 // messages to 0xffffffff.
-                SendMessage(response, new IPEndPoint(IPAddress.Broadcast,68));
+                SendMessage(response, new IPEndPoint(IPAddress.Broadcast, 68));
             }
         }
 
@@ -590,7 +586,7 @@ namespace GitHub.JPMikkers.DHCP
 
             response.Options.Add(new DHCPOptionIPAddressLeaseTime(leaseTime));
             response.Options.Add(new DHCPOptionServerIdentifier(((IPEndPoint)_socket.LocalEndPoint).Address));
-            if (sourceMsg.IsRequestedParameter(TDHCPOption.SubnetMask)) response.Options.Add(new DHCPOptionSubnetMask(this._subnetMask));
+            if(sourceMsg.IsRequestedParameter(TDHCPOption.SubnetMask)) response.Options.Add(new DHCPOptionSubnetMask(this._subnetMask));
             AppendConfiguredOptions(sourceMsg, response);
             SendOfferOrAck(sourceMsg, response);
         }
@@ -649,7 +645,7 @@ namespace GitHub.JPMikkers.DHCP
             //All others                MAY                
 
             response.Options.Add(new DHCPOptionServerIdentifier(((IPEndPoint)_socket.LocalEndPoint).Address));
-            if (sourceMsg.IsRequestedParameter(TDHCPOption.SubnetMask)) response.Options.Add(new DHCPOptionSubnetMask(this._subnetMask));
+            if(sourceMsg.IsRequestedParameter(TDHCPOption.SubnetMask)) response.Options.Add(new DHCPOptionSubnetMask(this._subnetMask));
             AppendConfiguredOptions(sourceMsg, response);
             SendMessage(response, new IPEndPoint(sourceMsg.ClientIPAddress, 68));
         }
@@ -662,7 +658,7 @@ namespace GitHub.JPMikkers.DHCP
             // its IP address must have the source address field in the IP header
             // set to 0.
 
-            if (!request.RelayAgentIPAddress.Equals(IPAddress.Any))
+            if(!request.RelayAgentIPAddress.Equals(IPAddress.Any))
             {
                 // If the 'giaddr' field in a DHCP message from a client is non-zero,
                 // the server sends any return messages to the 'DHCP server' port on the
@@ -671,7 +667,7 @@ namespace GitHub.JPMikkers.DHCP
             }
             else
             {
-                if (!request.ClientIPAddress.Equals(IPAddress.Any))
+                if(!request.ClientIPAddress.Equals(IPAddress.Any))
                 {
                     // If the 'giaddr' field is zero and the 'ciaddr' field is nonzero, then the server
                     // unicasts DHCPOFFER and DHCPACK messages to the address in 'ciaddr'.
@@ -694,9 +690,9 @@ namespace GitHub.JPMikkers.DHCP
             bool result = false;
             DHCPOptionServerIdentifier dhcpOptionServerIdentifier = (DHCPOptionServerIdentifier)msg.GetOption(TDHCPOption.ServerIdentifier);
 
-            if (dhcpOptionServerIdentifier != null)
+            if(dhcpOptionServerIdentifier != null)
             {
-                if (dhcpOptionServerIdentifier.IPAddress.Equals(EndPoint.Address))
+                if(dhcpOptionServerIdentifier.IPAddress.Equals(EndPoint.Address))
                 {
                     result = true;
                 }
@@ -712,7 +708,7 @@ namespace GitHub.JPMikkers.DHCP
             return result;
         }
 
-        private bool IsIPAddressInRange(IPAddress address,IPAddress start,IPAddress end)
+        private bool IsIPAddressInRange(IPAddress address, IPAddress start, IPAddress end)
         {
             var adr32 = Utils.IPAddressToUInt32(address);
             return adr32 >= Utils.IPAddressToUInt32(SanitizeHostRange(start)) && adr32 <= Utils.IPAddressToUInt32(SanitizeHostRange(end));
@@ -735,13 +731,13 @@ namespace GitHub.JPMikkers.DHCP
 
         private bool IPAddressIsFree(IPAddress address, bool reuseReleased)
         {
-            if (!IPAddressIsInSubnet(address)) return false;
-            if (address.Equals(_endPoint.Address)) return false;
+            if(!IPAddressIsInSubnet(address)) return false;
+            if(address.Equals(_endPoint.Address)) return false;
             foreach(DHCPClient client in _clients.Keys)
             {
                 if(client.IPAddress.Equals(address))
                 {
-                    if (reuseReleased && client.State == DHCPClient.TState.Released)
+                    if(reuseReleased && client.State == DHCPClient.TState.Released)
                     {
                         client.IPAddress = IPAddress.Any;
                         return true;
@@ -769,18 +765,18 @@ namespace GitHub.JPMikkers.DHCP
 
             var reservation = _reservations.FirstOrDefault(x => x.Match(dhcpMessage));
 
-            if (reservation != null)
+            if(reservation != null)
             {
                 // the client matches a reservation.. find the first free address in the reservation block
-                for (UInt32 host = Utils.IPAddressToUInt32(SanitizeHostRange(reservation.PoolStart)); host <= Utils.IPAddressToUInt32(SanitizeHostRange(reservation.PoolEnd)); host++)
+                for(UInt32 host = Utils.IPAddressToUInt32(SanitizeHostRange(reservation.PoolStart)); host <= Utils.IPAddressToUInt32(SanitizeHostRange(reservation.PoolEnd)); host++)
                 {
                     IPAddress testIPAddress = Utils.UInt32ToIPAddress(host);
                     // I don't see the point of avoiding released addresses for reservations (yet)
-                    if (IPAddressIsFree(testIPAddress, true))
+                    if(IPAddressIsFree(testIPAddress, true))
                     {
                         return testIPAddress;
                     }
-                    else if (reservation.Preempt)
+                    else if(reservation.Preempt)
                     {
                         // if Preempt is true, return the first address of the reservation range. Preempt should ONLY ever be used if the range is a single address, and you're 100% sure you'll 
                         // _always_ have just a single device in your network that matches the reservation MAC or name.
@@ -789,10 +785,10 @@ namespace GitHub.JPMikkers.DHCP
                 }
             }
 
-            if(dhcpOptionRequestedIPAddress!=null)
+            if(dhcpOptionRequestedIPAddress != null)
             {
                 // there is a requested IP address. Is it in our subnet and free?
-                if(IPAddressIsFree(dhcpOptionRequestedIPAddress.IPAddress,true))
+                if(IPAddressIsFree(dhcpOptionRequestedIPAddress.IPAddress, true))
                 {
                     // yes, the requested address is ok
                     return dhcpOptionRequestedIPAddress.IPAddress;
@@ -803,17 +799,17 @@ namespace GitHub.JPMikkers.DHCP
             for(UInt32 host = Utils.IPAddressToUInt32(SanitizeHostRange(_poolStart)); host <= Utils.IPAddressToUInt32(SanitizeHostRange(_poolEnd)); host++)
             {
                 IPAddress testIPAddress = Utils.UInt32ToIPAddress(host);
-                if(IPAddressIsFree(testIPAddress,false))
+                if(IPAddressIsFree(testIPAddress, false))
                 {
                     return testIPAddress;
                 }
             }
 
             // nothing found.. now start allocating released ones as well
-            for (UInt32 host = Utils.IPAddressToUInt32(SanitizeHostRange(_poolStart)); host <= Utils.IPAddressToUInt32(SanitizeHostRange(_poolEnd)); host++)
+            for(UInt32 host = Utils.IPAddressToUInt32(SanitizeHostRange(_poolStart)); host <= Utils.IPAddressToUInt32(SanitizeHostRange(_poolEnd)); host++)
             {
                 IPAddress testIPAddress = Utils.UInt32ToIPAddress(host);
-                if (IPAddressIsFree(testIPAddress, true))
+                if(IPAddressIsFree(testIPAddress, true))
                 {
                     return testIPAddress;
                 }
@@ -825,11 +821,11 @@ namespace GitHub.JPMikkers.DHCP
 
         private void OfferClient(DHCPMessage dhcpMessage, DHCPClient client)
         {
-            lock (_clients)
+            lock(_clients)
             {
                 client.State = DHCPClient.TState.Offered;
                 client.OfferedTime = DateTime.Now;
-                if (!_clients.ContainsKey(client)) _clients.Add(client, client);
+                if(!_clients.ContainsKey(client)) _clients.Add(client, client);
                 SendOFFER(dhcpMessage, client.IPAddress, _leaseTime);
             }
         }
@@ -842,15 +838,15 @@ namespace GitHub.JPMikkers.DHCP
 
                 // translate array segment into a DHCPMessage
                 DHCPMessage dhcpMessage = DHCPMessage.FromStream(new MemoryStream(data.Array, data.Offset, data.Count, false, false));
-                Trace(Utils.PrefixLines(dhcpMessage.ToString(),"c->s "));
+                Trace(Utils.PrefixLines(dhcpMessage.ToString(), "c->s "));
 
                 // only react to messages from client to server. Ignore other types.
-                if (dhcpMessage.Opcode == DHCPMessage.TOpcode.BootRequest)
+                if(dhcpMessage.Opcode == DHCPMessage.TOpcode.BootRequest)
                 {
                     DHCPClient client = DHCPClient.CreateFromMessage(dhcpMessage);
                     Trace($"Client {client} sent {dhcpMessage.MessageType}");
 
-                    switch (dhcpMessage.MessageType)
+                    switch(dhcpMessage.MessageType)
                     {
                         // DHCPDISCOVER - client to server
                         // broadcast to locate available servers
@@ -859,12 +855,12 @@ namespace GitHub.JPMikkers.DHCP
                             {
                                 // is it a known client?
                                 DHCPClient knownClient = _clients.ContainsKey(client) ? _clients[client] : null;
-                                
-                                if(knownClient!=null)
+
+                                if(knownClient != null)
                                 {
                                     Trace($"Client is known, in state {knownClient.State}");
 
-                                    if (knownClient.State == DHCPClient.TState.Offered || knownClient.State == DHCPClient.TState.Assigned)
+                                    if(knownClient.State == DHCPClient.TState.Offered || knownClient.State == DHCPClient.TState.Assigned)
                                     {
                                         Trace("Client sent DISCOVER but we already offered, or assigned -> repeat offer with known address");
                                         OfferClient(dhcpMessage, knownClient);
@@ -873,16 +869,16 @@ namespace GitHub.JPMikkers.DHCP
                                     {
                                         Trace("Client is known but released");
                                         // client is known but released or dropped. Use the old address or allocate a new one
-                                        if (knownClient.IPAddress.Equals(IPAddress.Any))
+                                        if(knownClient.IPAddress.Equals(IPAddress.Any))
                                         {
                                             knownClient.IPAddress = AllocateIPAddress(dhcpMessage);
-                                            if (!knownClient.IPAddress.Equals(IPAddress.Any))
+                                            if(!knownClient.IPAddress.Equals(IPAddress.Any))
                                             {
                                                 OfferClient(dhcpMessage, knownClient);
                                             }
                                             else
                                             {
-                                                Trace("No more free addresses. Don't respond to discover");                                                
+                                                Trace("No more free addresses. Don't respond to discover");
                                             }
                                         }
                                         else
@@ -898,7 +894,7 @@ namespace GitHub.JPMikkers.DHCP
                                     // allocate new address, add client to client table in Offered state
                                     client.IPAddress = AllocateIPAddress(dhcpMessage);
                                     // allocation ok ?
-                                    if (!client.IPAddress.Equals(IPAddress.Any))
+                                    if(!client.IPAddress.Equals(IPAddress.Any))
                                     {
                                         OfferClient(dhcpMessage, client);
                                     }
@@ -916,27 +912,27 @@ namespace GitHub.JPMikkers.DHCP
                         // (b) confirming correctness of previously allocated address after e.g. system reboot, or
                         // (c) extending the lease on a particular network address
                         case TDHCPMessageType.REQUEST:
-                            lock (_clients)
+                            lock(_clients)
                             {
                                 // is it a known client?
                                 DHCPClient knownClient = _clients.ContainsKey(client) ? _clients[client] : null;
 
                                 // is there a server identifier?
-                                DHCPOptionServerIdentifier dhcpOptionServerIdentifier = (DHCPOptionServerIdentifier) dhcpMessage.GetOption(TDHCPOption.ServerIdentifier);
-                                DHCPOptionRequestedIPAddress dhcpOptionRequestedIPAddress = (DHCPOptionRequestedIPAddress) dhcpMessage.GetOption(TDHCPOption.RequestedIPAddress);
+                                DHCPOptionServerIdentifier dhcpOptionServerIdentifier = (DHCPOptionServerIdentifier)dhcpMessage.GetOption(TDHCPOption.ServerIdentifier);
+                                DHCPOptionRequestedIPAddress dhcpOptionRequestedIPAddress = (DHCPOptionRequestedIPAddress)dhcpMessage.GetOption(TDHCPOption.RequestedIPAddress);
 
-                                if (dhcpOptionServerIdentifier != null)
+                                if(dhcpOptionServerIdentifier != null)
                                 {
                                     // there is a server identifier: the message is in response to a DHCPOFFER
                                     if(dhcpOptionServerIdentifier.IPAddress.Equals(_endPoint.Address))
-                                    {         
+                                    {
                                         // it's a response to OUR offer.
                                         // but did we actually offer one?
-                                        if( knownClient!=null && knownClient.State == DHCPClient.TState.Offered)
+                                        if(knownClient != null && knownClient.State == DHCPClient.TState.Offered)
                                         {
                                             // yes.
                                             // the requested IP address MUST be filled in with the offered address
-                                            if(dhcpOptionRequestedIPAddress!=null)
+                                            if(dhcpOptionRequestedIPAddress != null)
                                             {
                                                 if(knownClient.IPAddress.Equals(dhcpOptionRequestedIPAddress.IPAddress))
                                                 {
@@ -952,7 +948,7 @@ namespace GitHub.JPMikkers.DHCP
                                                     SendNAK(dhcpMessage);
                                                     RemoveClient(knownClient);
                                                 }
-                                            }                   
+                                            }
                                             else
                                             {
                                                 Trace("Client sent request without filling the RequestedIPAddress option -> NAK");
@@ -961,7 +957,7 @@ namespace GitHub.JPMikkers.DHCP
                                             }
                                         }
                                         else
-                                        {          
+                                        {
                                             // we don't have an outstanding offer!
                                             Trace("Client requested IP address from this server, but we didn't offer any. -> NAK");
                                             SendNAK(dhcpMessage);
@@ -972,7 +968,7 @@ namespace GitHub.JPMikkers.DHCP
                                         Trace($"Client requests IP address that was offered by another DHCP server at '{dhcpOptionServerIdentifier.IPAddress}' -> drop offer");
                                         // it's a response to another DHCP server.
                                         // if we sent an OFFER to this client earlier, remove it.
-                                        if(knownClient!=null)
+                                        if(knownClient != null)
                                         {
                                             RemoveClient(knownClient);
                                         }
@@ -985,14 +981,14 @@ namespace GitHub.JPMikkers.DHCP
 
                                     Trace("Received REQUEST without server identifier, client state is INIT-REBOOT, RENEWING or REBINDING");
 
-                                    if (!dhcpMessage.ClientIPAddress.Equals(IPAddress.Any))
+                                    if(!dhcpMessage.ClientIPAddress.Equals(IPAddress.Any))
                                     {
                                         Trace("REQUEST client IP is filled in -> client state is RENEWING or REBINDING");
 
                                         // see : http://www.tcpipguide.com/free/t_DHCPLeaseRenewalandRebindingProcesses-2.htm
 
-                                        if (knownClient!=null && 
-                                            knownClient.State == DHCPClient.TState.Assigned && 
+                                        if(knownClient != null &&
+                                            knownClient.State == DHCPClient.TState.Assigned &&
                                             knownClient.IPAddress.Equals(dhcpMessage.ClientIPAddress))
                                         {
                                             // known, assigned, and IP address matches administration. ACK
@@ -1003,10 +999,10 @@ namespace GitHub.JPMikkers.DHCP
                                         else
                                         {
                                             // not known, or known but in some other state. Just dump the old one.
-                                            if(knownClient!=null) RemoveClient(knownClient);
+                                            if(knownClient != null) RemoveClient(knownClient);
 
                                             // check if client IP address is marked free
-                                            if (IPAddressIsFree(dhcpMessage.ClientIPAddress, false))
+                                            if(IPAddressIsFree(dhcpMessage.ClientIPAddress, false))
                                             {
                                                 // it's free. send ACK
                                                 client.IPAddress = dhcpMessage.ClientIPAddress;
@@ -1026,12 +1022,12 @@ namespace GitHub.JPMikkers.DHCP
                                     {
                                         Trace("REQUEST client IP is empty -> client state is INIT-REBOOT");
 
-                                        if (dhcpOptionRequestedIPAddress != null)
+                                        if(dhcpOptionRequestedIPAddress != null)
                                         {
-                                            if (knownClient != null &&
+                                            if(knownClient != null &&
                                                 knownClient.State == DHCPClient.TState.Assigned)
                                             {
-                                                if (knownClient.IPAddress.Equals(dhcpOptionRequestedIPAddress.IPAddress))
+                                                if(knownClient.IPAddress.Equals(dhcpOptionRequestedIPAddress.IPAddress))
                                                 {
                                                     Trace("Client request matches cached address -> ACK");
                                                     // known, assigned, and IP address matches administration. ACK
@@ -1053,7 +1049,7 @@ namespace GitHub.JPMikkers.DHCP
                                                 // see also: http://tcpipguide.com/free/t_DHCPGeneralOperationandClientFiniteStateMachine.htm
                                                 Trace("Client attempted INIT-REBOOT REQUEST but server has no lease for this client -> NAK");
                                                 SendNAK(dhcpMessage);
-                                                if (knownClient != null) RemoveClient(knownClient);
+                                                if(knownClient != null) RemoveClient(knownClient);
                                             }
                                         }
                                         else
@@ -1073,16 +1069,16 @@ namespace GitHub.JPMikkers.DHCP
                             // a possible configuration problem.
                             lock(_clients)
                             {
-                                if (ServerIdentifierPrecondition(dhcpMessage))
+                                if(ServerIdentifierPrecondition(dhcpMessage))
                                 {
                                     // is it a known client?
                                     DHCPClient knownClient = _clients.ContainsKey(client) ? _clients[client] : null;
 
-                                    if(knownClient!=null)
+                                    if(knownClient != null)
                                     {
                                         Trace("Found client in client table, removing.");
                                         RemoveClient(client);
-                                        
+
                                         /*
                                             // the network address that should be marked as not available MUST be 
                                             // specified in the RequestedIPAddress option.                                        
@@ -1094,11 +1090,11 @@ namespace GitHub.JPMikkers.DHCP
                                                     // TBD add IP address to exclusion list. or something.
                                                 }
                                             }
-                                         */ 
+                                         */
                                     }
                                     else
                                     {
-                                        Trace("Client not found in client table -> decline ignored.");                                        
+                                        Trace("Client not found in client table -> decline ignored.");
                                     }
                                 }
                             }
@@ -1112,14 +1108,14 @@ namespace GitHub.JPMikkers.DHCP
                             // subsequent requests from the client.
                             lock(_clients)
                             {
-                                if (ServerIdentifierPrecondition(dhcpMessage))
+                                if(ServerIdentifierPrecondition(dhcpMessage))
                                 {
                                     // is it a known client?
                                     DHCPClient knownClient = _clients.ContainsKey(client) ? _clients[client] : null;
 
-                                    if ( knownClient!=null /* && knownClient.State == DHCPClient.TState.Assigned */ )
+                                    if(knownClient != null /* && knownClient.State == DHCPClient.TState.Assigned */ )
                                     {
-                                        if (dhcpMessage.ClientIPAddress.Equals(knownClient.IPAddress))
+                                        if(dhcpMessage.ClientIPAddress.Equals(knownClient.IPAddress))
                                         {
                                             Trace("Found client in client table, marking as released");
                                             knownClient.State = DHCPClient.TState.Released;
@@ -1128,7 +1124,7 @@ namespace GitHub.JPMikkers.DHCP
                                         {
                                             Trace("IP address in RELEASE doesn't match known client address. Mark this client as released with unknown IP");
                                             knownClient.IPAddress = IPAddress.Any;
-                                            knownClient.State = DHCPClient.TState.Released;                                            
+                                            knownClient.State = DHCPClient.TState.Released;
                                         }
                                     }
                                     else
@@ -1160,7 +1156,7 @@ namespace GitHub.JPMikkers.DHCP
                 }
             }
             catch(Exception e)
-            {   
+            {
                 System.Diagnostics.Debug.WriteLine(e.Message);
                 System.Diagnostics.Debug.WriteLine(e.StackTrace);
             }

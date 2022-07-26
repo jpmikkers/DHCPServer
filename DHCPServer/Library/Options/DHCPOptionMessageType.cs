@@ -32,7 +32,7 @@ namespace GitHub.JPMikkers.DHCP
         public override IDHCPOption FromStream(Stream s)
         {
             DHCPOptionMessageType result = new DHCPOptionMessageType();
-            if (s.Length != 1) throw new IOException("Invalid DHCP option length");
+            if(s.Length != 1) throw new IOException("Invalid DHCP option length");
             result._messageType = (TDHCPMessageType)s.ReadByte();
             return result;
         }

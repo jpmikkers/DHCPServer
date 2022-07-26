@@ -1,10 +1,9 @@
+using GitHub.JPMikkers.DHCP;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
 using System.Net;
 using System.Threading;
-using GitHub.JPMikkers.DHCP;
 
 namespace DHCPServerApp
 {
@@ -13,11 +12,11 @@ namespace DHCPServerApp
         private const int RetryTime = 30000;
         private readonly object _lock;
         private bool _disposed;
-        private DHCPServerConfiguration _config;
-        private EventLog _eventLog;
+        private readonly DHCPServerConfiguration _config;
+        private readonly EventLog _eventLog;
 
         private DHCPServer _server;
-        private Timer _retryTimer;
+        private readonly Timer _retryTimer;
 
         public DHCPServerResurrector(DHCPServerConfiguration config, EventLog eventLog)
         {
@@ -43,22 +42,22 @@ namespace DHCPServerApp
 
         private void Resurrect(object state)
         {
-            lock (_lock)
+            lock(_lock)
             {
-                if (!_disposed)
+                if(!_disposed)
                 {
                     try
                     {
-                        _server = new DHCPServer(Program.GetClientInfoPath(_config.Name,_config.Address));
-                        _server.EndPoint = new IPEndPoint(IPAddress.Parse(_config.Address),67);
+                        _server = new DHCPServer(Program.GetClientInfoPath(_config.Name, _config.Address));
+                        _server.EndPoint = new IPEndPoint(IPAddress.Parse(_config.Address), 67);
                         _server.SubnetMask = IPAddress.Parse(_config.NetMask);
                         _server.PoolStart = IPAddress.Parse(_config.PoolStart);
                         _server.PoolEnd = IPAddress.Parse(_config.PoolEnd);
-                        _server.LeaseTime = (_config.LeaseTime>0) ? TimeSpan.FromSeconds(_config.LeaseTime) : Utils.InfiniteTimeSpan;
+                        _server.LeaseTime = (_config.LeaseTime > 0) ? TimeSpan.FromSeconds(_config.LeaseTime) : Utils.InfiniteTimeSpan;
                         _server.OfferExpirationTime = TimeSpan.FromSeconds(Math.Max(1, _config.OfferTime));
                         _server.MinimumPacketSize = _config.MinimumPacketSize;
 
-                        List <OptionItem> options = new List<OptionItem>();
+                        List<OptionItem> options = new List<OptionItem>();
                         foreach(OptionConfiguration optionConfiguration in _config.Options)
                         {
                             options.Add(optionConfiguration.ConstructOptionItem());
@@ -66,17 +65,17 @@ namespace DHCPServerApp
                         _server.Options = options;
 
                         List<ReservationItem> reservations = new List<ReservationItem>();
-                        foreach (ReservationConfiguration reservationConfiguration in _config.Reservations)
+                        foreach(ReservationConfiguration reservationConfiguration in _config.Reservations)
                         {
                             reservations.Add(reservationConfiguration.ConstructReservationItem());
                         }
                         _server.Reservations = reservations;
-                        
+
                         _server.OnStatusChange += server_OnStatusChange;
                         _server.OnTrace += server_OnTrace;
                         _server.Start();
                     }
-                    catch (Exception)
+                    catch(Exception)
                     {
                         CleanupAndRetry();
                     }
@@ -86,25 +85,25 @@ namespace DHCPServerApp
 
         private void Log(EventLogEntryType entryType, string msg)
         {
-            _eventLog.WriteEntry($"{_config.Name} : {msg}",entryType);
+            _eventLog.WriteEntry($"{_config.Name} : {msg}", entryType);
         }
 
         private void server_OnTrace(object sender, DHCPTraceEventArgs e)
         {
-            Log(EventLogEntryType.Information,e.Message);
+            Log(EventLogEntryType.Information, e.Message);
         }
 
         private void server_OnStatusChange(object sender, DHCPStopEventArgs e)
         {
             DHCPServer server = (DHCPServer)sender;
 
-            if (server.Active)
+            if(server.Active)
             {
                 //Log(EventLogEntryType.Information, string.Format("{0} transfers in progress", server.ActiveTransfers));
             }
             else
             {
-                if (e.Reason != null)
+                if(e.Reason != null)
                 {
                     Log(EventLogEntryType.Error, $"Stopped, reason: {e.Reason}");
                 }
@@ -114,12 +113,12 @@ namespace DHCPServerApp
 
         private void CleanupAndRetry()
         {
-            lock (_lock)
+            lock(_lock)
             {
-                if (!_disposed)
+                if(!_disposed)
                 {
                     // stop server
-                    if (_server != null)
+                    if(_server != null)
                     {
                         _server.OnStatusChange -= server_OnStatusChange;
                         _server.OnTrace -= server_OnTrace;
@@ -134,18 +133,18 @@ namespace DHCPServerApp
 
         protected void Dispose(bool disposing)
         {
-            if (disposing)
+            if(disposing)
             {
-                lock (_lock)
+                lock(_lock)
                 {
-                    if (!_disposed)
+                    if(!_disposed)
                     {
                         _disposed = true;
 
                         _retryTimer.Change(Timeout.Infinite, Timeout.Infinite);
                         _retryTimer.Dispose();
 
-                        if (_server != null)
+                        if(_server != null)
                         {
                             _server.OnStatusChange -= server_OnStatusChange;
                             _server.Dispose();

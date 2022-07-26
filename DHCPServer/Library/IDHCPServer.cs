@@ -1,9 +1,8 @@
 using System;
-using System.Net;
 using System.Collections.Generic;
-using System.Text;
-using System.Text.RegularExpressions;
 using System.Globalization;
+using System.Net;
+using System.Text.RegularExpressions;
 
 namespace GitHub.JPMikkers.DHCP
 {
@@ -44,7 +43,7 @@ namespace GitHub.JPMikkers.DHCP
         private byte[] _prefix;
         private int _prefixBits;
 
-        public string MacTaste 
+        public string MacTaste
         {
             get { return _macTaste; }
 
@@ -54,17 +53,17 @@ namespace GitHub.JPMikkers.DHCP
                 _prefix = null;
                 _prefixBits = 0;
 
-                if (!string.IsNullOrWhiteSpace(MacTaste))
+                if(!string.IsNullOrWhiteSpace(MacTaste))
                 {
                     try
                     {
                         Match match = s_regex.Match(_macTaste);
-                        if (match.Success && match.Groups["mac"].Success)
+                        if(match.Success && match.Groups["mac"].Success)
                         {
                             _prefix = Utils.HexStringToBytes(match.Groups["mac"].Value);
                             _prefixBits = _prefix.Length * 8;
 
-                            if (match.Groups["netmask"].Success)
+                            if(match.Groups["netmask"].Success)
                             {
                                 _prefixBits = Int32.Parse(match.Groups["netmask"].Value.Substring(1));
                             }
@@ -85,18 +84,18 @@ namespace GitHub.JPMikkers.DHCP
         private static bool MacMatch(byte[] mac, byte[] prefix, int bits)
         {
             // prefix should have more bits than masklength
-            if (((bits + 7) >> 3) > prefix.Length) return false;
+            if(((bits + 7) >> 3) > prefix.Length) return false;
             // prefix should be shorter or equal to mac address
-            if (prefix.Length > mac.Length) return false;
-            for (int t = 0; t < (bits - 7); t += 8)
+            if(prefix.Length > mac.Length) return false;
+            for(int t = 0; t < (bits - 7); t += 8)
             {
-                if (mac[t >> 3] != prefix[t >> 3]) return false;
+                if(mac[t >> 3] != prefix[t >> 3]) return false;
             }
 
-            if ((bits & 7) > 0)
+            if((bits & 7) > 0)
             {
                 byte bitMask = (byte)(0xFF00 >> (bits & 7));
-                if ((mac[bits >> 3] & bitMask) != (prefix[bits >> 3] & bitMask)) return false;
+                if((mac[bits >> 3] & bitMask) != (prefix[bits >> 3] & bitMask)) return false;
             }
             return true;
         }
@@ -105,15 +104,15 @@ namespace GitHub.JPMikkers.DHCP
         {
             var client = DHCPClient.CreateFromMessage(message);
 
-            if (!string.IsNullOrWhiteSpace(MacTaste) && _prefix!=null)
+            if(!string.IsNullOrWhiteSpace(MacTaste) && _prefix != null)
             {
                 return MacMatch(client.HardwareAddress, _prefix, _prefixBits);
             }
-            else if (!string.IsNullOrWhiteSpace(HostName))
+            else if(!string.IsNullOrWhiteSpace(HostName))
             {
-                if (!string.IsNullOrWhiteSpace(client.HostName))
+                if(!string.IsNullOrWhiteSpace(client.HostName))
                 {
-                    if (client.HostName.StartsWith(HostName,true,CultureInfo.InvariantCulture))
+                    if(client.HostName.StartsWith(HostName, true, CultureInfo.InvariantCulture))
                     {
                         return true;
                     }

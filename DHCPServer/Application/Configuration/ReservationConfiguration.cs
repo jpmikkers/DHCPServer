@@ -1,7 +1,7 @@
-﻿using System;
-using System.Net;
+﻿using GitHub.JPMikkers.DHCP;
+using System;
 using System.ComponentModel;
-using GitHub.JPMikkers.DHCP;
+using System.Net;
 
 namespace DHCPServerApp
 {
@@ -64,10 +64,10 @@ namespace DHCPServerApp
         public ReservationItem ConstructReservationItem()
         {
             return new ReservationItem()
-            { 
-                HostName = this.HostName, 
-                MacTaste = this.MacTaste, 
-                PoolStart = _poolStart, 
+            {
+                HostName = this.HostName,
+                MacTaste = this.MacTaste,
+                PoolStart = _poolStart,
                 PoolEnd = _poolEnd,
                 Preempt = _preempt,
             };

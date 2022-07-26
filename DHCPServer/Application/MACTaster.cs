@@ -1,16 +1,15 @@
+using GitHub.JPMikkers.DHCP;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Text;
 using System.Text.RegularExpressions;
-using GitHub.JPMikkers.DHCP;
 
 namespace DHCPServerApp
 {
     public class MACTaster
     {
         private static readonly Regex s_regex = new Regex(@"^(?<mac>([0-9a-fA-F][0-9a-fA-F][:\-\.]?)+)(?<netmask>/[0-9]+)?\s*(?<id>\w*)\s*(?<comment>#.*)?", RegexOptions.Compiled | RegexOptions.ExplicitCapture);
-        private List<PrefixItem> _prefixItems = new List<PrefixItem>();
+        private readonly List<PrefixItem> _prefixItems = new List<PrefixItem>();
 
         private struct PrefixItem
         {
@@ -18,7 +17,7 @@ namespace DHCPServerApp
             public int PrefixBits;
             public string Id;
 
-            public PrefixItem(byte[] prefix,int bits,string id)
+            public PrefixItem(byte[] prefix, int bits, string id)
             {
                 this.Prefix = prefix;
                 this.PrefixBits = bits;
@@ -30,21 +29,21 @@ namespace DHCPServerApp
         {
             try
             {
-                using (StreamReader sr = new StreamReader(configFile))
+                using(StreamReader sr = new StreamReader(configFile))
                 {
                     string line;
-                    while ((line = sr.ReadLine()) != null)
+                    while((line = sr.ReadLine()) != null)
                     {
                         try
                         {
                             Match match = s_regex.Match(line);
-                            if (match.Success && match.Groups["mac"].Success && match.Groups["id"].Success)
+                            if(match.Success && match.Groups["mac"].Success && match.Groups["id"].Success)
                             {
                                 byte[] prefix = Utils.HexStringToBytes(match.Groups["mac"].Value);
                                 string id = match.Groups["id"].Value;
-                                int prefixBits = prefix.Length*8;
+                                int prefixBits = prefix.Length * 8;
 
-                                if (match.Groups["netmask"].Success)
+                                if(match.Groups["netmask"].Success)
                                 {
                                     prefixBits = Int32.Parse(match.Groups["netmask"].Value.Substring(1));
                                 }
@@ -53,31 +52,31 @@ namespace DHCPServerApp
                             }
                         }
                         catch
-                        {                            
+                        {
                         }
                     }
                 }
             }
             catch
-            {                
+            {
             }
         }
 
-        private bool MacMatch(byte[] mac,byte[] prefix,int bits)
+        private bool MacMatch(byte[] mac, byte[] prefix, int bits)
         {
             // prefix should have more bits than masklength
-            if (((bits + 7) >> 3) > prefix.Length) return false;
+            if(((bits + 7) >> 3) > prefix.Length) return false;
             // prefix should be shorter or equal to mac address
-            if (prefix.Length > mac.Length) return false;
-            for(int t=0;t<(bits-7);t+=8)
+            if(prefix.Length > mac.Length) return false;
+            for(int t = 0; t < (bits - 7); t += 8)
             {
-                if (mac[t >> 3] != prefix[t >> 3]) return false;
+                if(mac[t >> 3] != prefix[t >> 3]) return false;
             }
 
-            if ((bits & 7) > 0)
+            if((bits & 7) > 0)
             {
-                byte bitMask = (byte) (0xFF00 >> (bits & 7));
-                if ((mac[bits >> 3] & bitMask) != (prefix[bits >> 3] & bitMask)) return false;
+                byte bitMask = (byte)(0xFF00 >> (bits & 7));
+                if((mac[bits >> 3] & bitMask) != (prefix[bits >> 3] & bitMask)) return false;
             }
             return true;
         }
@@ -87,7 +86,7 @@ namespace DHCPServerApp
         {
             foreach(PrefixItem prefixItem in _prefixItems)
             {
-                if(MacMatch(macAddress,prefixItem.Prefix,prefixItem.PrefixBits))
+                if(MacMatch(macAddress, prefixItem.Prefix, prefixItem.PrefixBits))
                 {
                     return prefixItem.Id;
                 }

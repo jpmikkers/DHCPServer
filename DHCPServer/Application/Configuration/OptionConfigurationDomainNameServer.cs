@@ -1,5 +1,5 @@
-﻿using System;
-using GitHub.JPMikkers.DHCP;
+﻿using GitHub.JPMikkers.DHCP;
+using System;
 using System.Linq;
 
 namespace DHCPServerApp

@@ -1,20 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
+﻿using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.ServiceProcess;
-using System.Text;
-using System.Configuration;
-using System.Threading;
-using GitHub.JPMikkers.DHCP;
 
 namespace DHCPServerApp
 {
     public partial class DHCPService : ServiceBase
     {
-        private EventLog _eventLog;
+        private readonly EventLog _eventLog;
         private DHCPServerConfigurationList _configuration;
         private List<DHCPServerResurrector> _servers;
 
@@ -29,7 +21,7 @@ namespace DHCPServerApp
             _configuration = DHCPServerConfigurationList.Read(Program.GetConfigurationPath());
             _servers = new List<DHCPServerResurrector>();
 
-            foreach (DHCPServerConfiguration config in _configuration)
+            foreach(DHCPServerConfiguration config in _configuration)
             {
                 _servers.Add(new DHCPServerResurrector(config, _eventLog));
             }
@@ -37,7 +29,7 @@ namespace DHCPServerApp
 
         protected override void OnStop()
         {
-            foreach (DHCPServerResurrector server in _servers)
+            foreach(DHCPServerResurrector server in _servers)
             {
                 server.Dispose();
             }

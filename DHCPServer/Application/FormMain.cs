@@ -1,27 +1,20 @@
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Windows.Forms;
-using System.ServiceProcess;
-using System.Security;
-using System.Security.Principal;
-using System.IO;
-using System.Diagnostics;
 using GitHub.JPMikkers.DHCP;
+using System;
+using System.ComponentModel;
+using System.Diagnostics;
+using System.Drawing;
+using System.Reflection;
+using System.ServiceProcess;
+using System.Windows.Forms;
 
 namespace DHCPServerApp
 {
     public partial class FormMain : Form
     {
-        private bool _hasAdministrativeRight;
-        private ServiceController _service;
+        private readonly bool _hasAdministrativeRight;
+        private readonly ServiceController _service;
         private DateTime _timeFilter;
-        private MACTaster _MACTaster;
+        private readonly MACTaster _MACTaster;
 
         public FormMain(ServiceController service)
         {
@@ -44,7 +37,7 @@ namespace DHCPServerApp
         {
             _service.Refresh();
             //System.Diagnostics.Debug.WriteLine(m_Service.Status.ToString());
-            if (!Program.HasAdministrativeRight())
+            if(!Program.HasAdministrativeRight())
             {
                 buttonStart.Enabled = false;
                 buttonStop.Enabled = false;
@@ -68,7 +61,7 @@ namespace DHCPServerApp
             {
                 _service.Start();
             }
-            catch (Exception)
+            catch(Exception)
             {
             }
             UpdateServiceStatus();
@@ -80,7 +73,7 @@ namespace DHCPServerApp
             {
                 _service.Stop();
             }
-            catch (Exception)
+            catch(Exception)
             {
             }
             UpdateServiceStatus();
@@ -98,7 +91,7 @@ namespace DHCPServerApp
 
         private void buttonElevate_Click(object sender, EventArgs e)
         {
-            if (Program.RunElevated(""))
+            if(Program.RunElevated(""))
             {
                 Close();
             }
@@ -118,12 +111,12 @@ namespace DHCPServerApp
         private void buttonConfigure_Click(object sender, EventArgs e)
         {
             FormConfigureOverview f = new FormConfigureOverview(Program.GetConfigurationPath());
-            if (f.ShowDialog(this) == DialogResult.OK)
+            if(f.ShowDialog(this) == DialogResult.OK)
             {
                 UpdateServiceStatus();
                 if(_hasAdministrativeRight && _service.Status == ServiceControllerStatus.Running)
                 {
-                    if (MessageBox.Show("The DHCP Service has to be restarted to enable the new settings.\r\n" +
+                    if(MessageBox.Show("The DHCP Service has to be restarted to enable the new settings.\r\n" +
                         "Are you sure you want to continue?", "Warning", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.Yes)
                     {
                         _service.Stop();
@@ -149,10 +142,10 @@ namespace DHCPServerApp
 
         private void AddEventLogEntry(EventLogEntry entry)
         {
-            if (entry.TimeGenerated > _timeFilter)
+            if(entry.TimeGenerated > _timeFilter)
             {
                 string entryType;
-                switch (entry.EntryType)
+                switch(entry.EntryType)
                 {
                     case EventLogEntryType.Error:
                         entryType = "ERROR";
@@ -182,7 +175,7 @@ namespace DHCPServerApp
             //textBox1.Up
             textBox1.Clear();
 
-            foreach (EventLogEntry entry in eventLog1.Entries)
+            foreach(EventLogEntry entry in eventLog1.Entries)
             {
                 AddEventLogEntry(entry);
             }
@@ -195,7 +188,7 @@ namespace DHCPServerApp
             {
                 SetTimeFilter(_timeFilter.AddDays(-1));
             }
-            catch (Exception)
+            catch(Exception)
             {
             }
         }
@@ -206,7 +199,7 @@ namespace DHCPServerApp
             {
                 SetTimeFilter(_timeFilter.AddHours(-1));
             }
-            catch (Exception)
+            catch(Exception)
             {
             }
         }
@@ -214,7 +207,7 @@ namespace DHCPServerApp
         private void SetTimeFilter(DateTime filter)
         {
             _timeFilter = filter;
-            if (_timeFilter == DateTime.MinValue)
+            if(_timeFilter == DateTime.MinValue)
             {
                 labelFilter.Text = "Showing all logging";
             }
@@ -239,7 +232,7 @@ namespace DHCPServerApp
                 DHCPServerConfigurationList configurationList =
                     DHCPServerConfigurationList.Read(Program.GetConfigurationPath());
 
-                foreach (DHCPServerConfiguration configuration in configurationList)
+                foreach(DHCPServerConfiguration configuration in configurationList)
                 {
                     try
                     {
@@ -247,18 +240,18 @@ namespace DHCPServerApp
                             DHCPClientInformation.Read(
                                 Program.GetClientInfoPath(configuration.Name, configuration.Address));
 
-                        foreach (DHCPClient client in clientInformation.Clients)
+                        foreach(DHCPClient client in clientInformation.Clients)
                         {
-                            bindingList.Add(new DHCPClientDisplayItem(configuration.Name,configuration.Address,client, _MACTaster.Taste(client.HardwareAddress)));
+                            bindingList.Add(new DHCPClientDisplayItem(configuration.Name, configuration.Address, client, _MACTaster.Taste(client.HardwareAddress)));
                         }
                     }
                     catch(Exception)
-                    {                        
+                    {
                     }
                 }
             }
             catch(Exception)
-            {                
+            {
             }
 
             dataGridView1.AutoGenerateColumns = false;
@@ -267,7 +260,7 @@ namespace DHCPServerApp
 
         private void dataGridView1_CellFormatting(object sender, DataGridViewCellFormattingEventArgs e)
         {
-            if ((dataGridView1.Rows[e.RowIndex].DataBoundItem != null) &&
+            if((dataGridView1.Rows[e.RowIndex].DataBoundItem != null) &&
                 (dataGridView1.Columns[e.ColumnIndex].DataPropertyName.Contains(".")))
             {
                 e.Value = BindProperty(dataGridView1.Rows[e.RowIndex].DataBoundItem,
@@ -282,7 +275,7 @@ namespace DHCPServerApp
         {
             string retValue = "";
 
-            if (propertyName.Contains("."))
+            if(propertyName.Contains("."))
             {
                 PropertyInfo[] arrayProperties;
                 string leftPropertyName;
@@ -290,9 +283,9 @@ namespace DHCPServerApp
                 leftPropertyName = propertyName.Substring(0, propertyName.IndexOf("."));
                 arrayProperties = property.GetType().GetProperties();
 
-                foreach (PropertyInfo propertyInfo in arrayProperties)
+                foreach(PropertyInfo propertyInfo in arrayProperties)
                 {
-                    if (propertyInfo.Name == leftPropertyName)
+                    if(propertyInfo.Name == leftPropertyName)
                     {
                         retValue = BindProperty(
                           propertyInfo.GetValue(property, null),
@@ -321,7 +314,7 @@ namespace DHCPServerApp
         private string m_ServerName;
         private string m_ServerIPAddress;
         private DHCPClient m_Client;
-        private string m_MacTaste;
+        private readonly string m_MacTaste;
 
         public string ServerName
         {
@@ -337,15 +330,15 @@ namespace DHCPServerApp
 
         public DHCPClient Client
         {
-            get { return m_Client;  }
-            set { m_Client = value;  }
+            get { return m_Client; }
+            set { m_Client = value; }
         }
 
         public string IdentifierAsString
         {
             get
             {
-                return Utils.BytesToHexString(m_Client.Identifier,":");
+                return Utils.BytesToHexString(m_Client.Identifier, ":");
             }
         }
 

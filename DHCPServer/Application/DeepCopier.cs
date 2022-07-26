@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Reflection;
-using System.Xml.Linq;
-using System.Runtime.CompilerServices;
-using System.Linq.Expressions;
 using System.Linq;
+using System.Linq.Expressions;
+using System.Reflection;
+using System.Runtime.CompilerServices;
+using System.Xml.Linq;
 
 namespace DHCPServerApp
 {
@@ -38,54 +38,54 @@ namespace DHCPServerApp
 
             private static bool IsPrimitiveOrImmutable(Type type)
             {
-                if (type.IsPrimitive)
+                if(type.IsPrimitive)
                 {
                     return true;
                 }
-                else if (type.IsValueType)
+                else if(type.IsValueType)
                 {
-                    if (type.IsEnum) return true;
-                    if (type == typeof(Decimal)) return true;
-                    if (type == typeof(DateTime)) return true;
+                    if(type.IsEnum) return true;
+                    if(type == typeof(Decimal)) return true;
+                    if(type == typeof(DateTime)) return true;
                 }
                 else
                 {
-                    if (type == typeof(String)) return true;
+                    if(type == typeof(String)) return true;
                 }
                 return false;
             }
 
             public Object InternalCopy(Object originalObject, bool includeInObjectGraph)
             {
-                if (originalObject == null) return null;
+                if(originalObject == null) return null;
                 var typeToReflect = originalObject.GetType();
-                if (IsPrimitiveOrImmutable(typeToReflect)) return originalObject;
+                if(IsPrimitiveOrImmutable(typeToReflect)) return originalObject;
 
-                if (typeof(XElement).IsAssignableFrom(typeToReflect)) return new XElement(originalObject as XElement);
-                if (typeof(Delegate).IsAssignableFrom(typeToReflect)) return null;
+                if(typeof(XElement).IsAssignableFrom(typeToReflect)) return new XElement(originalObject as XElement);
+                if(typeof(Delegate).IsAssignableFrom(typeToReflect)) return null;
 
-                if (includeInObjectGraph)
+                if(includeInObjectGraph)
                 {
                     object result;
-                    if (_visited.TryGetValue(originalObject, out result)) return result;
+                    if(_visited.TryGetValue(originalObject, out result)) return result;
                 }
 
                 var cloneObject = s_cloneMethod(originalObject);
 
-                if (includeInObjectGraph)
+                if(includeInObjectGraph)
                 {
                     _visited.Add(originalObject, cloneObject);
                 }
 
-                if (typeToReflect.IsArray)
+                if(typeToReflect.IsArray)
                 {
                     var arrayElementType = typeToReflect.GetElementType();
 
-                    if (IsPrimitiveOrImmutable(arrayElementType))
+                    if(IsPrimitiveOrImmutable(arrayElementType))
                     {
                         // for an array of primitives, do nothing. The shallow clone is enough.
                     }
-                    else if (arrayElementType.IsValueType)
+                    else if(arrayElementType.IsValueType)
                     {
                         // if its an array of structs, there's no need to check and add the individual elements to 'visited', because in .NET it's impossible to create
                         // references to individual array elements.
@@ -99,7 +99,7 @@ namespace DHCPServerApp
                 }
                 else
                 {
-                    foreach (var fieldInfo in CachedNonShallowFields(typeToReflect))
+                    foreach(var fieldInfo in CachedNonShallowFields(typeToReflect))
                     {
                         var originalFieldValue = fieldInfo.GetValue(originalObject);
                         // a valuetype field can never have a reference pointing to it, so don't check the object graph in that case
@@ -115,10 +115,10 @@ namespace DHCPServerApp
             {
                 int len = counts[dimension];
 
-                if (dimension < (counts.Length - 1))
+                if(dimension < (counts.Length - 1))
                 {
                     // not the final dimension, loop the range, and recursively handle one dimension higher
-                    for (int t = 0; t < len; t++)
+                    for(int t = 0; t < len; t++)
                     {
                         indices[dimension] = t;
                         ReplaceArrayElements(array, func, dimension + 1, counts, indices);
@@ -127,7 +127,7 @@ namespace DHCPServerApp
                 else
                 {
                     // we've reached the final dimension where the elements are closest together in memory. Do a final loop.
-                    for (int t = 0; t < len; t++)
+                    for(int t = 0; t < len; t++)
                     {
                         indices[dimension] = t;
                         array.SetValue(func(array.GetValue(indices)), indices);
@@ -137,11 +137,11 @@ namespace DHCPServerApp
 
             private static void ReplaceArrayElements(Array array, Func<object, object> func)
             {
-                if (array.Rank == 1)
+                if(array.Rank == 1)
                 {
                     // do a fast loop for the common case, a one dimensional array
                     int len = array.GetLength(0);
-                    for (int t = 0; t < len; t++)
+                    for(int t = 0; t < len; t++)
                     {
                         array.SetValue(func(array.GetValue(t)), t);
                     }
@@ -159,7 +159,7 @@ namespace DHCPServerApp
             {
                 FieldInfo[] result;
 
-                if (!_nonShallowFieldCache.TryGetValue(typeToReflect, out result))
+                if(!_nonShallowFieldCache.TryGetValue(typeToReflect, out result))
                 {
                     result = NonShallowFields(typeToReflect).ToArray();
                     _nonShallowFieldCache[typeToReflect] = result;
@@ -175,11 +175,11 @@ namespace DHCPServerApp
             /// <returns></returns>
             private static IEnumerable<FieldInfo> NonShallowFields(Type typeToReflect)
             {
-                while (typeToReflect != typeof(object))
+                while(typeToReflect != typeof(object))
                 {
-                    foreach (var fieldInfo in typeToReflect.GetFields(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.DeclaredOnly))
+                    foreach(var fieldInfo in typeToReflect.GetFields(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.DeclaredOnly))
                     {
-                        if (IsPrimitiveOrImmutable(fieldInfo.FieldType)) continue; // this is 5% faster than a where clause..
+                        if(IsPrimitiveOrImmutable(fieldInfo.FieldType)) continue; // this is 5% faster than a where clause..
                         yield return fieldInfo;
                     }
                     typeToReflect = typeToReflect.BaseType;
@@ -197,7 +197,7 @@ namespace DHCPServerApp
 
         public override int GetHashCode(object obj)
         {
-            if (obj == null) return 0;
+            if(obj == null) return 0;
             // The RuntimeHelpers.GetHashCode method always calls the Object.GetHashCode method non-virtually, 
             // even if the object's type has overridden the Object.GetHashCode method.
             return RuntimeHelpers.GetHashCode(obj);

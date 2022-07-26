@@ -1,5 +1,5 @@
-﻿using System;
-using GitHub.JPMikkers.DHCP;
+﻿using GitHub.JPMikkers.DHCP;
+using System;
 
 namespace DHCPServerApp
 {
@@ -15,7 +15,7 @@ namespace DHCPServerApp
 
         protected override IDHCPOption ConstructDHCPOption()
         {
-            return new DHCPOptionGeneric((TDHCPOption) Option, Utils.HexStringToBytes(Data));
+            return new DHCPOptionGeneric((TDHCPOption)Option, Utils.HexStringToBytes(Data));
         }
     }
 }

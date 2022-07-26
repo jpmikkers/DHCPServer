@@ -27,11 +27,11 @@ namespace GitHub.JPMikkers.DHCP
 
         public override IDHCPOption FromStream(Stream s)
         {
-            if (s.Length % 4 != 0) throw new IOException("Invalid DHCP option length");
+            if(s.Length % 4 != 0) throw new IOException("Invalid DHCP option length");
 
             var result = Create();
 
-            for(int t=0;t<s.Length;t+=4)
+            for(int t = 0; t < s.Length; t += 4)
             {
                 result._IPAddresses.Add(ParseHelper.ReadIPAddress(s));
             }
@@ -41,7 +41,7 @@ namespace GitHub.JPMikkers.DHCP
 
         public override void ToStream(Stream s)
         {
-            foreach (var ipAddress in _IPAddresses)
+            foreach(var ipAddress in _IPAddresses)
             {
                 ParseHelper.WriteIPAddress(s, ipAddress);
             }

@@ -1,6 +1,6 @@
-﻿using System;
+﻿using GitHub.JPMikkers.DHCP;
+using System;
 using System.IO;
-using GitHub.JPMikkers.DHCP;
 
 namespace DHCPServerApp
 {
@@ -25,9 +25,9 @@ namespace DHCPServerApp
                 data = Utils.HexStringToBytes(DataAsHex);
             }
             else
-            {      
+            {
                 MemoryStream m = new MemoryStream();
-                ParseHelper.WriteString(m,DataAsString);
+                ParseHelper.WriteString(m, DataAsString);
                 m.Flush();
                 data = m.ToArray();
             }

@@ -19,14 +19,14 @@ namespace GitHub.JPMikkers.DHCP
         public override IDHCPOption FromStream(Stream s)
         {
             DHCPOptionMaximumDHCPMessageSize result = new DHCPOptionMaximumDHCPMessageSize();
-            if (s.Length != 2) throw new IOException("Invalid DHCP option length");
+            if(s.Length != 2) throw new IOException("Invalid DHCP option length");
             result._maxSize = ParseHelper.ReadUInt16(s);
             return result;
         }
 
         public override void ToStream(Stream s)
         {
-            ParseHelper.WriteUInt16(s,_maxSize);
+            ParseHelper.WriteUInt16(s, _maxSize);
         }
 
         #endregion

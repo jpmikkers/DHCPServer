@@ -1,10 +1,7 @@
-using System;
 using System.Collections.Generic;
-using System.Text;
-using System.Net.Sockets;
-using System.Net;
 using System.IO;
-using System.Runtime.InteropServices;
+using System.Net;
+using System.Text;
 
 namespace GitHub.JPMikkers.DHCP
 {
@@ -62,8 +59,8 @@ namespace GitHub.JPMikkers.DHCP
 
         public TOpcode Opcode
         {
-            get{ return _opcode; }
-            set{ _opcode = value; }
+            get { return _opcode; }
+            set { _opcode = value; }
         }
 
         public THardwareType HardwareType
@@ -152,7 +149,7 @@ namespace GitHub.JPMikkers.DHCP
             get
             {
                 DHCPOptionMessageType messageTypeDHCPOption = (DHCPOptionMessageType)GetOption(TDHCPOption.MessageType);
-                if (messageTypeDHCPOption != null)
+                if(messageTypeDHCPOption != null)
                 {
                     return messageTypeDHCPOption.MessageType;
                 }
@@ -164,22 +161,22 @@ namespace GitHub.JPMikkers.DHCP
             set
             {
                 TDHCPMessageType currentMessageType = MessageType;
-                if(currentMessageType!=value)
+                if(currentMessageType != value)
                 {
                     _options.Add(new DHCPOptionMessageType(value));
                 }
             }
         }
 
-        private static void RegisterOption(IDHCPOption option) 
-        { 
-            s_optionsTemplates[(int)option.OptionType] = option; 
+        private static void RegisterOption(IDHCPOption option)
+        {
+            s_optionsTemplates[(int)option.OptionType] = option;
         }
 
         static DHCPMessage()
         {
             s_optionsTemplates = new IDHCPOption[256];
-            for (int t = 1; t < 255; t++)
+            for(int t = 1; t < 255; t++)
             {
                 s_optionsTemplates[t] = new DHCPOptionGeneric((TDHCPOption)t);
             }
@@ -212,9 +209,9 @@ namespace GitHub.JPMikkers.DHCP
         {
             _hardwareType = THardwareType.Ethernet;
             _clientIPAddress = IPAddress.Any;
-            _yourIPAddress  = IPAddress.Any;
-            _nextServerIPAddress  = IPAddress.Any;
-            _relayAgentIPAddress  = IPAddress.Any;
+            _yourIPAddress = IPAddress.Any;
+            _nextServerIPAddress = IPAddress.Any;
+            _relayAgentIPAddress = IPAddress.Any;
             _clientHardwareAddress = new byte[0];
             _serverHostName = "";
             _bootFileName = "";
@@ -223,7 +220,7 @@ namespace GitHub.JPMikkers.DHCP
 
         public IDHCPOption GetOption(TDHCPOption optionType)
         {
-            return _options.Find(delegate(IDHCPOption v) { return v.OptionType == optionType; });
+            return _options.Find(delegate (IDHCPOption v) { return v.OptionType == optionType; });
         }
 
         public bool IsRequestedParameter(TDHCPOption optionType)
@@ -246,7 +243,7 @@ namespace GitHub.JPMikkers.DHCP
             _nextServerIPAddress = ParseHelper.ReadIPAddress(s);
             _relayAgentIPAddress = ParseHelper.ReadIPAddress(s);
             s.Read(_clientHardwareAddress, 0, _clientHardwareAddress.Length);
-            for (int t = _clientHardwareAddress.Length; t < 16; t++) s.ReadByte();
+            for(int t = _clientHardwareAddress.Length; t < 16; t++) s.ReadByte();
 
             byte[] serverHostNameBuffer = new byte[64];
             s.Read(serverHostNameBuffer, 0, serverHostNameBuffer.Length);
@@ -265,7 +262,7 @@ namespace GitHub.JPMikkers.DHCP
 
             byte overload = ScanOverload(new MemoryStream(optionsBuffer));
 
-            switch (overload)
+            switch(overload)
             {
                 default:
                     _serverHostName = ParseHelper.ReadZString(new MemoryStream(serverHostNameBuffer));
@@ -284,7 +281,7 @@ namespace GitHub.JPMikkers.DHCP
                     break;
 
                 case 3:
-                    _options = ReadOptions(optionsBuffer, bootFileNameBuffer, serverHostNameBuffer );
+                    _options = ReadOptions(optionsBuffer, bootFileNameBuffer, serverHostNameBuffer);
                     break;
             }
         }
@@ -305,21 +302,21 @@ namespace GitHub.JPMikkers.DHCP
             target.Write(buffer, 0, length);
         }
 
-        private static void ReadOptions(List<IDHCPOption> options,MemoryStream s,params MemoryStream[] spillovers)
+        private static void ReadOptions(List<IDHCPOption> options, MemoryStream s, params MemoryStream[] spillovers)
         {
-            while (true)
+            while(true)
             {
                 int code = s.ReadByte();
-                if (code == -1 || code == 255) break;
-                else if (code == 0) continue;
+                if(code == -1 || code == 255) break;
+                else if(code == 0) continue;
                 else
                 {
                     MemoryStream concatStream = new MemoryStream();
                     int len = s.ReadByte();
-                    if (len == -1) break;
+                    if(len == -1) break;
                     CopyBytes(s, concatStream, len);
                     AppendOverflow(code, s, concatStream);
-                    foreach (MemoryStream spillOver in spillovers)
+                    foreach(MemoryStream spillOver in spillovers)
                     {
                         AppendOverflow(code, spillOver, concatStream);
                     }
@@ -334,22 +331,22 @@ namespace GitHub.JPMikkers.DHCP
             long initPosition = source.Position;
             try
             {
-                while (true)
+                while(true)
                 {
                     int c = source.ReadByte();
-                    if (c == -1 || c == 255) break;
-                    else if (c == 0) continue;
+                    if(c == -1 || c == 255) break;
+                    else if(c == 0) continue;
                     else
                     {
                         int l = source.ReadByte();
-                        if (l == -1) break;
+                        if(l == -1) break;
 
-                        if (c == code)
+                        if(c == code)
                         {
                             long startPosition = source.Position - 2;
                             CopyBytes(source, target, l);
                             source.Position = startPosition;
-                            for (int t = 0; t < (l + 2); t++)
+                            for(int t = 0; t < (l + 2); t++)
                             {
                                 source.WriteByte(0);
                             }
@@ -376,20 +373,20 @@ namespace GitHub.JPMikkers.DHCP
         {
             byte result = 0;
 
-            while (true)
+            while(true)
             {
                 int code = s.ReadByte();
-                if (code == -1 || code == 255) break;
-                else if (code == 0) continue;
-                else if (code == 52)
+                if(code == -1 || code == 255) break;
+                else if(code == 0) continue;
+                else if(code == 52)
                 {
-                    if (s.ReadByte() != 1) throw new IOException("Invalid length of DHCP option 'Option Overload'");
+                    if(s.ReadByte() != 1) throw new IOException("Invalid length of DHCP option 'Option Overload'");
                     result = (byte)s.ReadByte();
                 }
                 else
                 {
                     int l = s.ReadByte();
-                    if (l == -1) break;
+                    if(l == -1) break;
                     s.Position += l;
                 }
             }
@@ -401,7 +398,7 @@ namespace GitHub.JPMikkers.DHCP
             return new DHCPMessage(s);
         }
 
-        public void ToStream(Stream s,int minimumPacketSize)
+        public void ToStream(Stream s, int minimumPacketSize)
         {
             s.WriteByte((byte)_opcode);
             s.WriteByte((byte)_hardwareType);
@@ -415,12 +412,12 @@ namespace GitHub.JPMikkers.DHCP
             ParseHelper.WriteIPAddress(s, _nextServerIPAddress);
             ParseHelper.WriteIPAddress(s, _relayAgentIPAddress);
             s.Write(_clientHardwareAddress, 0, _clientHardwareAddress.Length);
-            for(int t=_clientHardwareAddress.Length; t<16; t++) s.WriteByte(0);
+            for(int t = _clientHardwareAddress.Length; t < 16; t++) s.WriteByte(0);
             ParseHelper.WriteZString(s, _serverHostName, 64);  // BOOTP legacy
             ParseHelper.WriteZString(s, _bootFileName, 128);   // BOOTP legacy
             s.Write(new byte[] { 99, 130, 83, 99 }, 0, 4);  // options magic cookie
             // write options
-            foreach (IDHCPOption option in _options)
+            foreach(IDHCPOption option in _options)
             {
                 MemoryStream optionStream = new MemoryStream();
                 option.ToStream(optionStream);
@@ -433,7 +430,7 @@ namespace GitHub.JPMikkers.DHCP
             s.WriteByte(255);
             s.Flush();
 
-            while (s.Length < minimumPacketSize)
+            while(s.Length < minimumPacketSize)
             {
                 s.WriteByte(0);
             }
@@ -455,7 +452,7 @@ namespace GitHub.JPMikkers.DHCP
             sb.AppendFormat("YourIPAddress (yiaddr)         : {0}\r\n", _yourIPAddress);
             sb.AppendFormat("NextServerIPAddress (siaddr)   : {0}\r\n", _nextServerIPAddress);
             sb.AppendFormat("RelayAgentIPAddress (giaddr)   : {0}\r\n", _relayAgentIPAddress);
-            sb.AppendFormat("ClientHardwareAddress (chaddr) : {0}\r\n", Utils.BytesToHexString(_clientHardwareAddress,"-"));
+            sb.AppendFormat("ClientHardwareAddress (chaddr) : {0}\r\n", Utils.BytesToHexString(_clientHardwareAddress, "-"));
             sb.AppendFormat("ServerHostName (sname)         : {0}\r\n", _serverHostName);
             sb.AppendFormat("BootFileName (file)            : {0}\r\n", _bootFileName);
 

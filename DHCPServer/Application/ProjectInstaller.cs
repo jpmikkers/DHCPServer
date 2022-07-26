@@ -1,9 +1,7 @@
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Configuration.Install;
-using System.Linq;
 using System.Diagnostics;
 
 
@@ -26,7 +24,7 @@ namespace DHCPServerApp
                 //EventLogPermission eventLogPermission = new EventLogPermission(EventLogPermissionAccess.Administer, ".");
                 //eventLogPermission.PermitOnly();
 
-                if (!EventLog.SourceExists(Program.CustomEventSource))
+                if(!EventLog.SourceExists(Program.CustomEventSource))
                 {
                     EventLog.CreateEventSource(Program.CustomEventSource, Program.CustomEventLog);
                 }
@@ -35,10 +33,10 @@ namespace DHCPServerApp
                 EventLog tmp = new EventLog(Program.CustomEventLog, ".", Program.CustomEventSource);
                 tmp.WriteEntry("Installation complete");
                 tmp.MaximumKilobytes = 16000;   // value MUST be a factor of 64
-                tmp.ModifyOverflowPolicy(OverflowAction.OverwriteAsNeeded,7);
+                tmp.ModifyOverflowPolicy(OverflowAction.OverwriteAsNeeded, 7);
                 tmp.Close();
             }
-            catch (Exception ex)
+            catch(Exception ex)
             {
                 System.Diagnostics.Trace.WriteLine($"Exception: {ex}");
             }
@@ -59,7 +57,7 @@ namespace DHCPServerApp
 
             try
             {
-                if (EventLog.SourceExists(Program.CustomEventSource))
+                if(EventLog.SourceExists(Program.CustomEventSource))
                 {
                     EventLog.DeleteEventSource(Program.CustomEventSource);
                 }

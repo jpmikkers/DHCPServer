@@ -1,11 +1,5 @@
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.IO;
 using System.Net;
-using System.Text;
-using System.Net.Sockets;
-using System.Net.NetworkInformation;
 using System.Xml.Serialization;
 
 namespace GitHub.JPMikkers.DHCP
@@ -107,7 +101,7 @@ namespace GitHub.JPMikkers.DHCP
             }
             set
             {
-                if (value >= DateTime.MaxValue)
+                if(value >= DateTime.MaxValue)
                 {
                     _leaseDuration = Utils.InfiniteTimeSpan;
                 }
@@ -138,7 +132,7 @@ namespace GitHub.JPMikkers.DHCP
 
         public DHCPClient Clone()
         {
-            DHCPClient result=new DHCPClient();
+            DHCPClient result = new DHCPClient();
             result._identifier = this._identifier;
             result._hardwareAddress = this._hardwareAddress;
             result._hostName = this._hostName;
@@ -157,14 +151,14 @@ namespace GitHub.JPMikkers.DHCP
 
             DHCPOptionHostName dhcpOptionHostName = (DHCPOptionHostName)message.GetOption(TDHCPOption.HostName);
 
-            if (dhcpOptionHostName != null)
+            if(dhcpOptionHostName != null)
             {
                 result._hostName = dhcpOptionHostName.HostName;
             }
 
             DHCPOptionClientIdentifier dhcpOptionClientIdentifier = (DHCPOptionClientIdentifier)message.GetOption(TDHCPOption.ClientIdentifier);
 
-            if (dhcpOptionClientIdentifier != null)
+            if(dhcpOptionClientIdentifier != null)
             {
                 result._identifier = dhcpOptionClientIdentifier.Data;
             }
@@ -188,7 +182,7 @@ namespace GitHub.JPMikkers.DHCP
             unchecked
             {
                 int result = 0;
-                foreach (byte b in _identifier) result = (result * 31) ^ b;
+                foreach(byte b in _identifier) result = (result * 31) ^ b;
                 return result;
             }
         }

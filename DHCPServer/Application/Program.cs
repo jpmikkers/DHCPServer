@@ -1,16 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.ServiceProcess;
-using System.Text;
-using System.Reflection;
-using System.Windows.Forms;
 using System.Diagnostics;
-using System.Security;
-using System.Security.Principal;
 using System.IO;
-using GitHub.JPMikkers.DHCP;
+using System.Linq;
+using System.Reflection;
+using System.Security.Principal;
+using System.ServiceProcess;
+using System.Windows.Forms;
 
 namespace DHCPServerApp
 {
@@ -28,7 +23,7 @@ namespace DHCPServerApp
             return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "JPMikkers\\DHCP Server\\Configuration.xml");
         }
 
-        public static string GetClientInfoPath(string serverName,string serverAddress)
+        public static string GetClientInfoPath(string serverName, string serverAddress)
         {
             string configurationPath = GetConfigurationPath();
             return Path.Combine(Path.GetDirectoryName(GetConfigurationPath()), $"{serverName}_{serverAddress.Replace('.', '_')}.xml");
@@ -46,7 +41,7 @@ namespace DHCPServerApp
             return principal.IsInRole(WindowsBuiltInRole.Administrator);
         }
 
-        private static bool RunElevated(string fileName,string args)
+        private static bool RunElevated(string fileName, string args)
         {
             ProcessStartInfo processInfo = new ProcessStartInfo();
             processInfo.Verb = "runas";
@@ -57,7 +52,7 @@ namespace DHCPServerApp
                 Process.Start(processInfo);
                 return true;
             }
-            catch (Exception)
+            catch(Exception)
             {
                 //Do nothing. Probably the user canceled the UAC window
             }
@@ -71,7 +66,7 @@ namespace DHCPServerApp
 
         private static void Install()
         {
-            if (!HasAdministrativeRight())
+            if(!HasAdministrativeRight())
             {
                 RunElevated(Switch_Install);
                 return;
@@ -87,7 +82,7 @@ namespace DHCPServerApp
                     Installer.Install(null);
                     Installer.Commit(null);
                 }
-                catch (Exception ex)
+                catch(Exception ex)
                 {
                     System.Diagnostics.Trace.WriteLine($"Exception: {ex}");
                 }
@@ -96,7 +91,7 @@ namespace DHCPServerApp
 
         private static void Uninstall()
         {
-            if (!HasAdministrativeRight())
+            if(!HasAdministrativeRight())
             {
                 RunElevated(Switch_Uninstall);
                 return;
@@ -111,7 +106,7 @@ namespace DHCPServerApp
                     Installer.UseNewContext = true;
                     Installer.Uninstall(null);
                 }
-                catch (Exception ex)
+                catch(Exception ex)
                 {
                     System.Diagnostics.Trace.WriteLine($"Exception: {ex}");
                 }
@@ -124,7 +119,7 @@ namespace DHCPServerApp
         [STAThread]
         static void Main(string[] args)
         {
-            if (args.Length > 0 && args[0].ToLower() == Switch_Service)
+            if(args.Length > 0 && args[0].ToLower() == Switch_Service)
             {
                 ServiceBase.Run(new ServiceBase[] { new DHCPService() });
             }
@@ -133,13 +128,13 @@ namespace DHCPServerApp
                 Application.EnableVisualStyles();
                 Application.SetCompatibleTextRenderingDefault(false);
 
-                if (args.Length == 0)
+                if(args.Length == 0)
                 {
                     ServiceController serviceController = ServiceController.GetServices().FirstOrDefault(x => x.ServiceName == "DHCPServer");
 
-                    if (serviceController == null)
+                    if(serviceController == null)
                     {
-                        if (MessageBox.Show("Service has not been installed yet, install?", "DHCP Server", MessageBoxButtons.YesNo) == DialogResult.Yes)
+                        if(MessageBox.Show("Service has not been installed yet, install?", "DHCP Server", MessageBoxButtons.YesNo) == DialogResult.Yes)
                         {
                             Install();
                         }
@@ -151,7 +146,7 @@ namespace DHCPServerApp
                 }
                 else
                 {
-                    switch (args[0].ToLower())
+                    switch(args[0].ToLower())
                     {
                         case Switch_Install:
                             Install();
