@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections.Concurrent;
 using System.Threading;
 
 namespace GitHub.JPMikkers.DHCP
@@ -6,10 +6,8 @@ namespace GitHub.JPMikkers.DHCP
     public class AutoPumpQueue<T>
     {
         public delegate void DataDelegate(AutoPumpQueue<T> sender, T data);
-
-        private readonly object _queueSync = new object();
         private readonly object _dispatchSync = new object();
-        private readonly Queue<T> _queue;
+        private readonly ConcurrentQueue<T> _queue;
         private readonly DataDelegate _dataDelegate;
 
         /// <summary>
@@ -17,7 +15,7 @@ namespace GitHub.JPMikkers.DHCP
         /// </summary>
         public AutoPumpQueue(DataDelegate dataDelegate)
         {
-            _queue = new Queue<T>();
+            _queue = new ConcurrentQueue<T>();
             _dataDelegate = dataDelegate;
         }
 
@@ -25,35 +23,14 @@ namespace GitHub.JPMikkers.DHCP
         {
             lock(_dispatchSync)    // ensures individual invokes are serialized
             {
-                bool empty = false;
-                T data = default(T);
-
-                while(!empty)
+                while(_queue.TryDequeue(out var data))
                 {
-                    lock(_queueSync)
+                    try
                     {
-                        if(_queue.Count == 0)
-                        {
-                            // no data
-                            empty = true;
-                        }
-                        else
-                        {
-                            // there are commands;
-                            data = _queue.Dequeue();
-                            empty = false;
-                        }
+                        _dataDelegate(this, data);
                     }
-
-                    if(!empty)
+                    catch
                     {
-                        try
-                        {
-                            _dataDelegate(this, data);
-                        }
-                        catch
-                        {
-                        }
                     }
                 }
             }
@@ -61,13 +38,8 @@ namespace GitHub.JPMikkers.DHCP
 
         public void Enqueue(T data)
         {
-            bool queueWasEmpty;
-
-            lock(_queueSync)
-            {
-                queueWasEmpty = (_queue.Count == 0);
-                _queue.Enqueue(data);
-            }
+            bool queueWasEmpty = _queue.IsEmpty;
+            _queue.Enqueue(data);
 
             if(queueWasEmpty)
             {
