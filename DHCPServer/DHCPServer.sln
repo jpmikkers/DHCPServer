@@ -5,14 +5,12 @@ VisualStudioVersion = 17.2.32630.192
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Library", "Library\Library.csproj", "{4F2230EB-DADF-46E6-868D-B727C3FD52E5}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Application", "Application\Application.csproj", "{83AB486F-9859-48EB-870C-57745C16A232}"
-EndProject
-Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "DHCPServerSetup", "Setup\Setup.vdproj", "{73E32342-532C-40C8-81FF-1EB4B34E5B3F}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{1A0773A3-30A9-4591-BF25-E897A2938973}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
 	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ManagedDHCPService", "ManagedDHCPService\ManagedDHCPService.csproj", "{091C24A1-0050-4929-9F62-E6A2FBE039E1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -24,14 +22,10 @@ Global
 		{4F2230EB-DADF-46E6-868D-B727C3FD52E5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4F2230EB-DADF-46E6-868D-B727C3FD52E5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4F2230EB-DADF-46E6-868D-B727C3FD52E5}.Release|Any CPU.Build.0 = Release|Any CPU
-		{83AB486F-9859-48EB-870C-57745C16A232}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{83AB486F-9859-48EB-870C-57745C16A232}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{83AB486F-9859-48EB-870C-57745C16A232}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{83AB486F-9859-48EB-870C-57745C16A232}.Release|Any CPU.Build.0 = Release|Any CPU
-		{73E32342-532C-40C8-81FF-1EB4B34E5B3F}.Debug|Any CPU.ActiveCfg = Debug
-		{73E32342-532C-40C8-81FF-1EB4B34E5B3F}.Debug|Any CPU.Build.0 = Debug
-		{73E32342-532C-40C8-81FF-1EB4B34E5B3F}.Release|Any CPU.ActiveCfg = Release
-		{73E32342-532C-40C8-81FF-1EB4B34E5B3F}.Release|Any CPU.Build.0 = Release
+		{091C24A1-0050-4929-9F62-E6A2FBE039E1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{091C24A1-0050-4929-9F62-E6A2FBE039E1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{091C24A1-0050-4929-9F62-E6A2FBE039E1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{091C24A1-0050-4929-9F62-E6A2FBE039E1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
