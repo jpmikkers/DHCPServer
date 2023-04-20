@@ -6,12 +6,6 @@ using System.Text.RegularExpressions;
 
 namespace GitHub.JPMikkers.DHCP
 {
-    public class DHCPTraceEventArgs : EventArgs
-    {
-        private string m_Message;
-        public string Message { get { return m_Message; } set { m_Message = value; } }
-    }
-
     public class DHCPStopEventArgs : EventArgs
     {
         private Exception m_Reason;
@@ -124,7 +118,6 @@ namespace GitHub.JPMikkers.DHCP
 
     public interface IDHCPServer : IDisposable
     {
-        event EventHandler<DHCPTraceEventArgs> OnTrace;
         event EventHandler<DHCPStopEventArgs> OnStatusChange;
 
         IPEndPoint EndPoint { get; set; }

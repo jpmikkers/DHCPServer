@@ -49,7 +49,7 @@ public class DHCPServerResurrector : IDisposable
             {
                 try
                 {
-                    _server = new DHCPServer(_clientInfoPath);
+                    _server = new DHCPServer(_logger, _clientInfoPath);
                     _server.EndPoint = new IPEndPoint(IPAddress.Parse(_config.Address), 67);
                     _server.SubnetMask = IPAddress.Parse(_config.NetMask);
                     _server.PoolStart = IPAddress.Parse(_config.PoolStart);
@@ -73,7 +73,6 @@ public class DHCPServerResurrector : IDisposable
                     _server.Reservations = reservations;
 
                     _server.OnStatusChange += server_OnStatusChange;
-                    _server.OnTrace += server_OnTrace;
                     _server.Start();
                 }
                 catch(Exception)
@@ -82,12 +81,6 @@ public class DHCPServerResurrector : IDisposable
                 }
             }
         }
-    }
-
-    private void server_OnTrace(object sender, DHCPTraceEventArgs e)
-    {
-        //Log(EventLogEntryType.Information, e.Message);
-        _logger.LogInformation($"{_config.Name} : {e.Message}");
     }
 
     private void server_OnStatusChange(object sender, DHCPStopEventArgs e)
@@ -119,7 +112,6 @@ public class DHCPServerResurrector : IDisposable
                 if(_server != null)
                 {
                     _server.OnStatusChange -= server_OnStatusChange;
-                    _server.OnTrace -= server_OnTrace;
                     _server.Dispose();
                     _server = null;
                 }
@@ -146,7 +138,6 @@ public class DHCPServerResurrector : IDisposable
                     {
                         _server.OnStatusChange -= server_OnStatusChange;
                         _server.Dispose();
-                        _server.OnTrace -= server_OnTrace;
                         _server = null;
                     }
                 }

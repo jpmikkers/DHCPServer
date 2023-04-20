@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Threading;
+using Microsoft.Extensions.Logging;
 
 namespace GitHub.JPMikkers.DHCP
 {
@@ -12,29 +13,28 @@ namespace GitHub.JPMikkers.DHCP
         private const int ClientInformationWriteRetries = 10;
 
         private readonly object _sync = new object();
-        private IPEndPoint _endPoint = new IPEndPoint(IPAddress.Loopback, 67);
+        private IPEndPoint _endPoint = new(IPAddress.Loopback, 67);
         private UDPSocket _socket;
         private IPAddress _subnetMask = IPAddress.Any;
         private IPAddress _poolStart = IPAddress.Any;
         private IPAddress _poolEnd = IPAddress.Broadcast;
-
+        private readonly ILogger _logger;
         private readonly string _clientInfoPath;
         private readonly string _hostName;
-        private readonly Dictionary<DHCPClient, DHCPClient> _clients = new Dictionary<DHCPClient, DHCPClient>();
+        private readonly Dictionary<DHCPClient, DHCPClient> _clients = new();
         private Timer _timer;
         private TimeSpan _offerExpirationTime = TimeSpan.FromSeconds(30.0);
         private TimeSpan _leaseTime = TimeSpan.FromDays(1);
         private bool _active = false;
-        private List<OptionItem> _options = new List<OptionItem>();
-        private List<IDHCPMessageInterceptor> _interceptors = new List<IDHCPMessageInterceptor>();
-        private List<ReservationItem> _reservations = new List<ReservationItem>();
+        private List<OptionItem> _options = new();
+        private List<IDHCPMessageInterceptor> _interceptors = new();
+        private List<ReservationItem> _reservations = new();
         private int _minimumPacketSize = 576;
         private readonly AutoPumpQueue<int> m_UpdateClientInfoQueue;
-        private readonly Random m_Random = new Random();
+        private readonly Random _random = new();
 
         #region IDHCPServer Members
 
-        public event EventHandler<DHCPTraceEventArgs> OnTrace = delegate (object sender, DHCPTraceEventArgs args) { };
         public event EventHandler<DHCPStopEventArgs> OnStatusChange = delegate (object sender, DHCPStopEventArgs args) { };
 
         public IPEndPoint EndPoint
@@ -220,7 +220,7 @@ namespace GitHub.JPMikkers.DHCP
 
                         if(t < ClientInformationWriteRetries)
                         {
-                            Thread.Sleep(m_Random.Next(500, 1000));
+                            Thread.Sleep(_random.Next(500, 1000));
                         }
                         else
                         {
@@ -235,9 +235,10 @@ namespace GitHub.JPMikkers.DHCP
             }
         }
 
-        public DHCPServer(string clientInfoPath)
+        public DHCPServer(ILogger logger, string clientInfoPath)
         {
             m_UpdateClientInfoQueue = new AutoPumpQueue<int>(OnUpdateClientInfo);
+            _logger = logger;
             _clientInfoPath = clientInfoPath;
             _hostName = System.Environment.MachineName;
         }
@@ -332,9 +333,7 @@ namespace GitHub.JPMikkers.DHCP
 
         internal void Trace(string msg)
         {
-            DHCPTraceEventArgs data = new DHCPTraceEventArgs();
-            data.Message = msg;
-            OnTrace(this, data);
+            _logger?.LogInformation(msg);
         }
 
         private void Stop(Exception reason)
