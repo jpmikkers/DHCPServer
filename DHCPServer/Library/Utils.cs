@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
@@ -42,46 +43,16 @@ namespace GitHub.JPMikkers.DHCP
 
         public static string BytesToHexString(byte[] data, string separator)
         {
-            StringBuilder sb = new StringBuilder();
-            for(int t = 0; t < data.Length; t++)
-            {
-                sb.AppendFormat("{0:X2}", data[t]);
-                if(t < (data.Length - 1))
-                {
-                    sb.Append(separator);
-                }
-            }
-            return sb.ToString();
+            return string.IsNullOrEmpty(separator) ? 
+                Convert.ToHexString(data) : string.Join(separator, Convert.ToHexString(data).Chunk(2).Select(x => new string(x)));
         }
 
         public static byte[] HexStringToBytes(string data)
         {
-            int c;
-            List<byte> result = new List<byte>();
-
-            MemoryStream ms = new MemoryStream();
-            StreamWriter sw = new StreamWriter(ms);
-            sw.Write(data);
-            sw.Flush();
-            ms.Position = 0;
-            StreamReader sr = new StreamReader(ms);
-
-            StringBuilder number = new StringBuilder();
-
-            while((c = sr.Read()) > 0)
-            {
-                if((c >= '0' && c <= '9') || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F'))
-                {
-                    number.Append((char)c);
-
-                    if(number.Length >= 2)
-                    {
-                        result.Add(Convert.ToByte(number.ToString(), 16));
-                        number.Length = 0;
-                    }
-                }
-            }
-            return result.ToArray();
+            // strip separator chars, anything not 0-9/A-F
+            var sb = new ReadOnlySpan<char>(data.Where(c => Char.IsAsciiHexDigit(c)).ToArray());
+            // remove spurious trailing nibble before converting
+            return Convert.FromHexString(sb[..(sb.Length & ~1)]);
         }
 
         public static IPAddress GetSubnetMask(IPAddress address)
