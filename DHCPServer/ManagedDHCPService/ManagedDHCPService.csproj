@@ -1,29 +1,25 @@
 <Project Sdk="Microsoft.NET.Sdk.Worker">
-
-	<PropertyGroup>
-		<TargetFramework>net7.0-windows</TargetFramework>
-		<Nullable>enable</Nullable>
-		<ImplicitUsings>enable</ImplicitUsings>
-		<UserSecretsId>dotnet-ManagedDHCPService-64109737-6169-4ec3-a7a7-f0d365b0f2d0</UserSecretsId>
-		<ServerGarbageCollection>true</ServerGarbageCollection>
-	</PropertyGroup>
-
-	<ItemGroup>
-		<PackageReference Include="Baksteen.Extensions.DeepCopy" Version="1.0.2" />
-		<PackageReference Include="Microsoft.Extensions.Hosting" Version="7.0.1" />
-		<PackageReference Include="Microsoft.Extensions.Hosting.WindowsServices" Version="7.0.0" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<ProjectReference Include="..\Library\Library.csproj" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<None Update="register.ps1">
-			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
-		</None>
-		<None Update="unregister.ps1">
-			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
-		</None>
-	</ItemGroup>
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>dotnet-ManagedDHCPService-64109737-6169-4ec3-a7a7-f0d365b0f2d0</UserSecretsId>
+    <ServerGarbageCollection>true</ServerGarbageCollection>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Baksteen.Extensions.DeepCopy" Version="1.0.3" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Hosting.WindowsServices" Version="8.0.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Library\Library.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="register.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="unregister.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
 </Project>
