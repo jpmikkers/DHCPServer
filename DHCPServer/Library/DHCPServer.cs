@@ -35,7 +35,7 @@ namespace GitHub.JPMikkers.DHCP
 
         #region IDHCPServer Members
 
-        public event EventHandler<DHCPStopEventArgs> OnStatusChange = delegate (object sender, DHCPStopEventArgs args) { };
+        public event EventHandler<DHCPStopEventArgs> OnStatusChange = delegate (object? sender, DHCPStopEventArgs args) { };
 
         public IPEndPoint EndPoint
         {
@@ -336,7 +336,7 @@ namespace GitHub.JPMikkers.DHCP
             _logger?.LogInformation(msg);
         }
 
-        private void Stop(Exception reason)
+        private void Stop(Exception? reason)
         {
             bool notify = false;
 
@@ -354,13 +354,11 @@ namespace GitHub.JPMikkers.DHCP
 
             if(notify)
             {
-                DHCPStopEventArgs data = new DHCPStopEventArgs();
-                data.Reason = reason;
-                HandleStatusChange(data);
+                HandleStatusChange(new() { Reason = reason });
             }
         }
 
-        private void OnTimer(object state)
+        private void OnTimer(object? state)
         {
             bool modified = false;
 

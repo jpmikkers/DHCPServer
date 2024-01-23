@@ -41,7 +41,7 @@ public class DHCPServerResurrector : IDisposable
         }
     }
 
-    private void Resurrect(object state)
+    private void Resurrect(object? state)
     {
         lock(_lock)
         {
@@ -83,7 +83,7 @@ public class DHCPServerResurrector : IDisposable
         }
     }
 
-    private void server_OnStatusChange(object sender, DHCPStopEventArgs e)
+    private void server_OnStatusChange(object? sender, DHCPStopEventArgs e)
     {
         DHCPServer server = (DHCPServer)sender;
 
