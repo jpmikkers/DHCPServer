@@ -19,7 +19,7 @@ namespace GitHub.JPMikkers.DHCP
             _dataDelegate = dataDelegate;
         }
 
-        private void WaitCallback(object state)
+        private void WaitCallback(object? state)
         {
             lock(_dispatchSync)    // ensures individual invokes are serialized
             {

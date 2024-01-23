@@ -41,7 +41,7 @@ public class DHCPServerResurrector : IDisposable
         }
     }
 
-    private void Resurrect(object state)
+    private void Resurrect(object? state)
     {
         lock(_lock)
         {
@@ -83,22 +83,23 @@ public class DHCPServerResurrector : IDisposable
         }
     }
 
-    private void server_OnStatusChange(object sender, DHCPStopEventArgs e)
+    private void server_OnStatusChange(object? sender, DHCPStopEventArgs e)
     {
-        DHCPServer server = (DHCPServer)sender;
-
-        if(server.Active)
+        if(sender is DHCPServer server)
         {
-            //Log(EventLogEntryType.Information, string.Format("{0} transfers in progress", server.ActiveTransfers));
-        }
-        else
-        {
-            if(e.Reason != null)
+            if(server.Active)
             {
-                //Log(EventLogEntryType.Error, $"Stopped, reason: {e.Reason}");
-                _logger.LogError($"{_config.Name} : Stopped, reason: {e.Reason}");
+                //Log(EventLogEntryType.Information, string.Format("{0} transfers in progress", server.ActiveTransfers));
             }
-            CleanupAndRetry();
+            else
+            {
+                if(e.Reason != null)
+                {
+                    //Log(EventLogEntryType.Error, $"Stopped, reason: {e.Reason}");
+                    _logger.LogError($"{_config.Name} : Stopped, reason: {e.Reason}");
+                }
+                CleanupAndRetry();
+            }
         }
     }
 

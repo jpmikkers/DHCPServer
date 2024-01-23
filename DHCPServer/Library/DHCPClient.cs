@@ -172,7 +172,7 @@ namespace GitHub.JPMikkers.DHCP
 
         #region IEquatable and related
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             return Equals(obj as DHCPClient);
         }
@@ -187,7 +187,7 @@ namespace GitHub.JPMikkers.DHCP
             }
         }
 
-        public bool Equals(DHCPClient other)
+        public bool Equals(DHCPClient? other)
         {
             return (other != null && Utils.ByteArraysAreEqual(_identifier, other._identifier));
         }

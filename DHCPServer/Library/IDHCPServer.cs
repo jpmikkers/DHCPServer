@@ -8,8 +8,7 @@ namespace GitHub.JPMikkers.DHCP
 {
     public class DHCPStopEventArgs : EventArgs
     {
-        private Exception m_Reason;
-        public Exception Reason { get { return m_Reason; } set { m_Reason = value; } }
+        public required Exception? Reason { get; init; }
     }
 
     public enum OptionMode

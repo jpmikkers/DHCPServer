@@ -35,7 +35,7 @@ namespace GitHub.JPMikkers.DHCP
 
         #region IDHCPServer Members
 
-        public event EventHandler<DHCPStopEventArgs> OnStatusChange = delegate (object sender, DHCPStopEventArgs args) { };
+        public event EventHandler<DHCPStopEventArgs> OnStatusChange = delegate (object? sender, DHCPStopEventArgs args) { };
 
         public IPEndPoint EndPoint
         {
@@ -336,7 +336,7 @@ namespace GitHub.JPMikkers.DHCP
             _logger?.LogInformation(msg);
         }
 
-        private void Stop(Exception reason)
+        private void Stop(Exception? reason)
         {
             bool notify = false;
 
@@ -354,13 +354,11 @@ namespace GitHub.JPMikkers.DHCP
 
             if(notify)
             {
-                DHCPStopEventArgs data = new DHCPStopEventArgs();
-                data.Reason = reason;
-                HandleStatusChange(data);
+                HandleStatusChange(new() { Reason = reason });
             }
         }
 
-        private void OnTimer(object state)
+        private void OnTimer(object? state)
         {
             bool modified = false;
 
@@ -480,7 +478,7 @@ namespace GitHub.JPMikkers.DHCP
             //All others                MAY          
 
             response.Options.Add(new DHCPOptionIPAddressLeaseTime(leaseTime));
-            response.Options.Add(new DHCPOptionServerIdentifier(((IPEndPoint)_socket.LocalEndPoint).Address));
+            response.Options.Add(new DHCPOptionServerIdentifier(_socket.LocalEndPoint.Address));
             if(sourceMsg.IsRequestedParameter(TDHCPOption.SubnetMask)) response.Options.Add(new DHCPOptionSubnetMask(this._subnetMask));
             AppendConfiguredOptions(sourceMsg, response);
             SendOfferOrAck(sourceMsg, response);
@@ -518,7 +516,7 @@ namespace GitHub.JPMikkers.DHCP
             response.RelayAgentIPAddress = sourceMsg.RelayAgentIPAddress;
             response.ClientHardwareAddress = sourceMsg.ClientHardwareAddress;
             response.MessageType = TDHCPMessageType.NAK;
-            response.Options.Add(new DHCPOptionServerIdentifier(((IPEndPoint)_socket.LocalEndPoint).Address));
+            response.Options.Add(new DHCPOptionServerIdentifier(_socket.LocalEndPoint.Address));
             if(sourceMsg.IsRequestedParameter(TDHCPOption.SubnetMask)) response.Options.Add(new DHCPOptionSubnetMask(this._subnetMask));
 
             if(!sourceMsg.RelayAgentIPAddress.Equals(IPAddress.Any))
@@ -584,7 +582,7 @@ namespace GitHub.JPMikkers.DHCP
             //All others                MAY                
 
             response.Options.Add(new DHCPOptionIPAddressLeaseTime(leaseTime));
-            response.Options.Add(new DHCPOptionServerIdentifier(((IPEndPoint)_socket.LocalEndPoint).Address));
+            response.Options.Add(new DHCPOptionServerIdentifier(_socket.LocalEndPoint.Address));
             if(sourceMsg.IsRequestedParameter(TDHCPOption.SubnetMask)) response.Options.Add(new DHCPOptionSubnetMask(this._subnetMask));
             AppendConfiguredOptions(sourceMsg, response);
             SendOfferOrAck(sourceMsg, response);
@@ -643,7 +641,7 @@ namespace GitHub.JPMikkers.DHCP
             //Maximum message size      MUST NOT              : ok
             //All others                MAY                
 
-            response.Options.Add(new DHCPOptionServerIdentifier(((IPEndPoint)_socket.LocalEndPoint).Address));
+            response.Options.Add(new DHCPOptionServerIdentifier(_socket.LocalEndPoint.Address));
             if(sourceMsg.IsRequestedParameter(TDHCPOption.SubnetMask)) response.Options.Add(new DHCPOptionSubnetMask(this._subnetMask));
             AppendConfiguredOptions(sourceMsg, response);
             SendMessage(response, new IPEndPoint(sourceMsg.ClientIPAddress, 68));

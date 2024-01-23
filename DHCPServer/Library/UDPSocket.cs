@@ -34,7 +34,7 @@ namespace GitHub.JPMikkers.DHCP
         private readonly AutoPumpQueue<PacketBuffer> _receiveFifo;  // queue of the incoming packets
         private readonly int _packetSize;                           // size of packets we'll try to receive
 
-        private readonly EndPoint _localEndPoint;
+        private readonly IPEndPoint _localEndPoint;
 
         private class PacketBuffer
         {
@@ -61,7 +61,7 @@ namespace GitHub.JPMikkers.DHCP
             }
         }
 
-        public EndPoint LocalEndPoint
+        public IPEndPoint LocalEndPoint
         {
             get
             {
@@ -111,7 +111,7 @@ namespace GitHub.JPMikkers.DHCP
                 _socket.Ttl = ttl;
             }
             _socket.Bind(localEndPoint);
-            _localEndPoint = _socket.LocalEndPoint;
+            _localEndPoint = (_socket.LocalEndPoint as IPEndPoint) ?? localEndPoint;
 
             try
             {
