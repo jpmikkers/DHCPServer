@@ -9,13 +9,13 @@ namespace ManagedDHCPService;
 [Serializable()]
 public class XmlSerializableIPAddress : IXmlSerializable
 {
-    public IPAddress Address { get; set; }
+    public IPAddress Address { get; set; } = IPAddress.None;
 
     public XmlSerializableIPAddress()
     {
     }
 
-    public XmlSchema GetSchema()
+    public XmlSchema? GetSchema()
     {
         return null;
     }

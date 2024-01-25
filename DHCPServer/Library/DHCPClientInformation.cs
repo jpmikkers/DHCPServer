@@ -43,7 +43,7 @@ namespace GitHub.JPMikkers.DHCP
             {
                 using(Stream s = File.OpenRead(file))
                 {
-                    result = (DHCPClientInformation)s_serializer.Deserialize(s);
+                    result = (s_serializer.Deserialize(s) as DHCPClientInformation) ?? new();
                 }
             }
             else
@@ -56,7 +56,7 @@ namespace GitHub.JPMikkers.DHCP
 
         public void Write(string file)
         {
-            string dirName = Path.GetDirectoryName(file);
+            string? dirName = Path.GetDirectoryName(file);
 
             if(!string.IsNullOrEmpty(dirName) && !Directory.Exists(dirName))
             {

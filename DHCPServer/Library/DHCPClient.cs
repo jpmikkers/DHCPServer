@@ -149,14 +149,14 @@ namespace GitHub.JPMikkers.DHCP
             DHCPClient result = new DHCPClient();
             result._hardwareAddress = message.ClientHardwareAddress;
 
-            DHCPOptionHostName dhcpOptionHostName = (DHCPOptionHostName)message.GetOption(TDHCPOption.HostName);
+            var dhcpOptionHostName = message.FindOption<DHCPOptionHostName>();
 
             if(dhcpOptionHostName != null)
             {
                 result._hostName = dhcpOptionHostName.HostName;
             }
 
-            DHCPOptionClientIdentifier dhcpOptionClientIdentifier = (DHCPOptionClientIdentifier)message.GetOption(TDHCPOption.ClientIdentifier);
+            var dhcpOptionClientIdentifier = message.FindOption<DHCPOptionClientIdentifier>();
 
             if(dhcpOptionClientIdentifier != null)
             {

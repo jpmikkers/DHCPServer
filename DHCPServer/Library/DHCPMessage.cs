@@ -149,7 +149,7 @@ namespace GitHub.JPMikkers.DHCP
         {
             get
             {
-                DHCPOptionMessageType messageTypeDHCPOption = (DHCPOptionMessageType)GetOption(TDHCPOption.MessageType);
+                var messageTypeDHCPOption = FindOption<DHCPOptionMessageType>();
                 if(messageTypeDHCPOption != null)
                 {
                     return messageTypeDHCPOption.MessageType;
@@ -222,14 +222,19 @@ namespace GitHub.JPMikkers.DHCP
             _options = new List<IDHCPOption>();
         }
 
-        public IDHCPOption GetOption(TDHCPOption optionType)
+        public T? FindOption<T>() where T : DHCPOptionBase
+        {
+            return _options.OfType<T>().FirstOrDefault();
+        }
+
+        public IDHCPOption? GetOption(TDHCPOption optionType)
         {
             return _options.Find(delegate (IDHCPOption v) { return v.OptionType == optionType; });
         }
 
         public bool IsRequestedParameter(TDHCPOption optionType)
         {
-            DHCPOptionParameterRequestList dhcpOptionParameterRequestList = (DHCPOptionParameterRequestList)GetOption(TDHCPOption.ParameterRequestList);
+            var dhcpOptionParameterRequestList = FindOption<DHCPOptionParameterRequestList>();
             return (dhcpOptionParameterRequestList != null && dhcpOptionParameterRequestList.RequestList.Contains(optionType));
         }
 

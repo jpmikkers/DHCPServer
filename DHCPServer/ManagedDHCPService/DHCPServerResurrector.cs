@@ -83,7 +83,7 @@ public class DHCPServerResurrector : IDisposable
         }
     }
 
-    private void server_OnStatusChange(object? sender, DHCPStopEventArgs e)
+    private void server_OnStatusChange(object? sender, DHCPStopEventArgs? e)
     {
         if(sender is DHCPServer server)
         {
@@ -93,7 +93,7 @@ public class DHCPServerResurrector : IDisposable
             }
             else
             {
-                if(e.Reason != null)
+                if(e!=null && e.Reason != null)
                 {
                     //Log(EventLogEntryType.Error, $"Stopped, reason: {e.Reason}");
                     _logger.LogError($"{_config.Name} : Stopped, reason: {e.Reason}");

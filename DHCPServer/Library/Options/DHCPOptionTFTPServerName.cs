@@ -4,7 +4,7 @@ namespace GitHub.JPMikkers.DHCP
 {
     public class DHCPOptionTFTPServerName : DHCPOptionBase
     {
-        private string _name;
+        private string _name = string.Empty;
 
         #region IDHCPOption Members
 

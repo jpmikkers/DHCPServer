@@ -32,8 +32,8 @@ namespace GitHub.JPMikkers.DHCP
     public class ReservationItem
     {
         private static readonly Regex s_regex = new Regex(@"^(?<mac>([0-9a-fA-F][0-9a-fA-F][:\-\.]?)+)(?<netmask>/[0-9]+)?", RegexOptions.Compiled | RegexOptions.ExplicitCapture);
-        private string _macTaste;
-        private byte[] _prefix;
+        private string _macTaste = string.Empty;
+        private byte[]? _prefix;
         private int _prefixBits;
 
         public string MacTaste
@@ -69,9 +69,9 @@ namespace GitHub.JPMikkers.DHCP
             }
         }
 
-        public string HostName { get; set; }
-        public IPAddress PoolStart { get; set; }
-        public IPAddress PoolEnd { get; set; }
+        public string HostName { get; set; } = string.Empty;
+        public IPAddress PoolStart { get; set; } = IPAddress.None;
+        public IPAddress PoolEnd { get; set; } = IPAddress.None;
         public bool Preempt { get; set; }
 
         private static bool MacMatch(byte[] mac, byte[] prefix, int bits)
@@ -117,7 +117,7 @@ namespace GitHub.JPMikkers.DHCP
 
     public interface IDHCPServer : IDisposable
     {
-        event EventHandler<DHCPStopEventArgs> OnStatusChange;
+        event EventHandler<DHCPStopEventArgs?> OnStatusChange;
 
         IPEndPoint EndPoint { get; set; }
         IPAddress SubnetMask { get; set; }

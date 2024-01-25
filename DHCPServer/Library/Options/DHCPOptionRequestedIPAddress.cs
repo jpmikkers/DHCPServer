@@ -5,7 +5,7 @@ namespace GitHub.JPMikkers.DHCP
 {
     public class DHCPOptionRequestedIPAddress : DHCPOptionBase
     {
-        private IPAddress _IPAddress;
+        private IPAddress _IPAddress = IPAddress.None;
 
         #region IDHCPOption Members
 

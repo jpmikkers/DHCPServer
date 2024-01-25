@@ -8,11 +8,11 @@ namespace ManagedDHCPService;
 [Serializable()]
 public class DHCPServerConfiguration
 {
-    private string _name;
-    private IPAddress _address;
-    private IPAddress _netMask;
-    private IPAddress _poolStart;
-    private IPAddress _poolEnd;
+    private string _name = string.Empty;
+    private IPAddress _address = IPAddress.None;
+    private IPAddress _netMask = IPAddress.None;
+    private IPAddress _poolStart = IPAddress.None;
+    private IPAddress _poolEnd = IPAddress.None;
     private int _leaseTime;
     private int _offerTime;
     private int _minimumPacketSize;
@@ -140,11 +140,11 @@ public class DHCPServerConfiguration
         NetMask = "255.255.255.0";
         PoolStart = "0.0.0.0";
         PoolEnd = "255.255.255.255";
-        LeaseTime = (int)TimeSpan.FromDays(1.0).TotalSeconds;
-        OfferTime = 30;
-        MinimumPacketSize = 576;
-        Options = new List<OptionConfiguration>();
-        Reservations = new List<ReservationConfiguration>();
+        _leaseTime = (int)TimeSpan.FromDays(1.0).TotalSeconds;
+        _offerTime = 30;
+        _minimumPacketSize = 576;
+        _options = [];
+        _reservations = [];
     }
 
     public DHCPServerConfiguration Clone()

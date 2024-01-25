@@ -18,12 +18,12 @@ public class DHCPServerConfigurationList : List<DHCPServerConfiguration>
         {
             using(Stream s = File.OpenRead(file))
             {
-                result = (DHCPServerConfigurationList)s_serializer.Deserialize(s);
+                result = (s_serializer.Deserialize(s) as DHCPServerConfigurationList) ?? [];
             }
         }
         else
         {
-            result = new DHCPServerConfigurationList();
+            result = [];
         }
 
         return result;
@@ -31,9 +31,9 @@ public class DHCPServerConfigurationList : List<DHCPServerConfiguration>
 
     public void Write(string file)
     {
-        string dirName = Path.GetDirectoryName(file);
+        string? dirName = Path.GetDirectoryName(file);
 
-        if(!Directory.Exists(dirName))
+        if(!string.IsNullOrEmpty(dirName) && !Directory.Exists(dirName))
         {
             Directory.CreateDirectory(dirName);
         }

@@ -5,8 +5,8 @@ namespace ManagedDHCPService;
 public class Worker : BackgroundService
 {
     private readonly ILogger<Worker> _logger;
-    private DHCPServerConfigurationList _configuration;
-    private List<DHCPServerResurrector> _servers;
+    private DHCPServerConfigurationList _configuration = new();
+    private List<DHCPServerResurrector> _servers = new();
 
     public Worker(ILogger<Worker> logger)
     {
@@ -22,14 +22,19 @@ public class Worker : BackgroundService
         }
     }
 
+    private static string GetDHCPServerApplicationDataFolder()
+    {
+        return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "JPMikkers\\DHCP Server");
+    }
+
     private static string GetConfigurationPath()
     {
-        return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "JPMikkers\\DHCP Server\\Configuration.xml");
+        return Path.Combine(GetDHCPServerApplicationDataFolder(), "Configuration.xml");
     }
 
     public static string GetClientInfoPath(string serverName, string serverAddress)
     {
-        return Path.Combine(Path.GetDirectoryName(GetConfigurationPath()), $"{serverName}_{serverAddress.Replace('.', '_')}.xml");
+        return Path.Combine(GetDHCPServerApplicationDataFolder(), $"{serverName}_{serverAddress.Replace('.', '_')}.xml");
     }
 
     public override Task StartAsync(CancellationToken cancellationToken)

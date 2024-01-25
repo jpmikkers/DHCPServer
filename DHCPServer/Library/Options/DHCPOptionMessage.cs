@@ -4,7 +4,7 @@ namespace GitHub.JPMikkers.DHCP
 {
     public class DHCPOptionMessage : DHCPOptionBase
     {
-        private string _message;
+        private string _message = string.Empty;
 
         #region IDHCPOption Members
 

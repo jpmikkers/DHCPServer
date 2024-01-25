@@ -5,7 +5,7 @@ namespace GitHub.JPMikkers.DHCP
 {
     public class DHCPOptionServerIdentifier : DHCPOptionBase
     {
-        private IPAddress _IPAddress;
+        private IPAddress _IPAddress = IPAddress.None;
 
         public IPAddress IPAddress
         {

@@ -8,21 +8,21 @@ namespace ManagedDHCPService;
 [Serializable()]
 public class ReservationConfiguration
 {
-    private IPAddress _poolStart;
-    private IPAddress _poolEnd;
+    private IPAddress _poolStart = IPAddress.None;
+    private IPAddress _poolEnd = IPAddress.None;
     private bool _preempt;
 
     public string MacTaste
     {
         get;
         set;
-    }
+    } = string.Empty;
 
     public string HostName
     {
         get;
         set;
-    }
+    } = string.Empty;
 
     public string PoolStart
     {

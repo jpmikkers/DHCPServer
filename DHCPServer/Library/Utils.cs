@@ -101,7 +101,7 @@ namespace GitHub.JPMikkers.DHCP
             sw.Flush();
             ms.Position = 0;
             StreamReader sr = new StreamReader(ms);
-            string line;
+            string? line;
             while((line = sr.ReadLine()) != null)
             {
                 sb.Append(prefix);

@@ -14,7 +14,7 @@ namespace GitHub.JPMikkers.DHCP
 
         private readonly object _sync = new object();
         private IPEndPoint _endPoint = new(IPAddress.Loopback, 67);
-        private UDPSocket _socket;
+        private UDPSocket _socket = default!;
         private IPAddress _subnetMask = IPAddress.Any;
         private IPAddress _poolStart = IPAddress.Any;
         private IPAddress _poolEnd = IPAddress.Broadcast;
@@ -22,7 +22,7 @@ namespace GitHub.JPMikkers.DHCP
         private readonly string _clientInfoPath;
         private readonly string _hostName;
         private readonly Dictionary<DHCPClient, DHCPClient> _clients = new();
-        private Timer _timer;
+        private readonly Timer _timer;
         private TimeSpan _offerExpirationTime = TimeSpan.FromSeconds(30.0);
         private TimeSpan _leaseTime = TimeSpan.FromDays(1);
         private bool _active = false;
@@ -30,12 +30,12 @@ namespace GitHub.JPMikkers.DHCP
         private List<IDHCPMessageInterceptor> _interceptors = new();
         private List<ReservationItem> _reservations = new();
         private int _minimumPacketSize = 576;
-        private readonly AutoPumpQueue<int> m_UpdateClientInfoQueue;
+        private readonly AutoPumpQueue<int> _updateClientInfoQueue;
         private readonly Random _random = new();
 
         #region IDHCPServer Members
 
-        public event EventHandler<DHCPStopEventArgs> OnStatusChange = delegate (object? sender, DHCPStopEventArgs args) { };
+        public event EventHandler<DHCPStopEventArgs?> OnStatusChange = delegate (object? sender, DHCPStopEventArgs? args) { };
 
         public IPEndPoint EndPoint
         {
@@ -237,10 +237,11 @@ namespace GitHub.JPMikkers.DHCP
 
         public DHCPServer(ILogger logger, string clientInfoPath)
         {
-            m_UpdateClientInfoQueue = new AutoPumpQueue<int>(OnUpdateClientInfo);
+            _updateClientInfoQueue = new AutoPumpQueue<int>(OnUpdateClientInfo);
             _logger = logger;
             _clientInfoPath = clientInfoPath;
             _hostName = System.Environment.MachineName;
+            _timer = new Timer(new TimerCallback(OnTimer), null, Timeout.Infinite, Timeout.Infinite);
         }
 
         public void Start()
@@ -269,7 +270,7 @@ namespace GitHub.JPMikkers.DHCP
                         Trace($"Starting DHCP server '{_endPoint}'");
                         _active = true;
                         _socket = new UDPSocket(_endPoint, 2048, true, 10, OnReceive, OnStop);
-                        _timer = new Timer(new TimerCallback(OnTimer), null, TimeSpan.FromSeconds(1.0), TimeSpan.FromSeconds(1.0));
+                        _timer.Change(TimeSpan.FromSeconds(1.0), TimeSpan.FromSeconds(1.0));
                         Trace("DHCP Server start succeeded");
                     }
                     catch(Exception e)
@@ -325,9 +326,9 @@ namespace GitHub.JPMikkers.DHCP
 
         #endregion
 
-        private void HandleStatusChange(DHCPStopEventArgs data)
+        private void HandleStatusChange(DHCPStopEventArgs? data)
         {
-            m_UpdateClientInfoQueue.Enqueue(0);
+            _updateClientInfoQueue.Enqueue(0);
             OnStatusChange(this, data);
         }
 
@@ -339,6 +340,11 @@ namespace GitHub.JPMikkers.DHCP
         private void Stop(Exception? reason)
         {
             bool notify = false;
+
+            if(_active)
+            {
+                _timer.Change(Timeout.Infinite, Timeout.Infinite);
+            }
 
             lock(_sync)
             {
@@ -685,7 +691,7 @@ namespace GitHub.JPMikkers.DHCP
         private bool ServerIdentifierPrecondition(DHCPMessage msg)
         {
             bool result = false;
-            DHCPOptionServerIdentifier dhcpOptionServerIdentifier = (DHCPOptionServerIdentifier)msg.GetOption(TDHCPOption.ServerIdentifier);
+            var dhcpOptionServerIdentifier = msg.FindOption<DHCPOptionServerIdentifier>();
 
             if(dhcpOptionServerIdentifier != null)
             {
@@ -758,7 +764,7 @@ namespace GitHub.JPMikkers.DHCP
 
         private IPAddress AllocateIPAddress(DHCPMessage dhcpMessage)
         {
-            DHCPOptionRequestedIPAddress dhcpOptionRequestedIPAddress = (DHCPOptionRequestedIPAddress)dhcpMessage.GetOption(TDHCPOption.RequestedIPAddress);
+            var dhcpOptionRequestedIPAddress = dhcpMessage.FindOption<DHCPOptionRequestedIPAddress>();
 
             var reservation = _reservations.FirstOrDefault(x => x.Match(dhcpMessage));
 
@@ -833,6 +839,8 @@ namespace GitHub.JPMikkers.DHCP
             {
                 Trace("Incoming packet - parsing DHCP Message");
 
+                if(data.Array is null) throw new IOException("Unexpected null udp packet buffer");
+
                 // translate array segment into a DHCPMessage
                 DHCPMessage dhcpMessage = DHCPMessage.FromStream(new MemoryStream(data.Array, data.Offset, data.Count, false, false));
                 Trace(Utils.PrefixLines(dhcpMessage.ToString(), "c->s "));
@@ -851,7 +859,7 @@ namespace GitHub.JPMikkers.DHCP
                             lock(_clients)
                             {
                                 // is it a known client?
-                                DHCPClient knownClient = _clients.ContainsKey(client) ? _clients[client] : null;
+                                DHCPClient? knownClient = _clients.TryGetValue(client, out DHCPClient? value) ? value : null;
 
                                 if(knownClient != null)
                                 {
@@ -912,11 +920,11 @@ namespace GitHub.JPMikkers.DHCP
                             lock(_clients)
                             {
                                 // is it a known client?
-                                DHCPClient knownClient = _clients.ContainsKey(client) ? _clients[client] : null;
+                                DHCPClient? knownClient = _clients.TryGetValue(client, out DHCPClient? value) ? value : null;
 
                                 // is there a server identifier?
-                                DHCPOptionServerIdentifier dhcpOptionServerIdentifier = (DHCPOptionServerIdentifier)dhcpMessage.GetOption(TDHCPOption.ServerIdentifier);
-                                DHCPOptionRequestedIPAddress dhcpOptionRequestedIPAddress = (DHCPOptionRequestedIPAddress)dhcpMessage.GetOption(TDHCPOption.RequestedIPAddress);
+                                var dhcpOptionServerIdentifier = dhcpMessage.FindOption<DHCPOptionServerIdentifier>();
+                                var dhcpOptionRequestedIPAddress = dhcpMessage.FindOption<DHCPOptionRequestedIPAddress>();
 
                                 if(dhcpOptionServerIdentifier != null)
                                 {
@@ -1069,7 +1077,7 @@ namespace GitHub.JPMikkers.DHCP
                                 if(ServerIdentifierPrecondition(dhcpMessage))
                                 {
                                     // is it a known client?
-                                    DHCPClient knownClient = _clients.ContainsKey(client) ? _clients[client] : null;
+                                    DHCPClient? knownClient = _clients.TryGetValue(client, out DHCPClient? value) ? value : null;
 
                                     if(knownClient != null)
                                     {
@@ -1108,7 +1116,7 @@ namespace GitHub.JPMikkers.DHCP
                                 if(ServerIdentifierPrecondition(dhcpMessage))
                                 {
                                     // is it a known client?
-                                    DHCPClient knownClient = _clients.ContainsKey(client) ? _clients[client] : null;
+                                    DHCPClient? knownClient = _clients.TryGetValue(client, out DHCPClient? value) ? value : null;
 
                                     if(knownClient != null /* && knownClient.State == DHCPClient.TState.Assigned */ )
                                     {
@@ -1159,7 +1167,7 @@ namespace GitHub.JPMikkers.DHCP
             }
         }
 
-        private void OnStop(UDPSocket sender, Exception reason)
+        private void OnStop(UDPSocket sender, Exception? reason)
         {
             Stop(reason);
         }

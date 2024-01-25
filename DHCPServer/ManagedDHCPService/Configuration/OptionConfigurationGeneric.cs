@@ -7,7 +7,7 @@ namespace ManagedDHCPService;
 public class OptionConfigurationGeneric : OptionConfiguration
 {
     public int Option;
-    public string Data;
+    public string Data = string.Empty;
 
     public OptionConfigurationGeneric()
     {

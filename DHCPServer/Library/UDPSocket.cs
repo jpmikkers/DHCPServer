@@ -14,7 +14,7 @@ namespace GitHub.JPMikkers.DHCP
         const uint SIO_UDP_CONNRESET = IOC_IN | IOC_VENDOR | 12;
 
         public delegate void OnReceiveDelegate(UDPSocket sender, IPEndPoint endPoint, ArraySegment<byte> data);
-        public delegate void OnStopDelegate(UDPSocket sender, Exception reason);
+        public delegate void OnStopDelegate(UDPSocket sender, Exception? reason);
 
         #region private types, members
 
@@ -181,7 +181,7 @@ namespace GitHub.JPMikkers.DHCP
 
         #region private methods, properties
 
-        private void Stop(Exception reason)
+        private void Stop(Exception? reason)
         {
             bool notifyStop = false;
 
@@ -224,13 +224,16 @@ namespace GitHub.JPMikkers.DHCP
                         _sendPending = true;   // !! MUST BE DONE BEFORE CALLING BEGINSEND. Sometimes beginsend will call the SendDone routine synchronously!!
                         PacketBuffer sendPacket = _sendFifo.Dequeue();
 
-                        try
+                        if(sendPacket.Data.Array is not null)
                         {
-                            _socket.BeginSendTo(sendPacket.Data.Array, sendPacket.Data.Offset, sendPacket.Data.Count, SocketFlags.None, sendPacket.EndPoint, new AsyncCallback(SendDone), sendPacket);
-                        }
-                        catch(Exception)
-                        {
-                            // don't care about any exceptions here because the TFTP protocol will take care of retrying to send the packet
+                            try
+                            {
+                                _socket.BeginSendTo(sendPacket.Data.Array, sendPacket.Data.Offset, sendPacket.Data.Count, SocketFlags.None, sendPacket.EndPoint, new AsyncCallback(SendDone), sendPacket);
+                            }
+                            catch(Exception)
+                            {
+                                // don't care about any exceptions here because the TFTP protocol will take care of retrying to send the packet
+                            }
                         }
                     }
                 }
@@ -275,7 +278,10 @@ namespace GitHub.JPMikkers.DHCP
             {
                 _receivePending++;
                 PacketBuffer receivePacket = new PacketBuffer(new IPEndPoint(_IPv6 ? IPAddress.IPv6Any : IPAddress.Any, 0), new ArraySegment<byte>(new byte[_packetSize], 0, _packetSize));
-                _socket.BeginReceiveFrom(receivePacket.Data.Array, receivePacket.Data.Offset, receivePacket.Data.Count, SocketFlags.None, ref receivePacket.EndPoint, new AsyncCallback(ReceiveDone), receivePacket);
+                if(receivePacket.Data.Array is not null)
+                {
+                    _socket.BeginReceiveFrom(receivePacket.Data.Array, receivePacket.Data.Offset, receivePacket.Data.Count, SocketFlags.None, ref receivePacket.EndPoint, new AsyncCallback(ReceiveDone), receivePacket);
+                }
             }
         }
 
@@ -293,20 +299,22 @@ namespace GitHub.JPMikkers.DHCP
                     {
                         try
                         {
-                            PacketBuffer buf = (PacketBuffer)ar.AsyncState;
-                            int packetSize;
-                            try
+                            if(ar.AsyncState is PacketBuffer buf && buf.Data.Array is not null)
                             {
-                                packetSize = _socket.EndReceiveFrom(ar, ref buf.EndPoint);
+                                int packetSize;
+                                try
+                                {
+                                    packetSize = _socket.EndReceiveFrom(ar, ref buf.EndPoint);
+                                }
+                                finally
+                                {
+                                    _receivePending--;
+                                }
+                                buf.Data = new ArraySegment<byte>(buf.Data.Array, 0, packetSize);
+                                _receiveFifo.Enqueue(buf);
+                                // BeginReceive should check state again because Stop() could have been called synchronously at NotifyReceive()
+                                BeginReceive();
                             }
-                            finally
-                            {
-                                _receivePending--;
-                            }
-                            buf.Data = new ArraySegment<byte>(buf.Data.Array, 0, packetSize);
-                            _receiveFifo.Enqueue(buf);
-                            // BeginReceive should check state again because Stop() could have been called synchronously at NotifyReceive()
-                            BeginReceive();
                         }
                         catch(SocketException e)
                         {

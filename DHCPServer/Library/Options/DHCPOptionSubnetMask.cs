@@ -5,7 +5,7 @@ namespace GitHub.JPMikkers.DHCP
 {
     public class DHCPOptionSubnetMask : DHCPOptionBase
     {
-        private IPAddress _subnetMask;
+        private IPAddress _subnetMask = IPAddress.None;
 
         #region IDHCPOption Members
 
