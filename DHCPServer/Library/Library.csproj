@@ -5,7 +5,8 @@
     <RootNamespace>GitHub.JPMikkers.DHCP</RootNamespace>
     <AssemblyName>DHCPLibrary</AssemblyName>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <FileUpgradeFlags />
+    <Nullable>disable</Nullable>
+	<FileUpgradeFlags />
     <UpgradeBackupLocation />
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
@@ -48,8 +49,10 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</Description>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugType>full</DebugType>
+    <Deterministic>False</Deterministic>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
+    <Deterministic>False</Deterministic>
   </PropertyGroup>
 </Project>

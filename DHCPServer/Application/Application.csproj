@@ -7,6 +7,7 @@
     <AssemblyName>DHCPServer</AssemblyName>
     <ApplicationIcon>Resources\MainIcon.ico</ApplicationIcon>
     <TargetFramework>net48</TargetFramework>
+	<Nullable>disable</Nullable>
     <FileUpgradeFlags />
     <UpgradeBackupLocation />
     <IsWebBootstrapper>false</IsWebBootstrapper>
