@@ -139,7 +139,6 @@ namespace GitHub.JPMikkers.DHCP
         public List<IDHCPOption> Options
         {
             get { return _options; }
-            set { _options = value; }
         }
 
         /// <summary>

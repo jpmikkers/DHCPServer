@@ -14,12 +14,13 @@ namespace GitHub.JPMikkers.DHCP
 
         private readonly object _sync = new object();
         private IPEndPoint _endPoint = new(IPAddress.Loopback, 67);
-        private UDPSocket _socket = default!;
+        private IUDPSocket _socket = default!;
         private IPAddress _subnetMask = IPAddress.Any;
         private IPAddress _poolStart = IPAddress.Any;
         private IPAddress _poolEnd = IPAddress.Broadcast;
         private readonly ILogger _logger;
         private readonly string _clientInfoPath;
+        private readonly IUDPSocketFactory _udpSocketFactory;
         private readonly string _hostName;
         private readonly Dictionary<DHCPClient, DHCPClient> _clients = new();
         private readonly Timer _timer;
@@ -235,11 +236,12 @@ namespace GitHub.JPMikkers.DHCP
             }
         }
 
-        public DHCPServer(ILogger logger, string clientInfoPath)
+        public DHCPServer(ILogger logger, string clientInfoPath, IUDPSocketFactory udpSocketFactory)
         {
             _updateClientInfoQueue = new AutoPumpQueue<int>(OnUpdateClientInfo);
             _logger = logger;
             _clientInfoPath = clientInfoPath;
+            _udpSocketFactory = udpSocketFactory;
             _hostName = System.Environment.MachineName;
             _timer = new Timer(new TimerCallback(OnTimer), null, Timeout.Infinite, Timeout.Infinite);
         }
@@ -269,7 +271,7 @@ namespace GitHub.JPMikkers.DHCP
                     {
                         Trace($"Starting DHCP server '{_endPoint}'");
                         _active = true;
-                        _socket = new UDPSocket(_endPoint, 2048, true, 10, OnReceive, OnStop);
+                        _socket = _udpSocketFactory.Create(_endPoint, 2048, true, 10, OnReceive, OnStop);
                         _timer.Change(TimeSpan.FromSeconds(1.0), TimeSpan.FromSeconds(1.0));
                         Trace("DHCP Server start succeeded");
                     }
@@ -833,7 +835,7 @@ namespace GitHub.JPMikkers.DHCP
             }
         }
 
-        private void OnReceive(UDPSocket sender, IPEndPoint endPoint, ArraySegment<byte> data)
+        private void OnReceive(IUDPSocket sender, IPEndPoint endPoint, ArraySegment<byte> data)
         {
             try
             {
@@ -1167,7 +1169,7 @@ namespace GitHub.JPMikkers.DHCP
             }
         }
 
-        private void OnStop(UDPSocket sender, Exception? reason)
+        private void OnStop(IUDPSocket sender, Exception? reason)
         {
             Stop(reason);
         }

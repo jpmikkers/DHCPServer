@@ -17,6 +17,7 @@ public class DHCPServerResurrector : IDisposable
     private readonly string _clientInfoPath;
     private DHCPServer? _server;
     private readonly Timer _retryTimer;
+    private readonly IUDPSocketFactory _udpSocketFactory = new DefaultUDPSocketFactory();
 
     public DHCPServerResurrector(DHCPServerConfiguration config, ILogger eventLog, string clientInfoPath)
     {
@@ -49,7 +50,7 @@ public class DHCPServerResurrector : IDisposable
             {
                 try
                 {
-                    _server = new DHCPServer(_logger, _clientInfoPath);
+                    _server = new DHCPServer(_logger, _clientInfoPath, _udpSocketFactory);
                     _server.EndPoint = new IPEndPoint(IPAddress.Parse(_config.Address), 67);
                     _server.SubnetMask = IPAddress.Parse(_config.NetMask);
                     _server.PoolStart = IPAddress.Parse(_config.PoolStart);

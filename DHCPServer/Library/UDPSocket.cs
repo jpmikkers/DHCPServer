@@ -5,7 +5,7 @@ using System.Net.Sockets;
 
 namespace GitHub.JPMikkers.DHCP
 {
-    public class UDPSocket : IDisposable
+    public class UDPSocket : IUDPSocket
     {
         // See: http://stackoverflow.com/questions/5199026/c-sharp-async-udp-listener-socketexception
 
@@ -13,8 +13,8 @@ namespace GitHub.JPMikkers.DHCP
         const uint IOC_VENDOR = 0x18000000;
         const uint SIO_UDP_CONNRESET = IOC_IN | IOC_VENDOR | 12;
 
-        public delegate void OnReceiveDelegate(UDPSocket sender, IPEndPoint endPoint, ArraySegment<byte> data);
-        public delegate void OnStopDelegate(UDPSocket sender, Exception? reason);
+        public delegate void OnReceiveDelegate(IUDPSocket sender, IPEndPoint endPoint, ArraySegment<byte> data);
+        public delegate void OnStopDelegate(IUDPSocket sender, Exception? reason);
 
         #region private types, members
 
