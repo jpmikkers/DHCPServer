@@ -26,6 +26,7 @@ public class FakeClient
     {
         Assert.AreEqual(DHCPMessage.TOpcode.BootRequest, message.Opcode);
         Assert.AreEqual(DHCPMessage.THardwareType.Ethernet, message.HardwareType);
+        Assert.AreEqual(0, message.Hops);
 
         await SendClientMessage(new IPEndPoint(IPAddress.Broadcast, 68), message);
     }
@@ -40,6 +41,7 @@ public class FakeClient
 
         var response = DHCPMessage.FromStream(new MemoryStream(msg.msg.Array!, msg.msg.Offset, msg.msg.Count, false, false));
 
+        Assert.AreEqual(0, response.Hops);
         Assert.AreEqual(DHCPMessage.TOpcode.BootReply, response.Opcode);
         Assert.AreEqual(DHCPMessage.THardwareType.Ethernet, response.HardwareType);
 
