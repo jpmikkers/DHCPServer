@@ -58,84 +58,140 @@ namespace GitHub.JPMikkers.DHCP
         private string _bootFileName;
         private List<IDHCPOption> _options;
 
+        /// <summary>
+        /// op, Message op code / message type. 1 = BOOTREQUEST, 2 = BOOTREPLY
+        /// </summary>
         public TOpcode Opcode
         {
             get { return _opcode; }
             set { _opcode = value; }
         }
 
+        /// <summary>
+        /// htype, Hardware address type, see ARP section in "Assigned Numbers" RFC; e.g., '1' = 10mb ethernet.
+        /// </summary>
         public THardwareType HardwareType
         {
             get { return _hardwareType; }
             set { _hardwareType = value; }
         }
 
+        /// <summary>
+        /// Client sets to zero, optionally used by relay agents when booting via a relay agent.
+        /// </summary>
         public byte Hops
         {
             get { return _hops; }
             set { _hops = value; }
         }
 
+        /// <summary>
+        /// xid (Transaction ID), a random number chosen by the client, used by the client and server 
+        /// to associate messages and responses between a client and a server.
+        /// </summary>
         public uint XID
         {
             get { return _xID; }
             set { _xID = value; }
         }
 
+        /// <summary>
+        /// Filled in by client, seconds elapsed since client began address acquisition or renewal process.
+        /// </summary>
         public ushort Secs
         {
             get { return _secs; }
             set { _secs = value; }
         }
 
+        /// <summary>
+        /// Broadcast flag. From rfc2131: 
+        /// If the 'giaddr' field in a DHCP message from a client is non-zero,
+        /// the server sends any return messages to the 'DHCP server' port on the
+        /// BOOTP relay agent whose address appears in 'giaddr'. If the 'giaddr'
+        /// field is zero and the 'ciaddr' field is nonzero, then the server
+        /// unicasts DHCPOFFER and DHCPACK messages to the address in 'ciaddr'.
+        /// If 'giaddr' is zero and 'ciaddr' is zero, and the broadcast bit is
+        /// set, then the server broadcasts DHCPOFFER and DHCPACK messages to
+        /// 0xffffffff. If the broadcast bit is not set and 'giaddr' is zero and
+        /// 'ciaddr' is zero, then the server unicasts DHCPOFFER and DHCPACK
+        /// messages to the client's hardware address and 'yiaddr' address.  In
+        /// all cases, when 'giaddr' is zero, the server broadcasts any DHCPNAK
+        /// messages to 0xffffffff.
+        /// </summary>
         public bool BroadCast
         {
             get { return _broadCast; }
             set { _broadCast = value; }
         }
 
+        /// <summary>
+        /// ciaddr (Client IP address) only filled in if client is in BOUND, RENEW or REBINDING state and can respond to ARP requests.
+        /// </summary>
         public IPAddress ClientIPAddress
         {
             get { return _clientIPAddress; }
             set { _clientIPAddress = value; }
         }
 
+        /// <summary>
+        /// yiaddr, 'your' (client) IP address.
+        /// </summary>
         public IPAddress YourIPAddress
         {
             get { return _yourIPAddress; }
             set { _yourIPAddress = value; }
         }
 
+        /// <summary>
+        /// siaddr, IP address of next server to use in bootstrap returned in DHCPOFFER, DHCPACK by server.
+        /// </summary>
         public IPAddress NextServerIPAddress
         {
             get { return _nextServerIPAddress; }
             set { _nextServerIPAddress = value; }
         }
 
+        /// <summary>
+        /// giaddr (Relay agent IP address) used in booting via a relay agent.
+        /// </summary>
         public IPAddress RelayAgentIPAddress
         {
             get { return _relayAgentIPAddress; }
             set { _relayAgentIPAddress = value; }
         }
 
+        /// <summary>
+        /// chaddr, Client hardware address.
+        /// </summary>
         public byte[] ClientHardwareAddress
         {
             get { return _clientHardwareAddress; }
             set { _clientHardwareAddress = value; }
         }
 
+        /// <summary>
+        /// Optional server host name, null terminated string.
+        /// </summary>
         public string ServerHostName
         {
             get { return _serverHostName; }
             set { _serverHostName = value; }
         }
 
+        /// <summary>
+        /// file (Boot file name) null terminated string; "generic" name or null in 
+        /// DHCPDISCOVER, fully qualified directory-path name in DHCPOFFER.
+        /// </summary>
         public string BootFileName
         {
             get { return _bootFileName; }
             set { _bootFileName = value; }
         }
 
+        /// <summary>
+        /// Optional parameters field.
+        /// </summary>
         public List<IDHCPOption> Options
         {
             get { return _options; }
