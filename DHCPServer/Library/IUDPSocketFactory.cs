@@ -10,6 +10,6 @@ namespace GitHub.JPMikkers.DHCP
 {
     public interface IUDPSocketFactory
     {
-        IUDPSocket Create(IPEndPoint localEndPoint, int packetSize, bool dontFragment, short ttl, OnReceiveDelegate onReceive, OnStopDelegate onStop);
+        IUDPSocket Create(IPEndPoint localEndPoint, int packetSize, bool dontFragment, short ttl);
     }
 }

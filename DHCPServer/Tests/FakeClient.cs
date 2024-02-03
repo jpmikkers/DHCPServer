@@ -39,7 +39,7 @@ public class FakeClient
         Assert.AreEqual(msg.targetEndPoint.Port, 68);
         Assert.IsNotNull(msg.msg);
 
-        var response = DHCPMessage.FromStream(new MemoryStream(msg.msg.Array!, msg.msg.Offset, msg.msg.Count, false, false));
+        var response = DHCPMessage.FromStream(new MemoryStream(msg.msg.ToArray()));
 
         Assert.AreEqual(0, response.Hops);
         Assert.AreEqual(DHCPMessage.TOpcode.BootReply, response.Opcode);

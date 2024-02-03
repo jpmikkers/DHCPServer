@@ -7,7 +7,7 @@ public class FakeUDPSocketFactory : IUDPSocketFactory
 {
     public FakeUDPSocket? UdpSocket { get; set; }
 
-    public IUDPSocket Create(IPEndPoint localEndPoint, int packetSize, bool dontFragment, short ttl, UDPSocket.OnReceiveDelegate onReceive, UDPSocket.OnStopDelegate onStop)
+    public IUDPSocket Create(IPEndPoint localEndPoint, int packetSize, bool dontFragment, short ttl)
     {
         UdpSocket = new FakeUDPSocket() 
         { 
@@ -15,8 +15,6 @@ public class FakeUDPSocketFactory : IUDPSocketFactory
             PacketSize = packetSize,
             DontFragment = dontFragment, 
             Ttl = ttl, 
-            OnReceive = onReceive, 
-            OnStop = onStop, 
         };
         return UdpSocket;
     }

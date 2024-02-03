@@ -9,9 +9,9 @@ namespace GitHub.JPMikkers.DHCP
 {
     public class DefaultUDPSocketFactory : IUDPSocketFactory
     {
-        public IUDPSocket Create(IPEndPoint localEndPoint, int packetSize, bool dontFragment, short ttl, UDPSocket.OnReceiveDelegate onReceive, UDPSocket.OnStopDelegate onStop)
+        public IUDPSocket Create(IPEndPoint localEndPoint, int packetSize, bool dontFragment, short ttl)
         {
-            return new UDPSocket(localEndPoint,packetSize,dontFragment,ttl,onReceive,onStop);
+            return new UDPSocket(localEndPoint,packetSize,dontFragment,ttl);
         }
     }
 }

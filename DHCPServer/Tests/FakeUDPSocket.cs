@@ -8,8 +8,8 @@ namespace Tests;
 
 public class FakeUDPSocket : IUDPSocket
 {
-    private Channel<(IPEndPoint targetEndPoint, ArraySegment<byte> msg)> _serverToClientChannel;
-    private TaskQueue _clientToServerChannel = new();
+    private Channel<(IPEndPoint targetEndPoint, ReadOnlyMemory<byte> msg)> _serverToClientChannel;
+    private Channel<(IPEndPoint clientEndPoint, ReadOnlyMemory<byte> msg)> _clientToServerChannel;
 
     public required IPEndPoint LocalEndPoint { get; init; }
 
@@ -17,13 +17,18 @@ public class FakeUDPSocket : IUDPSocket
 
     public required int PacketSize { get; init; }
     public required bool DontFragment { get; init; }
-    public required OnReceiveDelegate OnReceive { get; init; }
-    public required OnStopDelegate OnStop { get; init; }
     public required short Ttl { get; init; }
 
     public FakeUDPSocket()
     {
-        _serverToClientChannel = Channel.CreateUnbounded<(IPEndPoint targetEndPoint, ArraySegment<byte> msg)>(new UnboundedChannelOptions
+        _serverToClientChannel = Channel.CreateUnbounded<(IPEndPoint targetEndPoint, ReadOnlyMemory<byte> msg)>(new UnboundedChannelOptions
+        {
+            AllowSynchronousContinuations = true,
+            SingleReader = false,
+            SingleWriter = false
+        });
+
+        _clientToServerChannel = Channel.CreateUnbounded<(IPEndPoint clientEndPoint, ReadOnlyMemory<byte> msg)>(new UnboundedChannelOptions
         {
             AllowSynchronousContinuations = true,
             SingleReader = false,
@@ -31,9 +36,9 @@ public class FakeUDPSocket : IUDPSocket
         });
     }
 
-    public void Send(IPEndPoint endPoint, ArraySegment<byte> msg)
+    public async Task Send(IPEndPoint endPoint, ReadOnlyMemory<byte> msg, CancellationToken cancellationToken)
     {
-        Task.Run(async () => await _serverToClientChannel.Writer.WriteAsync((endPoint, msg))).Wait();
+        await _serverToClientChannel.Writer.WriteAsync((endPoint, msg),cancellationToken);
     }
 
     public void Dispose()
@@ -42,13 +47,16 @@ public class FakeUDPSocket : IUDPSocket
 
     public async Task ClientSend(IPEndPoint clientEndPoint, ArraySegment<byte> msg)
     {
-        await _clientToServerChannel.Enqueue(() => {
-            this.OnReceive?.Invoke(this, clientEndPoint, msg);
-        });
+        await _clientToServerChannel.Writer.WriteAsync((clientEndPoint, msg));
     }
 
-    public async Task<(IPEndPoint targetEndPoint, ArraySegment<byte> msg)> ClientReceive()
+    public async Task<(IPEndPoint targetEndPoint, ReadOnlyMemory<byte> msg)> ClientReceive()
     {
         return await _serverToClientChannel.Reader.ReadAsync();
+    }
+
+    public async Task<(IPEndPoint, ReadOnlyMemory<byte>)> Receive(CancellationToken cancellationToken)
+    {
+        return await _clientToServerChannel.Reader.ReadAsync(cancellationToken);
     }
 }
