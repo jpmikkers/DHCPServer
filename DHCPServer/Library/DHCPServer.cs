@@ -24,7 +24,6 @@ namespace GitHub.JPMikkers.DHCP
         private readonly IUDPSocketFactory _udpSocketFactory;
         private readonly string _hostName;
         private readonly ConcurrentDictionary<DHCPClient, DHCPClient> _clients = new();
-        private readonly Timer _timer;
         private TimeSpan _offerExpirationTime = TimeSpan.FromSeconds(30.0);
         private TimeSpan _leaseTime = TimeSpan.FromDays(1);
         private bool _active = false;
@@ -235,7 +234,6 @@ namespace GitHub.JPMikkers.DHCP
             _clientInfoPath = clientInfoPath;
             _udpSocketFactory = udpSocketFactory;
             _hostName = System.Environment.MachineName;
-            _timer = new Timer(new TimerCallback(OnTimer), null, Timeout.Infinite, Timeout.Infinite);
         }
 
         public void Start()
@@ -262,7 +260,6 @@ namespace GitHub.JPMikkers.DHCP
                     Trace($"Starting DHCP server '{_endPoint}'");
                     _active = true;
                     _socket = _udpSocketFactory.Create(_endPoint, 2048, true, 10);
-                    _timer.Change(TimeSpan.FromSeconds(1.0), TimeSpan.FromSeconds(1.0));
                     _mainTask = Task.Run(async () => { await MainTask(_cancellationTokenSource.Token); });
                     Trace("DHCP Server start succeeded");
                 }
@@ -335,11 +332,6 @@ namespace GitHub.JPMikkers.DHCP
 
             if(_active)
             {
-                _timer.Change(Timeout.Infinite, Timeout.Infinite);
-            }
-
-            if(_active)
-            {
                 Trace($"Stopping DHCP server '{_endPoint}'");
                 _active = false;
                 notify = true;
@@ -368,28 +360,22 @@ namespace GitHub.JPMikkers.DHCP
             }
         }
 
-        private void OnTimer(object? state)
+        private void CheckLeaseExpiration()
         {
             bool modified = false;
 
-            List<DHCPClient> clientsToRemove = new List<DHCPClient>();
-            foreach(DHCPClient client in _clients.Keys)
+            foreach(var client in _clients.Keys.ToList())
             {
                 if(client.State == DHCPClient.TState.Offered && (DateTime.Now - client.OfferedTime) > _offerExpirationTime)
                 {
-                    clientsToRemove.Add(client);
+                    RemoveClient(client);
+                    modified = true;
                 }
                 else if(client.State == DHCPClient.TState.Assigned && (DateTime.Now > client.LeaseEndTime))
                 {
-                    // lease expired. remove client
-                    clientsToRemove.Add(client);
+                    RemoveClient(client);
+                    modified = true;
                 }
-            }
-
-            foreach(DHCPClient client in clientsToRemove)
-            {
-                _ = _clients.TryRemove(client, out _);
-                modified = true;
             }
 
             if(modified)
@@ -831,10 +817,36 @@ namespace GitHub.JPMikkers.DHCP
 
         private async Task MainTask(CancellationToken cancellationToken)
         {
+            var timer = new PeriodicTimer(TimeSpan.FromSeconds(1));
+            Task<(IPEndPoint,ReadOnlyMemory<byte>)>? receiveTask = default;
+            Task? timerTask = default;
+
             while(!cancellationToken.IsCancellationRequested)
             {
-                (var ipEndPoint,var data) = await _socket.Receive(cancellationToken);
-                await OnReceive(null!, ipEndPoint, data);
+                if(receiveTask == null)
+                {
+                    receiveTask = _socket.Receive(cancellationToken);
+                }
+
+                if(timerTask == null)
+                {
+                    timerTask = timer.WaitForNextTickAsync(cancellationToken).AsTask();
+                }
+
+                var completedTask = await Task.WhenAny(receiveTask, timerTask);
+
+                if(completedTask == receiveTask) 
+                {
+                    (var ipEndPoint, var data) = await receiveTask;
+                    receiveTask = null;
+                    await OnReceive(ipEndPoint, data);
+                }
+                else if(completedTask == timerTask)
+                {
+                    await timerTask;
+                    timerTask = null;
+                    CheckLeaseExpiration();
+                }
             }
         }
 
@@ -843,7 +855,7 @@ namespace GitHub.JPMikkers.DHCP
             return _clients.TryGetValue(client, out var value) ? value : null;
         }
 
-        private async Task OnReceive(IUDPSocket sender, IPEndPoint endPoint, ReadOnlyMemory<byte> data)
+        private async Task OnReceive(IPEndPoint endPoint, ReadOnlyMemory<byte> data)
         {
             try
             {
