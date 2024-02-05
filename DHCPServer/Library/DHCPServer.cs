@@ -396,10 +396,18 @@ namespace GitHub.JPMikkers.DHCP
         {
             Trace($"==== Sending response to {endPoint} ====");
             Trace(Utils.PrefixLines(msg.ToString(), "s->c "));
-            MemoryStream m = new MemoryStream();
-            msg.ToStream(m, _minimumPacketSize);
-            //Task.Run(async () => { await _socket.Send(endPoint, new ArraySegment<byte>(m.ToArray())); }).GetAwaiter().GetResult();
-            await _socket.Send(endPoint, new ArraySegment<byte>(m.ToArray()),_cancellationTokenSource.Token);
+
+            try
+            {
+                MemoryStream m = new();
+                msg.ToStream(m, _minimumPacketSize);
+                await _socket.Send(endPoint, m.ToArray(), _cancellationTokenSource.Token);
+            }
+            catch(Exception e)
+            {
+                // treat any send failures like a lost udp packet, we don't want any badly behaving DHCP clients to kill the server
+                Trace($"{nameof(SendMessage)} failed: {e.Message}");
+            }
         }
 
         private void AppendConfiguredOptions(DHCPMessage sourceMsg, DHCPMessage targetMsg)
@@ -823,29 +831,42 @@ namespace GitHub.JPMikkers.DHCP
 
             while(!cancellationToken.IsCancellationRequested)
             {
-                if(receiveTask == null)
-                {
-                    receiveTask = _socket.Receive(cancellationToken);
-                }
-
-                if(timerTask == null)
-                {
-                    timerTask = timer.WaitForNextTickAsync(cancellationToken).AsTask();
-                }
+                receiveTask ??= _socket.Receive(cancellationToken);
+                timerTask ??= timer.WaitForNextTickAsync(cancellationToken).AsTask();
 
                 var completedTask = await Task.WhenAny(receiveTask, timerTask);
 
                 if(completedTask == receiveTask) 
                 {
-                    (var ipEndPoint, var data) = await receiveTask;
-                    receiveTask = null;
-                    await OnReceive(ipEndPoint, data);
+                    try
+                    {
+                        (var ipEndPoint, var data) = await receiveTask;
+                        await OnReceive(ipEndPoint, data);
+                    }
+                    catch(UDPSocketException ex)
+                    {
+                        if(ex.IsFatal)
+                        {
+                            _logger?.LogError(ex, $"fatal exception in {nameof(MainTask)}");
+                            throw;
+                        }
+                    }
+                    finally
+                    {
+                        receiveTask = null;
+                    }
                 }
                 else if(completedTask == timerTask)
                 {
-                    await timerTask;
-                    timerTask = null;
-                    CheckLeaseExpiration();
+                    try
+                    {
+                        await timerTask;
+                        CheckLeaseExpiration();
+                    }
+                    finally
+                    {
+                        timerTask = null;
+                    }
                 }
             }
         }

@@ -68,53 +68,38 @@ namespace GitHub.JPMikkers.DHCP
 
         public async Task<(IPEndPoint, ReadOnlyMemory<byte>)> Receive(CancellationToken cancellationToken)
         {
-            //try
-            //{
-            var mem = new Memory<byte>(new byte[_packetSize]);
-
-            Console.WriteLine("UDPSocket before receive");
-            var result = await _socket.ReceiveFromAsync(mem, new IPEndPoint(IPAddress.Any, 0), cancellationToken);
-            Console.WriteLine("UDPSocket after receive");
-
-            if(result.RemoteEndPoint is IPEndPoint endpoint)
+            try
             {
-                return (endpoint, mem[..result.ReceivedBytes]);
+                var mem = new Memory<byte>(new byte[_packetSize]);
+                var result = await _socket.ReceiveFromAsync(mem, new IPEndPoint(IPAddress.Any, 0), cancellationToken);
+
+                if(result.RemoteEndPoint is IPEndPoint endpoint)
+                {
+                    return (endpoint, mem[..result.ReceivedBytes]);
+                }
+                else
+                {
+                    throw new InvalidCastException("unexpected endpoint type");
+                }
             }
-            else
+            catch(SocketException ex) when(ex.SocketErrorCode == SocketError.MessageSize)
             {
-                throw new InvalidOperationException("unexpected endpoint type");
+                // someone tried to send a message bigger than _maxPacketSize
+                // discard it, and start receiving the next packet
+                throw new UDPSocketException($"{nameof(Receive)} error: {ex.Message}", ex) { IsFatal = false };
             }
-            //}
-            //catch(Exception ex)
-            //{
-            //    Console.WriteLine($"UDPSocket receive exception {ex}");
-            //}
+            catch(SocketException ex) when(ex.SocketErrorCode == SocketError.ConnectionReset)
+            {
+                // ConnectionReset is reported when the remote port wasn't listening.
+                // Since we're using UDP messaging we don't care about this -> continue receiving.
+                throw new UDPSocketException($"{nameof(Receive)} error: {ex.Message}", ex) { IsFatal = false };
+            }
+            catch(Exception ex)
+            {
+                // everything else is fatal
+                throw new UDPSocketException($"{nameof(Receive)} error: {ex.Message}", ex) { IsFatal = true };
+            }
         }
-
-
-        //private async Task SocketTask(CancellationToken cancellationToken)
-        //{
-        //    while(!cancellationToken.IsCancellationRequested)
-        //    {
-        //        try
-        //        {
-        //            var mem = new Memory<byte>(new byte[_packetSize]);
-
-        //            Console.WriteLine("UDPSocket before receive");
-        //            var result = await _socket.ReceiveFromAsync(mem, new IPEndPoint(IPAddress.Any, 0), cancellationToken);
-        //            Console.WriteLine("UDPSocket after receive");
-
-        //            if(result.RemoteEndPoint is IPEndPoint endpoint)
-        //            {
-        //                await _onReceive(this, endpoint, mem[..result.ReceivedBytes]);
-        //            }
-        //        }
-        //        catch(Exception ex)
-        //        {
-        //            Console.WriteLine($"UDPSocket receive exception {ex}");
-        //        }
-        //    }
-        //}
 
         ~UDPSocket()
         {
@@ -141,30 +126,12 @@ namespace GitHub.JPMikkers.DHCP
         {
             try
             {
-                Console.WriteLine("UDPSocket before send");
                 await _socket.SendToAsync(msg, endPoint, cancellationToken);
-                Console.WriteLine("UDPSocket after send");
             }
-            catch(Exception e)
+            catch (Exception ex)
             {
-                Console.WriteLine($"UDPSocket send exception {e}");
+                throw new UDPSocketException($"{nameof(Send)}", ex) { IsFatal = true };
             }
-
-            //try
-            //{
-            //    lock(_sync)
-            //    {
-            //        if(!_disposed)
-            //        {
-            //            _sendFifo.Enqueue(new PacketBuffer(endPoint, msg));
-            //            BeginSend();
-            //        }
-            //    }
-            //}
-            //catch(Exception e)
-            //{
-            //    Stop(e);
-            //}
         }
 
         #endregion
@@ -209,69 +176,6 @@ namespace GitHub.JPMikkers.DHCP
                 //_onStop(this, reason);
             }
         }
-
-        /// <summary>
-        /// Callback handler for the asynchronous Socket.BeginReceive() method
-        /// </summary>
-        /// <param name="ar">Represents the status of an asynchronous operation</param>
-        //private void ReceiveDone(IAsyncResult ar)
-        //{
-        //    try
-        //    {
-        //        lock(_sync)
-        //        {
-        //            if(!_disposed)
-        //            {
-        //                try
-        //                {
-        //                    if(ar.AsyncState is PacketBuffer buf && buf.Data.Array is not null)
-        //                    {
-        //                        int packetSize;
-        //                        try
-        //                        {
-        //                            packetSize = _socket.EndReceiveFrom(ar, ref buf.EndPoint);
-        //                        }
-        //                        finally
-        //                        {
-        //                            _receivePending--;
-        //                        }
-        //                        buf.Data = new ArraySegment<byte>(buf.Data.Array, 0, packetSize);
-        //                        _receiveFifo.Enqueue(buf);
-        //                        // BeginReceive should check state again because Stop() could have been called synchronously at NotifyReceive()
-        //                        BeginReceive();
-        //                    }
-        //                }
-        //                catch(SocketException e)
-        //                {
-        //                    switch(e.SocketErrorCode)
-        //                    {
-        //                        case SocketError.ConnectionReset:
-        //                            // ConnectionReset is reported when the remote port wasn't listening.
-        //                            // Since we're using UDP messaging we don't care about this -> continue receiving.
-        //                            BeginReceive();
-        //                            break;
-
-        //                        case SocketError.MessageSize:
-        //                            // someone tried to send a message bigger than m_MaxPacketSize
-        //                            // discard it, and start receiving the next packet
-        //                            BeginReceive();
-        //                            break;
-
-        //                        default:
-        //                            // just assume anything else is fatal -> pass the exception.
-        //                            throw;
-        //                    }
-        //                }
-        //            }
-        //        }
-        //    }
-        //    catch(Exception e)
-        //    {
-        //        // it's only safe to Stop() the socket if this method wasn't called recursively (because in that case the lock will be taken!)
-        //        // rethrow the exception until the stack unwinds to the top-level ReceiveDone.
-        //        if(ar.CompletedSynchronously) throw; else Stop(e);
-        //    }
-        //}
 
         protected virtual void Dispose(bool disposing)
         {
