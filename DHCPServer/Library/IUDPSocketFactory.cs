@@ -4,7 +4,6 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
-using static GitHub.JPMikkers.DHCP.UDPSocket;
 
 namespace GitHub.JPMikkers.DHCP
 {

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace GitHub.JPMikkers.DHCP;
 
-public class UDPSocket : IUDPSocket
+public class UDPSocketLinux : IUDPSocket
 {
     // See: http://stackoverflow.com/questions/5199026/c-sharp-async-udp-listener-socketexception
 
@@ -30,7 +30,7 @@ public class UDPSocket : IUDPSocket
         }
     }
 
-    public UDPSocket(IPEndPoint localEndPoint, int maxPacketSize, bool dontFragment, short ttl)
+    public UDPSocketLinux(IPEndPoint localEndPoint, int maxPacketSize, bool dontFragment, short ttl)
     {
         _maxPacketSize = maxPacketSize;
         _disposed = false;
@@ -110,7 +110,7 @@ public class UDPSocket : IUDPSocket
         }
     }
 
-    ~UDPSocket()
+    ~UDPSocketLinux()
     {
         try
         {

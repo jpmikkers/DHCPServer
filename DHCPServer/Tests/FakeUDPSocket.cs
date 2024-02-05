@@ -1,6 +1,5 @@
 ﻿using GitHub.JPMikkers.DHCP;
 using System.Net;
-using static GitHub.JPMikkers.DHCP.UDPSocket;
 using System.Threading.Channels;
 using Baksteen.Async;
 
