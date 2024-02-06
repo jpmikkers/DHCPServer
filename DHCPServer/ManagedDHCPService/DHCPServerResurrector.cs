@@ -17,15 +17,16 @@ public class DHCPServerResurrector : IDisposable
     private readonly string _clientInfoPath;
     private DHCPServer? _server;
     private readonly Timer _retryTimer;
-    private readonly IUDPSocketFactory _udpSocketFactory = new DefaultUDPSocketFactory();
+    private readonly IUDPSocketFactory _udpSocketFactory;
 
-    public DHCPServerResurrector(DHCPServerConfiguration config, ILogger eventLog, string clientInfoPath)
+    public DHCPServerResurrector(DHCPServerConfiguration config, ILogger logger, string clientInfoPath)
     {
         _lock = new object();
         _disposed = false;
         _config = config;
-        _logger = eventLog;
+        _logger = logger;
         _clientInfoPath = clientInfoPath;
+        _udpSocketFactory = new DefaultUDPSocketFactory(logger);
         _retryTimer = new Timer(new TimerCallback(Resurrect));
         Resurrect(null);
     }

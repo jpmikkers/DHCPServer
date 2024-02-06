@@ -6,18 +6,23 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Linq;
-using System.Runtime.InteropServices;
 
 namespace GitHub.JPMikkers.DHCP;
 
-public class UDPSocketLinux : IUDPSocket
+public class UDPSocketLinuxDual : IUDPSocket
 {
+    // See: http://stackoverflow.com/questions/5199026/c-sharp-async-udp-listener-socketexception
+    //const uint IOC_IN = 0x80000000;
+    //const uint IOC_VENDOR = 0x18000000;
+    //const uint SIO_UDP_CONNRESET = IOC_IN | IOC_VENDOR | 12;
+
     // see https://github.com/dotnet/runtime/issues/83525
     const int SO_BINDTODEVICE = 25;
     const int SOL_SOCKET = 1;
 
     private bool _disposed;                                     // true => object is disposed
     private readonly bool _IPv6;                                // true => it's an IPv6 connection
+    private readonly Socket _broadRcvSocket;                    // linux workaround, socket that will recieve broadcast packets
     private readonly Socket _socket;                            // The active socket
     private readonly int _maxPacketSize;                        // size of packets we'll try to receive
 
@@ -31,7 +36,7 @@ public class UDPSocketLinux : IUDPSocket
         }
     }
 
-    public UDPSocketLinux(IPEndPoint localEndPoint, int maxPacketSize, bool dontFragment, short ttl)
+    public UDPSocketLinuxDual(IPEndPoint localEndPoint, int maxPacketSize, bool dontFragment, short ttl)
     {
         foreach(var nic in NetworkInterface.GetAllNetworkInterfaces())
         {
@@ -53,6 +58,20 @@ public class UDPSocketLinux : IUDPSocket
 
         _IPv6 = (localEndPoint.AddressFamily == AddressFamily.InterNetworkV6);
 
+        _broadRcvSocket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+        _broadRcvSocket.EnableBroadcast = false;
+        _broadRcvSocket.ExclusiveAddressUse = false;
+        _broadRcvSocket.SendBufferSize = 65536;
+        _broadRcvSocket.ReceiveBufferSize = 65536;
+        if(!_IPv6) _broadRcvSocket.DontFragment = dontFragment;
+        if(ttl >= 0)
+        {
+            _broadRcvSocket.Ttl = ttl;
+        }
+
+        _broadRcvSocket.SetRawSocketOption(SOL_SOCKET, SO_BINDTODEVICE, Encoding.UTF8.GetBytes(selectedNic.Id));
+        _broadRcvSocket.Bind(new IPEndPoint(IPAddress.Any, localEndPoint.Port));
+
         _socket = new Socket(localEndPoint.AddressFamily, SocketType.Dgram, ProtocolType.Udp);
         _socket.EnableBroadcast = true;
         _socket.ExclusiveAddressUse = false;    //_socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, 1);
@@ -63,30 +82,85 @@ public class UDPSocketLinux : IUDPSocket
         {
             _socket.Ttl = ttl;
         }
+        _socket.Bind(localEndPoint);
+        _localEndPoint = (_socket.LocalEndPoint as IPEndPoint) ?? localEndPoint;
 
-        if(!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-        {
-            _socket.SetRawSocketOption(SOL_SOCKET, SO_BINDTODEVICE, Encoding.UTF8.GetBytes(selectedNic.Id));
-        }
-        _socket.Bind(new IPEndPoint(IPAddress.Any, localEndPoint.Port));
-        _localEndPoint = localEndPoint;
+        //try
+        //{
+        //    _socket.IOControl((IOControlCode)SIO_UDP_CONNRESET, [0, 0, 0, 0], null);
+        //}
+        //catch(PlatformNotSupportedException)
+        //{
+        //}
     }
 
+    private Memory<byte> _receiveBroadcastMem = new();
+    private Task<SocketReceiveFromResult>? _receiveBroadcastTask = null;
+
+    private Memory<byte> _receiveUnicastMem = new();
+    private Task<SocketReceiveFromResult>? _receiveUnicastTask = null;
 
     public async Task<(IPEndPoint, ReadOnlyMemory<byte>)> Receive(CancellationToken cancellationToken)
     {
         try
         {
-            var mem = new Memory<byte>(new byte[_maxPacketSize]);
-            var result = await _socket.ReceiveFromAsync(mem, new IPEndPoint(IPAddress.Any, 0), cancellationToken);
-
-            if(result.RemoteEndPoint is IPEndPoint endpoint)
+            if(_receiveBroadcastTask is null)
             {
-                return (endpoint, mem[..result.ReceivedBytes]);
+                _receiveBroadcastMem = new Memory<byte>(new byte[_maxPacketSize]);
+                _receiveBroadcastTask = _socket.ReceiveFromAsync(_receiveBroadcastMem, new IPEndPoint(IPAddress.Any, 0), cancellationToken).AsTask();
+            }
+
+            if(_receiveUnicastTask is null)
+            {
+                _receiveUnicastMem = new Memory<byte>(new byte[_maxPacketSize]);
+                _receiveUnicastTask = _socket.ReceiveFromAsync(_receiveUnicastMem, new IPEndPoint(IPAddress.Any, 0), cancellationToken).AsTask();
+            }
+
+            var completedTask = await Task.WhenAny(_receiveBroadcastTask, _receiveUnicastTask);
+
+            if(completedTask == _receiveBroadcastTask)
+            {
+                try
+                {
+                    var result = await _receiveBroadcastTask;
+
+                    if(result.RemoteEndPoint is IPEndPoint endpoint)
+                    {
+                        return (endpoint, _receiveBroadcastMem[..result.ReceivedBytes]);
+                    }
+                    else
+                    {
+                        throw new InvalidCastException("unexpected endpoint type");
+                    }
+                }
+                finally
+                {
+                    _receiveBroadcastTask = null;
+                }
+            }
+            else if(completedTask == _receiveUnicastTask)
+            {
+                try
+                {
+                    var result = await _receiveUnicastTask;
+
+                    if(result.RemoteEndPoint is IPEndPoint endpoint)
+                    {
+                        return (endpoint, _receiveUnicastMem[..result.ReceivedBytes]);
+                    }
+                    else
+                    {
+                        throw new InvalidCastException("unexpected endpoint type");
+                    }
+                }
+                finally
+                {
+                    _receiveUnicastTask = null;
+                }
             }
             else
             {
-                throw new InvalidCastException("unexpected endpoint type");
+                throw new InvalidOperationException("unexpected task completion");
             }
         }
         catch(SocketException ex) when(ex.SocketErrorCode == SocketError.MessageSize)
@@ -125,7 +199,7 @@ public class UDPSocketLinux : IUDPSocket
         }
     }
 
-    ~UDPSocketLinux()
+    ~UDPSocketLinuxDual()
     {
         try
         {
@@ -158,6 +232,16 @@ public class UDPSocketLinux : IUDPSocket
                 {
                     _socket.Shutdown(SocketShutdown.Both);
                     _socket.Close();
+                }
+                catch(Exception)
+                {
+                    // socket tends to complain a lot during close. just eat those exceptions.
+                }
+
+                try
+                {
+                    _broadRcvSocket.Shutdown(SocketShutdown.Both);
+                    _broadRcvSocket.Close();
                 }
                 catch(Exception)
                 {
