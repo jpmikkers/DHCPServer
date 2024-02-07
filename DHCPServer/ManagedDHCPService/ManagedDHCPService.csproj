@@ -9,6 +9,7 @@
   <ItemGroup>
     <PackageReference Include="Baksteen.Extensions.DeepCopy" Version="1.0.3" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Hosting.Systemd" Version="8.0.0" />
     <PackageReference Include="Microsoft.Extensions.Hosting.WindowsServices" Version="8.0.0" />
   </ItemGroup>
   <ItemGroup>
