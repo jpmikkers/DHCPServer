@@ -20,7 +20,7 @@ namespace GitHub.JPMikkers.DHCP
         private IPAddress _poolStart = IPAddress.Any;
         private IPAddress _poolEnd = IPAddress.Broadcast;
         private readonly ILogger _logger;
-        private readonly string _clientInfoPath;
+        private readonly string? _clientInfoPath;
         private readonly IUDPSocketFactory _udpSocketFactory;
         private readonly string _hostName;
         private readonly ConcurrentDictionary<DHCPClient, DHCPClient> _clients = new();
@@ -233,7 +233,7 @@ namespace GitHub.JPMikkers.DHCP
         public DHCPServer(ILogger logger, IUDPSocketFactory udpSocketFactory) : this(logger, null, udpSocketFactory)
         { }
 
-        public DHCPServer(ILogger logger, string clientInfoPath, IUDPSocketFactory udpSocketFactory)
+        public DHCPServer(ILogger logger, string? clientInfoPath, IUDPSocketFactory udpSocketFactory)
         {
             _updateClientInfoQueue = new AutoPumpQueue<int>(OnUpdateClientInfo);
             _logger = logger;
@@ -246,7 +246,7 @@ namespace GitHub.JPMikkers.DHCP
         {
             try
             {
-                DHCPClientInformation clientInformation = DHCPClientInformation.Read(_clientInfoPath);
+                var clientInformation = string.IsNullOrWhiteSpace(_clientInfoPath) ? new DHCPClientInformation() : DHCPClientInformation.Read(_clientInfoPath);
 
                 foreach(DHCPClient client in clientInformation.Clients
                     .Where(c => c.State != DHCPClient.TState.Offered)   // Forget offered clients.

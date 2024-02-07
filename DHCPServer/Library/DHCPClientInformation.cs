@@ -8,7 +8,7 @@ namespace GitHub.JPMikkers.DHCP
     [Serializable()]
     public class DHCPClientInformation
     {
-        private List<DHCPClient> _clients = new List<DHCPClient>();
+        private List<DHCPClient> _clients = new();
 
         public DateTime TimeStamp
         {
@@ -39,7 +39,7 @@ namespace GitHub.JPMikkers.DHCP
         {
             DHCPClientInformation result;
 
-            if(file != null && File.Exists(file))
+            if(File.Exists(file))
             {
                 using(Stream s = File.OpenRead(file))
                 {
@@ -48,7 +48,7 @@ namespace GitHub.JPMikkers.DHCP
             }
             else
             {
-                result = new DHCPClientInformation();
+                result = new();
             }
 
             return result;
