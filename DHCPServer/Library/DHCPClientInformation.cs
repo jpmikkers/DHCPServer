@@ -39,7 +39,7 @@ namespace GitHub.JPMikkers.DHCP
         {
             DHCPClientInformation result;
 
-            if(File.Exists(file))
+            if(file != null && File.Exists(file))
             {
                 using(Stream s = File.OpenRead(file))
                 {

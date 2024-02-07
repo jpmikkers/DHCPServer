@@ -199,24 +199,27 @@ namespace GitHub.JPMikkers.DHCP
                         clientInformation.Clients.Add(client);
                     }
 
-                    for(int t = 0; t < ClientInformationWriteRetries; t++)
+                    if(_clientInfoPath != null)
                     {
-                        try
+                        for(int t = 0; t < ClientInformationWriteRetries; t++)
                         {
-                            clientInformation.Write(_clientInfoPath);
-                            break;
-                        }
-                        catch
-                        {
-                        }
+                            try
+                            {
+                                clientInformation.Write(_clientInfoPath);
+                                break;
+                            }
+                            catch
+                            {
+                            }
 
-                        if(t < ClientInformationWriteRetries)
-                        {
-                            Thread.Sleep(_random.Next(500, 1000));
-                        }
-                        else
-                        {
-                            Trace("Could not update client information, data might be stale");
+                            if(t < ClientInformationWriteRetries)
+                            {
+                                Thread.Sleep(_random.Next(500, 1000));
+                            }
+                            else
+                            {
+                                Trace("Could not update client information, data might be stale");
+                            }
                         }
                     }
                 }
@@ -226,6 +229,9 @@ namespace GitHub.JPMikkers.DHCP
                 }
             }
         }
+
+        public DHCPServer(ILogger logger, IUDPSocketFactory udpSocketFactory) : this(logger, null, udpSocketFactory)
+        { }
 
         public DHCPServer(ILogger logger, string clientInfoPath, IUDPSocketFactory udpSocketFactory)
         {
