@@ -192,15 +192,11 @@ namespace GitHub.JPMikkers.DHCP
             {
                 try
                 {
-                    DHCPClientInformation clientInformation = new DHCPClientInformation();
-
-                    foreach(DHCPClient client in Clients)
-                    {
-                        clientInformation.Clients.Add(client);
-                    }
-
                     if(_clientInfoPath != null)
                     {
+                        DHCPClientInformation clientInformation = new();
+                        clientInformation.Clients.AddRange(Clients);
+
                         for(int t = 0; t < ClientInformationWriteRetries; t++)
                         {
                             try
