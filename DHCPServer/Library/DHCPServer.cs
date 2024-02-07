@@ -230,6 +230,9 @@ namespace GitHub.JPMikkers.DHCP
             }
         }
 
+        public DHCPServer(ILogger logger, IUDPSocketFactory udpSocketFactory) : this(logger, null, udpSocketFactory)
+        { }
+
         public DHCPServer(ILogger logger, string clientInfoPath, IUDPSocketFactory udpSocketFactory)
         {
             _updateClientInfoQueue = new AutoPumpQueue<int>(OnUpdateClientInfo);
