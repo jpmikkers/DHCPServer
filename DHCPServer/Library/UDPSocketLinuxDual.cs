@@ -100,7 +100,7 @@ public class UDPSocketLinuxDual : IUDPSocket
     private Memory<byte> _receiveUnicastMem = new();
     private Task<SocketReceiveFromResult>? _receiveUnicastTask = null;
 
-    public async Task<(IPEndPoint, ReadOnlyMemory<byte>)> Receive(CancellationToken cancellationToken)
+    public async Task<(IPEndPoint, ReadOnlyMemory<byte>)> ReceiveAsync(CancellationToken cancellationToken)
     {
         try
         {
@@ -167,18 +167,18 @@ public class UDPSocketLinuxDual : IUDPSocket
         {
             // someone tried to send a message bigger than _maxPacketSize
             // discard it, and start receiving the next packet
-            throw new UDPSocketException($"{nameof(Receive)} error: {ex.Message}", ex) { IsFatal = false };
+            throw new UDPSocketException($"{nameof(ReceiveAsync)} error: {ex.Message}", ex) { IsFatal = false };
         }
         catch(SocketException ex) when(ex.SocketErrorCode == SocketError.ConnectionReset)
         {
             // ConnectionReset is reported when the remote port wasn't listening.
             // Since we're using UDP messaging we don't care about this -> continue receiving.
-            throw new UDPSocketException($"{nameof(Receive)} error: {ex.Message}", ex) { IsFatal = false };
+            throw new UDPSocketException($"{nameof(ReceiveAsync)} error: {ex.Message}", ex) { IsFatal = false };
         }
         catch(Exception ex)
         {
             // everything else is fatal
-            throw new UDPSocketException($"{nameof(Receive)} error: {ex.Message}", ex) { IsFatal = true };
+            throw new UDPSocketException($"{nameof(ReceiveAsync)} error: {ex.Message}", ex) { IsFatal = true };
         }
     }
 
@@ -187,7 +187,7 @@ public class UDPSocketLinuxDual : IUDPSocket
     /// </summary>
     /// <param name="endPoint">Target for the data</param>
     /// <param name="msg">Data to send</param>
-    public async Task Send(IPEndPoint endPoint, ReadOnlyMemory<byte> msg, CancellationToken cancellationToken)
+    public async Task SendAsync(IPEndPoint endPoint, ReadOnlyMemory<byte> msg, CancellationToken cancellationToken)
     {
         try
         {
@@ -195,7 +195,7 @@ public class UDPSocketLinuxDual : IUDPSocket
         }
         catch(Exception ex)
         {
-            throw new UDPSocketException($"{nameof(Send)}", ex) { IsFatal = true };
+            throw new UDPSocketException($"{nameof(SendAsync)}", ex) { IsFatal = true };
         }
     }
 
