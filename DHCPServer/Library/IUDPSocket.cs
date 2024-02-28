@@ -1,11 +1,10 @@
-﻿using System;
+using System;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace GitHub.JPMikkers.DHCP
 {
-
     [Serializable]
     public class UDPSocketException : Exception
     {
@@ -29,7 +28,7 @@ namespace GitHub.JPMikkers.DHCP
     {
         IPEndPoint LocalEndPoint { get; }
 
-        Task Send(IPEndPoint endPoint, ReadOnlyMemory<byte> msg, CancellationToken cancellationToken);
-        Task<(IPEndPoint,ReadOnlyMemory<byte>)> Receive(CancellationToken cancellationToken);
+        Task SendAsync(IPEndPoint endPoint, ReadOnlyMemory<byte> msg, CancellationToken cancellationToken);
+        Task<(IPEndPoint,ReadOnlyMemory<byte>)> ReceiveAsync(CancellationToken cancellationToken);
     }
 }
