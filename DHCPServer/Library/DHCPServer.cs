@@ -876,7 +876,7 @@ namespace GitHub.JPMikkers.DHCP
                 }
                 catch
                 {
-                    return;
+                    // Ignored.
                 }
             }
         }
