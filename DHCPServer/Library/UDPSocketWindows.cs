@@ -69,10 +69,8 @@ public class UDPSocketWindows : IUDPSocket
             {
                 return (endpoint, mem[..result.ReceivedBytes]);
             }
-            else
-            {
-                throw new InvalidCastException("unexpected endpoint type");
-            }
+
+            throw new InvalidCastException("unexpected endpoint type");
         }
         catch(SocketException ex) when(ex.SocketErrorCode == SocketError.MessageSize)
         {
@@ -85,6 +83,10 @@ public class UDPSocketWindows : IUDPSocket
             // ConnectionReset is reported when the remote port wasn't listening.
             // Since we're using UDP messaging we don't care about this -> continue receiving.
             throw new UDPSocketException($"{nameof(Receive)} error: {ex.Message}", ex) { IsFatal = false };
+        }
+        catch(OperationCanceledException)
+        {
+            throw;
         }
         catch(Exception ex)
         {
