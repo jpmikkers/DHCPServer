@@ -262,7 +262,7 @@ namespace GitHub.JPMikkers.DHCP
                     Trace($"Starting DHCP server '{_endPoint}'");
                     _active = true;
                     _socket = _udpSocketFactory.Create(_endPoint, 2048, true, 10);
-                    _mainTask = Task.Run(async () => { await MainTask(_cancellationTokenSource.Token); });
+                    _mainTask = Task.Run(async () => await MainTask(_cancellationTokenSource.Token));
                     Trace("DHCP Server start succeeded");
                 }
                 catch(Exception e)
@@ -403,7 +403,7 @@ namespace GitHub.JPMikkers.DHCP
             {
                 MemoryStream m = new();
                 msg.ToStream(m, _minimumPacketSize);
-                await _socket.Send(endPoint, m.ToArray(), _cancellationTokenSource.Token);
+                await _socket.SendAsync(endPoint, m.ToArray(), _cancellationTokenSource.Token);
             }
             catch(Exception e)
             {
@@ -833,49 +833,55 @@ namespace GitHub.JPMikkers.DHCP
 
             while(!cancellationToken.IsCancellationRequested)
             {
-                receiveTask ??= _socket.Receive(cancellationToken);
-                timerTask ??= timer.WaitForNextTickAsync(cancellationToken).AsTask();
-
-                var completedTask = await Task.WhenAny(receiveTask, timerTask);
-
-                if(completedTask == receiveTask) 
+                try
                 {
-                    try
+                    receiveTask ??= _socket.ReceiveAsync(cancellationToken);
+                    timerTask ??= timer.WaitForNextTickAsync(cancellationToken).AsTask();
+
+                    var completedTask = await Task.WhenAny(receiveTask, timerTask);
+                    if(completedTask == receiveTask)
                     {
-                        (var ipEndPoint, var data) = await receiveTask;
-                        await OnReceive(ipEndPoint, data);
-                    }
-                    catch(UDPSocketException ex)
-                    {
-                        if(ex.IsFatal)
+                        try
                         {
-                            _logger?.LogError(ex, $"fatal exception in {nameof(MainTask)}");
-                            throw;
+                            (var ipEndPoint, var data) = await receiveTask;
+                            await OnReceive(ipEndPoint, data);
+                        }
+                        catch(UDPSocketException ex)
+                        {
+                            if(ex.IsFatal)
+                            {
+                                _logger?.LogError(ex, $"fatal exception in {nameof(MainTask)}");
+                                throw;
+                            }
+                        }
+                        finally
+                        {
+                            receiveTask = null;
                         }
                     }
-                    finally
+                    else if(completedTask == timerTask)
                     {
-                        receiveTask = null;
+                        try
+                        {
+                            await timerTask;
+                            CheckLeaseExpiration();
+                        }
+                        finally
+                        {
+                            timerTask = null;
+                        }
                     }
                 }
-                else if(completedTask == timerTask)
+                catch(OperationCanceledException)
                 {
-                    try
-                    {
-                        await timerTask;
-                        CheckLeaseExpiration();
-                    }
-                    finally
-                    {
-                        timerTask = null;
-                    }
+                    // Cancelled out next loop.
                 }
             }
         }
 
         private DHCPClient? GetKnownClient(DHCPClient client)
         {
-            return _clients.TryGetValue(client, out var value) ? value : null;
+            return _clients.GetValueOrDefault(client);
         }
 
         private async Task OnReceive(IPEndPoint endPoint, ReadOnlyMemory<byte> data)
