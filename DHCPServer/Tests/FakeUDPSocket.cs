@@ -1,4 +1,4 @@
-﻿using GitHub.JPMikkers.DHCP;
+using GitHub.JPMikkers.DHCP;
 using System.Net;
 using System.Threading.Channels;
 using Baksteen.Async;
@@ -35,7 +35,7 @@ public class FakeUDPSocket : IUDPSocket
         });
     }
 
-    public async Task Send(IPEndPoint endPoint, ReadOnlyMemory<byte> msg, CancellationToken cancellationToken)
+    public async Task SendAsync(IPEndPoint endPoint, ReadOnlyMemory<byte> msg, CancellationToken cancellationToken)
     {
         await _serverToClientChannel.Writer.WriteAsync((endPoint, msg),cancellationToken);
     }
@@ -54,7 +54,7 @@ public class FakeUDPSocket : IUDPSocket
         return await _serverToClientChannel.Reader.ReadAsync();
     }
 
-    public async Task<(IPEndPoint, ReadOnlyMemory<byte>)> Receive(CancellationToken cancellationToken)
+    public async Task<(IPEndPoint, ReadOnlyMemory<byte>)> ReceiveAsync(CancellationToken cancellationToken)
     {
         return await _clientToServerChannel.Reader.ReadAsync(cancellationToken);
     }
