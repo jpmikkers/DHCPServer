@@ -851,7 +851,7 @@ namespace GitHub.JPMikkers.DHCP
                             if(ex.IsFatal)
                             {
                                 _logger?.LogError(ex, $"fatal exception in {nameof(MainTask)}");
-                                throw;
+                                return;
                             }
                         }
                         finally
