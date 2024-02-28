@@ -235,7 +235,7 @@ namespace GitHub.JPMikkers.DHCP
             _logger = logger;
             _clientInfoPath = clientInfoPath;
             _udpSocketFactory = udpSocketFactory;
-            _hostName = System.Environment.MachineName;
+            _hostName = Environment.MachineName;
         }
 
         public void Start()
@@ -827,55 +827,77 @@ namespace GitHub.JPMikkers.DHCP
 
         private async Task MainTask(CancellationToken cancellationToken)
         {
-            var timer = new PeriodicTimer(TimeSpan.FromSeconds(1));
+            using var timer = new PeriodicTimer(TimeSpan.FromSeconds(1));
+
             Task<(IPEndPoint,ReadOnlyMemory<byte>)>? receiveTask = default;
             Task? timerTask = default;
 
-            while(!cancellationToken.IsCancellationRequested)
+            _logger?.LogInformation("Maintask has started");
+
+            try
             {
-                receiveTask ??= _socket.Receive(cancellationToken);
-                timerTask ??= timer.WaitForNextTickAsync(cancellationToken).AsTask();
-
-                var completedTask = await Task.WhenAny(receiveTask, timerTask);
-
-                if(completedTask == receiveTask) 
+                while(!cancellationToken.IsCancellationRequested)
                 {
-                    try
+                    receiveTask ??= _socket.Receive(cancellationToken);
+                    timerTask ??= timer.WaitForNextTickAsync(cancellationToken).AsTask();
+
+                    var completedTask = await Task.WhenAny(receiveTask, timerTask);
+
+                    if(completedTask == receiveTask)
                     {
-                        (var ipEndPoint, var data) = await receiveTask;
-                        await OnReceive(ipEndPoint, data);
-                    }
-                    catch(UDPSocketException ex)
-                    {
-                        if(ex.IsFatal)
+                        try
                         {
-                            _logger?.LogError(ex, $"fatal exception in {nameof(MainTask)}");
-                            throw;
+                            (var ipEndPoint, var data) = await receiveTask;
+                            await OnReceive(ipEndPoint, data);
+                        }
+                        catch(UDPSocketException ex) when (!ex.IsFatal)
+                        {
+                            // udp socket says something non-fatal happened, ignore and try receiving the next packet
+                        }
+                        finally
+                        {
+                            receiveTask = null;
                         }
                     }
-                    finally
+                    else if(completedTask == timerTask)
                     {
-                        receiveTask = null;
+                        try
+                        {
+                            await timerTask;
+                            CheckLeaseExpiration();
+                        }
+                        finally
+                        {
+                            timerTask = null;
+                        }
                     }
                 }
-                else if(completedTask == timerTask)
-                {
-                    try
-                    {
-                        await timerTask;
-                        CheckLeaseExpiration();
-                    }
-                    finally
-                    {
-                        timerTask = null;
-                    }
-                }
+                // this ensures a normal exit is always handled via the catch clause of OperationCanceledException
+                cancellationToken.ThrowIfCancellationRequested();   
+            }
+            catch(OperationCanceledException)
+            {
+                // OperationCanceledException is the normal way of exiting MainTask
+                _logger?.LogInformation("Maintask has stopped gracefully");
+            }
+            catch(Exception ex)
+            {
+                _logger?.LogError(ex, $"fatal exception in {nameof(MainTask)}");
+                // TODO jmik: throw to report ??
+            }
+            finally
+            {
+                // make sure the two marker tasks don't cause unobserved exceptions, because it's
+                // possible one of them is still in the proces of canceling
+                // thanks to https://github.com/Nuklon for reporting this issue!
+                receiveTask?.IgnoreExceptions();
+                timerTask?.IgnoreExceptions();
             }
         }
 
         private DHCPClient? GetKnownClient(DHCPClient client)
         {
-            return _clients.TryGetValue(client, out var value) ? value : null;
+            return _clients.GetValueOrDefault(client);
         }
 
         private async Task OnReceive(IPEndPoint endPoint, ReadOnlyMemory<byte> data)
