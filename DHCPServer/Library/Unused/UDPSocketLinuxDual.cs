@@ -1,3 +1,4 @@
+#if NEVER       // THIS WAS AN EXPERIMENT.
 using System;
 using System.Net;
 using System.Net.NetworkInformation;
@@ -251,3 +252,4 @@ public class UDPSocketLinuxDual : IUDPSocket
         }
     }
 }
+#endif

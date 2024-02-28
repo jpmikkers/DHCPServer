@@ -86,6 +86,10 @@ public class UDPSocketWindows : IUDPSocket
             // Since we're using UDP messaging we don't care about this -> continue receiving.
             throw new UDPSocketException($"{nameof(Receive)} error: {ex.Message}", ex) { IsFatal = false };
         }
+        catch(OperationCanceledException)
+        {
+            throw;
+        }
         catch(Exception ex)
         {
             // everything else is fatal
@@ -104,6 +108,10 @@ public class UDPSocketWindows : IUDPSocket
         {
             await _socket.SendToAsync(msg, endPoint, cancellationToken);
         }
+        catch(OperationCanceledException)
+        {
+            throw;
+        }        
         catch(Exception ex)
         {
             throw new UDPSocketException($"{nameof(Send)}", ex) { IsFatal = true };
