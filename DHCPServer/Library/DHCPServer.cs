@@ -14,6 +14,7 @@ namespace GitHub.JPMikkers.DHCP
     {
         private const int ClientInformationWriteRetries = 10;
 
+        private readonly SemaphoreSlim _taskSemaphoreSlim = new(1, 1);
         private IPEndPoint _endPoint = new(IPAddress.Loopback, 67);
         private IUDPSocket _socket = default!;
         private IPAddress _subnetMask = IPAddress.Any;
@@ -341,8 +342,8 @@ namespace GitHub.JPMikkers.DHCP
                 notify = true;
                 _cancellationTokenSource.Cancel();
 
-                StopTask(_receiveTask);
-                StopTask(_timerTask);
+                AwaitTask(_receiveTask);
+                AwaitTask(_timerTask);
 
                 _receiveTask = null;
                 _timerTask = null;
@@ -350,7 +351,7 @@ namespace GitHub.JPMikkers.DHCP
                 _socket.Dispose();
                 Trace("Stopped");
 
-                void StopTask(Task task)
+                void AwaitTask(Task task)
                 {
                     if(task != null)
                     {
@@ -835,35 +836,17 @@ namespace GitHub.JPMikkers.DHCP
             await SendOFFER(dhcpMessage, client.IPAddress, _leaseTime);
         }
 
-        private async Task TimerTask(CancellationToken cancellationToken)
-        {
-            PeriodicTimer timer = new(TimeSpan.FromSeconds(1));
-
-            try
-            {
-                while(!cancellationToken.IsCancellationRequested)
-                {
-                    await timer.WaitForNextTickAsync(cancellationToken);
-                    CheckLeaseExpiration();
-                }
-            }
-            catch
-            {
-                // Ignored.
-            }
-            finally
-            {
-                timer.Dispose();
-            }
-        }
-
         private async Task ReceiveTask(CancellationToken cancellationToken)
         {
             while(!cancellationToken.IsCancellationRequested)
             {
+                bool enteredSemaphore = false;
+
                 try
                 {
                     (IPEndPoint ipEndPoint, ReadOnlyMemory<byte> data) = await _socket.Receive(cancellationToken);
+                    await _taskSemaphoreSlim.WaitAsync(cancellationToken);
+                    enteredSemaphore = true;
                     await OnReceive(ipEndPoint, data);
                 }
                 catch(UDPSocketException ex)
@@ -878,6 +861,45 @@ namespace GitHub.JPMikkers.DHCP
                 {
                     // Ignored.
                 }
+                finally
+                {
+                    if(enteredSemaphore)
+                        _taskSemaphoreSlim.Release();
+                }
+            }
+        }
+
+        private async Task TimerTask(CancellationToken cancellationToken)
+        {
+            PeriodicTimer timer = new(TimeSpan.FromSeconds(1));
+
+            try
+            {
+                while(!cancellationToken.IsCancellationRequested)
+                {
+                    bool enteredSemaphore = false;
+
+                    try
+                    {
+                        await timer.WaitForNextTickAsync(cancellationToken);
+                        await _taskSemaphoreSlim.WaitAsync(cancellationToken);
+                        enteredSemaphore = true;
+                        CheckLeaseExpiration();
+                    }
+                    finally
+                    {
+                        if(enteredSemaphore)
+                            _taskSemaphoreSlim.Release();
+                    }
+                }
+            }
+            catch
+            {
+                // Ignored.
+            }
+            finally
+            {
+                timer.Dispose();
             }
         }
 
@@ -1058,7 +1080,7 @@ namespace GitHub.JPMikkers.DHCP
                                             client.State = DHCPClient.TState.Assigned;
                                             client.LeaseStartTime = DateTime.Now;
                                             client.LeaseDuration = _leaseTime;
-                                            _=_clients.TryAdd(client, client);
+                                            _ = _clients.TryAdd(client, client);
                                             await SendACK(dhcpMessage, dhcpMessage.ClientIPAddress, client.LeaseDuration);
                                         }
                                         else
