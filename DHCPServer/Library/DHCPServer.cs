@@ -34,7 +34,8 @@ namespace GitHub.JPMikkers.DHCP
         private readonly AutoPumpQueue<int> _updateClientInfoQueue;
         private readonly Random _random = new();
         private CancellationTokenSource _cancellationTokenSource = new();
-        private Task? _mainTask;
+        private Task? _receiveTask;
+        private Task? _timerTask;
 
         #region IDHCPServer Members
 
@@ -235,7 +236,7 @@ namespace GitHub.JPMikkers.DHCP
             _logger = logger;
             _clientInfoPath = clientInfoPath;
             _udpSocketFactory = udpSocketFactory;
-            _hostName = System.Environment.MachineName;
+            _hostName = Environment.MachineName;
         }
 
         public void Start()
@@ -262,7 +263,8 @@ namespace GitHub.JPMikkers.DHCP
                     Trace($"Starting DHCP server '{_endPoint}'");
                     _active = true;
                     _socket = _udpSocketFactory.Create(_endPoint, 2048, true, 10);
-                    _mainTask = Task.Run(async () => { await MainTask(_cancellationTokenSource.Token); });
+                    _receiveTask = Task.Run(async () => await ReceiveTask(_cancellationTokenSource.Token));
+                    _timerTask = Task.Run(async () => await TimerTask(_cancellationTokenSource.Token));
                     Trace("DHCP Server start succeeded");
                 }
                 catch(Exception e)
@@ -339,21 +341,29 @@ namespace GitHub.JPMikkers.DHCP
                 notify = true;
                 _cancellationTokenSource.Cancel();
 
-                if(_mainTask!= null)
-                {
-                    try
-                    {
-                        _mainTask.GetAwaiter().GetResult();
-                    }
-                    catch(Exception ex)
-                    {
-                        _logger?.LogError(ex, $"Exception during {nameof(Stop)}");
-                    }
-                    _mainTask = null;
-                }
+                StopTask(_receiveTask);
+                StopTask(_timerTask);
+
+                _receiveTask = null;
+                _timerTask = null;
 
                 _socket.Dispose();
                 Trace("Stopped");
+
+                void StopTask(Task task)
+                {
+                    if(task != null)
+                    {
+                        try
+                        {
+                            task.GetAwaiter().GetResult();
+                        }
+                        catch(Exception ex)
+                        {
+                            _logger?.LogError(ex, $"Exception during {nameof(Stop)}");
+                        }
+                    }
+                }
             }
 
             if(notify)
@@ -825,57 +835,55 @@ namespace GitHub.JPMikkers.DHCP
             await SendOFFER(dhcpMessage, client.IPAddress, _leaseTime);
         }
 
-        private async Task MainTask(CancellationToken cancellationToken)
+        private async Task TimerTask(CancellationToken cancellationToken)
         {
-            var timer = new PeriodicTimer(TimeSpan.FromSeconds(1));
-            Task<(IPEndPoint,ReadOnlyMemory<byte>)>? receiveTask = default;
-            Task? timerTask = default;
+            PeriodicTimer timer = new(TimeSpan.FromSeconds(1));
 
+            try
+            {
+                while(!cancellationToken.IsCancellationRequested)
+                {
+                    await timer.WaitForNextTickAsync(cancellationToken);
+                    CheckLeaseExpiration();
+                }
+            }
+            catch
+            {
+                // Ignored.
+            }
+            finally
+            {
+                timer.Dispose();
+            }
+        }
+
+        private async Task ReceiveTask(CancellationToken cancellationToken)
+        {
             while(!cancellationToken.IsCancellationRequested)
             {
-                receiveTask ??= _socket.Receive(cancellationToken);
-                timerTask ??= timer.WaitForNextTickAsync(cancellationToken).AsTask();
-
-                var completedTask = await Task.WhenAny(receiveTask, timerTask);
-
-                if(completedTask == receiveTask) 
+                try
                 {
-                    try
+                    (IPEndPoint ipEndPoint, ReadOnlyMemory<byte> data) = await _socket.Receive(cancellationToken);
+                    await OnReceive(ipEndPoint, data);
+                }
+                catch(UDPSocketException ex)
+                {
+                    if(ex.IsFatal)
                     {
-                        (var ipEndPoint, var data) = await receiveTask;
-                        await OnReceive(ipEndPoint, data);
-                    }
-                    catch(UDPSocketException ex)
-                    {
-                        if(ex.IsFatal)
-                        {
-                            _logger?.LogError(ex, $"fatal exception in {nameof(MainTask)}");
-                            throw;
-                        }
-                    }
-                    finally
-                    {
-                        receiveTask = null;
+                        _logger?.LogError(ex, $"fatal exception in {nameof(ReceiveTask)}");
+                        return;
                     }
                 }
-                else if(completedTask == timerTask)
+                catch
                 {
-                    try
-                    {
-                        await timerTask;
-                        CheckLeaseExpiration();
-                    }
-                    finally
-                    {
-                        timerTask = null;
-                    }
+                    return;
                 }
             }
         }
 
         private DHCPClient? GetKnownClient(DHCPClient client)
         {
-            return _clients.TryGetValue(client, out var value) ? value : null;
+            return _clients.GetValueOrDefault(client);
         }
 
         private async Task OnReceive(IPEndPoint endPoint, ReadOnlyMemory<byte> data)
