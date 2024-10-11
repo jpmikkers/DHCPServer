@@ -5,10 +5,9 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace GitHub.JPMikkers.DHCP
+namespace GitHub.JPMikkers.DHCP;
+
+public interface IUDPSocketFactory
 {
-    public interface IUDPSocketFactory
-    {
-        IUDPSocket Create(IPEndPoint localEndPoint, int packetSize, bool dontFragment, short ttl);
-    }
+    IUDPSocket Create(IPEndPoint localEndPoint, int packetSize, bool dontFragment, short ttl);
 }

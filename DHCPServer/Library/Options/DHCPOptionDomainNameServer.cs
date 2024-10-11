@@ -1,14 +1,13 @@
-﻿namespace GitHub.JPMikkers.DHCP
-{
-    public class DHCPOptionDomainNameServer : DHCPOptionServerListBase
-    {
-        public override DHCPOptionServerListBase Create()
-        {
-            return new DHCPOptionDomainNameServer();
-        }
+﻿namespace GitHub.JPMikkers.DHCP;
 
-        public DHCPOptionDomainNameServer() : base(TDHCPOption.DomainNameServer)
-        {
-        }
+public class DHCPOptionDomainNameServer : DHCPOptionServerListBase
+{
+    public override DHCPOptionServerListBase Create()
+    {
+        return new DHCPOptionDomainNameServer();
+    }
+
+    public DHCPOptionDomainNameServer() : base(TDHCPOption.DomainNameServer)
+    {
     }
 }

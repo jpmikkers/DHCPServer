@@ -1,51 +1,50 @@
 ﻿using System;
 using System.IO;
 
-namespace GitHub.JPMikkers.DHCP
+namespace GitHub.JPMikkers.DHCP;
+
+public class DHCPOptionRebindingTimeValue : DHCPOptionBase
 {
-    public class DHCPOptionRebindingTimeValue : DHCPOptionBase
+    private TimeSpan _timeSpan;
+
+    #region IDHCPOption Members
+
+    public TimeSpan TimeSpan
     {
-        private TimeSpan _timeSpan;
-
-        #region IDHCPOption Members
-
-        public TimeSpan TimeSpan
+        get
         {
-            get
-            {
-                return _timeSpan;
-            }
+            return _timeSpan;
         }
+    }
 
-        public override IDHCPOption FromStream(Stream s)
-        {
-            DHCPOptionRebindingTimeValue result = new DHCPOptionRebindingTimeValue();
-            if(s.Length != 4) throw new IOException("Invalid DHCP option length");
-            result._timeSpan = TimeSpan.FromSeconds(ParseHelper.ReadUInt32(s));
-            return result;
-        }
+    public override IDHCPOption FromStream(Stream s)
+    {
+        DHCPOptionRebindingTimeValue result = new DHCPOptionRebindingTimeValue();
+        if(s.Length != 4) throw new IOException("Invalid DHCP option length");
+        result._timeSpan = TimeSpan.FromSeconds(ParseHelper.ReadUInt32(s));
+        return result;
+    }
 
-        public override void ToStream(Stream s)
-        {
-            ParseHelper.WriteUInt32(s, (uint)_timeSpan.TotalSeconds);
-        }
+    public override void ToStream(Stream s)
+    {
+        ParseHelper.WriteUInt32(s, (uint)_timeSpan.TotalSeconds);
+    }
 
-        #endregion
+    #endregion
 
-        public DHCPOptionRebindingTimeValue()
-            : base(TDHCPOption.RebindingTimeValue)
-        {
-        }
+    public DHCPOptionRebindingTimeValue()
+        : base(TDHCPOption.RebindingTimeValue)
+    {
+    }
 
-        public DHCPOptionRebindingTimeValue(TimeSpan timeSpan)
-            : base(TDHCPOption.RebindingTimeValue)
-        {
-            _timeSpan = timeSpan;
-        }
+    public DHCPOptionRebindingTimeValue(TimeSpan timeSpan)
+        : base(TDHCPOption.RebindingTimeValue)
+    {
+        _timeSpan = timeSpan;
+    }
 
-        public override string ToString()
-        {
-            return $"Option(name=[{OptionType}],value=[{_timeSpan}])";
-        }
+    public override string ToString()
+    {
+        return $"Option(name=[{OptionType}],value=[{_timeSpan}])";
     }
 }

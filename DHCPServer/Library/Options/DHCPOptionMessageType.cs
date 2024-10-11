@@ -1,63 +1,62 @@
 ﻿using System.IO;
 
-namespace GitHub.JPMikkers.DHCP
+namespace GitHub.JPMikkers.DHCP;
+
+public enum TDHCPMessageType
 {
-    public enum TDHCPMessageType
+    DISCOVER = 1,
+    OFFER,
+    REQUEST,
+    DECLINE,
+    ACK,
+    NAK,
+    RELEASE,
+    INFORM,
+    Undefined
+}
+
+public class DHCPOptionMessageType : DHCPOptionBase
+{
+    private TDHCPMessageType _messageType;
+
+    #region IDHCPOption Members
+
+    public TDHCPMessageType MessageType
     {
-        DISCOVER = 1,
-        OFFER,
-        REQUEST,
-        DECLINE,
-        ACK,
-        NAK,
-        RELEASE,
-        INFORM,
-        Undefined
+        get
+        {
+            return _messageType;
+        }
     }
 
-    public class DHCPOptionMessageType : DHCPOptionBase
+    public override IDHCPOption FromStream(Stream s)
     {
-        private TDHCPMessageType _messageType;
+        DHCPOptionMessageType result = new DHCPOptionMessageType();
+        if(s.Length != 1) throw new IOException("Invalid DHCP option length");
+        result._messageType = (TDHCPMessageType)s.ReadByte();
+        return result;
+    }
 
-        #region IDHCPOption Members
+    public override void ToStream(Stream s)
+    {
+        s.WriteByte((byte)_messageType);
+    }
 
-        public TDHCPMessageType MessageType
-        {
-            get
-            {
-                return _messageType;
-            }
-        }
+    #endregion
 
-        public override IDHCPOption FromStream(Stream s)
-        {
-            DHCPOptionMessageType result = new DHCPOptionMessageType();
-            if(s.Length != 1) throw new IOException("Invalid DHCP option length");
-            result._messageType = (TDHCPMessageType)s.ReadByte();
-            return result;
-        }
+    public DHCPOptionMessageType()
+        : base(TDHCPOption.MessageType)
+    {
+    }
 
-        public override void ToStream(Stream s)
-        {
-            s.WriteByte((byte)_messageType);
-        }
+    public DHCPOptionMessageType(TDHCPMessageType messageType)
+        : base(TDHCPOption.MessageType)
+    {
+        _messageType = messageType;
+    }
 
-        #endregion
-
-        public DHCPOptionMessageType()
-            : base(TDHCPOption.MessageType)
-        {
-        }
-
-        public DHCPOptionMessageType(TDHCPMessageType messageType)
-            : base(TDHCPOption.MessageType)
-        {
-            _messageType = messageType;
-        }
-
-        public override string ToString()
-        {
-            return $"Option(name=[{OptionType}],value=[{_messageType}])";
-        }
+    public override string ToString()
+    {
+        return $"Option(name=[{OptionType}],value=[{_messageType}])";
     }
 }

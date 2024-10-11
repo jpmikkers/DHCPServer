@@ -1,29 +1,28 @@
 ﻿using System.IO;
 
-namespace GitHub.JPMikkers.DHCP
+namespace GitHub.JPMikkers.DHCP;
+
+public class DHCPOptionFixedLength : DHCPOptionBase
 {
-    public class DHCPOptionFixedLength : DHCPOptionBase
+    #region IDHCPOption Members
+
+    public override IDHCPOption FromStream(Stream s)
     {
-        #region IDHCPOption Members
+        return this;
+    }
 
-        public override IDHCPOption FromStream(Stream s)
-        {
-            return this;
-        }
+    public override void ToStream(Stream s)
+    {
+    }
 
-        public override void ToStream(Stream s)
-        {
-        }
+    #endregion
 
-        #endregion
+    public DHCPOptionFixedLength(TDHCPOption option) : base(option)
+    {
+    }
 
-        public DHCPOptionFixedLength(TDHCPOption option) : base(option)
-        {
-        }
-
-        public override string ToString()
-        {
-            return $"Option(name=[{_optionType}],value=[])";
-        }
+    public override string ToString()
+    {
+        return $"Option(name=[{_optionType}],value=[])";
     }
 }

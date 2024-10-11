@@ -3,71 +3,70 @@ using System.Collections.Generic;
 using System.IO;
 using System.Xml.Serialization;
 
-namespace GitHub.JPMikkers.DHCP
+namespace GitHub.JPMikkers.DHCP;
+
+[Serializable()]
+public class DHCPClientInformation
 {
-    [Serializable()]
-    public class DHCPClientInformation
+    private List<DHCPClient> _clients = new();
+
+    public DateTime TimeStamp
     {
-        private List<DHCPClient> _clients = new();
-
-        public DateTime TimeStamp
+        get
         {
-            get
+            return DateTime.Now;
+        }
+        set
+        {
+        }
+    }
+
+    public List<DHCPClient> Clients
+    {
+        get
+        {
+            return _clients;
+        }
+        set
+        {
+            _clients = value;
+        }
+    }
+
+    private static readonly XmlSerializer s_serializer = new XmlSerializer(typeof(DHCPClientInformation));
+
+    public static DHCPClientInformation Read(string file)
+    {
+        DHCPClientInformation result;
+
+        if(File.Exists(file))
+        {
+            using(Stream s = File.OpenRead(file))
             {
-                return DateTime.Now;
-            }
-            set
-            {
+                result = (s_serializer.Deserialize(s) as DHCPClientInformation) ?? new();
             }
         }
-
-        public List<DHCPClient> Clients
+        else
         {
-            get
-            {
-                return _clients;
-            }
-            set
-            {
-                _clients = value;
-            }
+            result = new();
         }
 
-        private static readonly XmlSerializer s_serializer = new XmlSerializer(typeof(DHCPClientInformation));
+        return result;
+    }
 
-        public static DHCPClientInformation Read(string file)
+    public void Write(string file)
+    {
+        string? dirName = Path.GetDirectoryName(file);
+
+        if(!string.IsNullOrEmpty(dirName) && !Directory.Exists(dirName))
         {
-            DHCPClientInformation result;
-
-            if(File.Exists(file))
-            {
-                using(Stream s = File.OpenRead(file))
-                {
-                    result = (s_serializer.Deserialize(s) as DHCPClientInformation) ?? new();
-                }
-            }
-            else
-            {
-                result = new();
-            }
-
-            return result;
+            Directory.CreateDirectory(dirName);
         }
 
-        public void Write(string file)
+        using(Stream s = File.Open(file, FileMode.Create, FileAccess.ReadWrite, FileShare.None))
         {
-            string? dirName = Path.GetDirectoryName(file);
-
-            if(!string.IsNullOrEmpty(dirName) && !Directory.Exists(dirName))
-            {
-                Directory.CreateDirectory(dirName);
-            }
-
-            using(Stream s = File.Open(file, FileMode.Create, FileAccess.ReadWrite, FileShare.None))
-            {
-                s_serializer.Serialize(s, this);
-                s.Flush();
-            }
+            s_serializer.Serialize(s, this);
+            s.Flush();
         }
     }
 }

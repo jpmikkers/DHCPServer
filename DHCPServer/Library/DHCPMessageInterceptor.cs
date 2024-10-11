@@ -1,7 +1,6 @@
-namespace GitHub.JPMikkers.DHCP
+namespace GitHub.JPMikkers.DHCP;
+
+public interface IDHCPMessageInterceptor
 {
-    public interface IDHCPMessageInterceptor
-    {
-        void Apply(DHCPMessage sourceMsg, DHCPMessage targetMsg);
-    }
+    void Apply(DHCPMessage sourceMsg, DHCPMessage targetMsg);
 }
