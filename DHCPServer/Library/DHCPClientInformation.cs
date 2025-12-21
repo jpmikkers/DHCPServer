@@ -8,7 +8,7 @@ namespace GitHub.JPMikkers.DHCP;
 [Serializable()]
 public class DHCPClientInformation
 {
-    private List<DHCPClient> _clients = new();
+    private List<DHCPClient> _clients = [];
 
     public DateTime TimeStamp
     {

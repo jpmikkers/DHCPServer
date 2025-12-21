@@ -43,7 +43,7 @@ public class DHCPOptionClientIdentifier : DHCPOptionBase
         : base(TDHCPOption.ClientIdentifier)
     {
         _hardwareType = DHCPMessage.THardwareType.Unknown;
-        _data = new byte[0];
+        _data = [];
     }
 
     public DHCPOptionClientIdentifier(DHCPMessage.THardwareType hardwareType, byte[] data)

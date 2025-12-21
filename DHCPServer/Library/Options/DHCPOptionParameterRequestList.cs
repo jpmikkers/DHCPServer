@@ -51,7 +51,7 @@ public class DHCPOptionParameterRequestList : DHCPOptionBase
         foreach(TDHCPOption opt in _requestList)
         {
             sb.Append(opt.ToString());
-            sb.Append(",");
+            sb.Append(',');
         }
         if(_requestList.Count > 0) sb.Remove(sb.Length - 1, 1);
         return $"Option(name=[{OptionType}],value=[{sb}])";

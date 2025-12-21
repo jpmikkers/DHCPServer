@@ -32,7 +32,7 @@ public class DHCPOptionVendorSpecificInformation : DHCPOptionBase
     public DHCPOptionVendorSpecificInformation()
         : base(TDHCPOption.VendorSpecificInformation)
     {
-        _data = new byte[0];
+        _data = [];
     }
 
     public DHCPOptionVendorSpecificInformation(byte[] data)

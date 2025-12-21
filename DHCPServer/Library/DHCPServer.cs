@@ -27,8 +27,8 @@ public class DHCPServer : IDHCPServer
     private TimeSpan _offerExpirationTime = TimeSpan.FromSeconds(30.0);
     private TimeSpan _leaseTime = TimeSpan.FromDays(1);
     private bool _active = false;
-    private List<OptionItem> _options = new();
-    private List<IDHCPMessageInterceptor> _interceptors = new();
+    private List<OptionItem> _options = [];
+    private List<IDHCPMessageInterceptor> _interceptors = [];
     private List<ReservationItem> _reservations = new();
     private int _minimumPacketSize = 576;
     private readonly AutoPumpQueue<int> _updateClientInfoQueue;

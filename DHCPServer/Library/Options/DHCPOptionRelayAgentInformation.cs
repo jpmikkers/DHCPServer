@@ -87,9 +87,9 @@ public class DHCPOptionRelayAgentInformation : DHCPOptionBase
     public DHCPOptionRelayAgentInformation()
         : base(TDHCPOption.RelayAgentInformation)
     {
-        _data = new byte[0];
-        _agentCircuitId = new byte[0];
-        _agentRemoteId = new byte[0];
+        _data = [];
+        _agentCircuitId = [];
+        _agentRemoteId = [];
     }
 
     public override string ToString()

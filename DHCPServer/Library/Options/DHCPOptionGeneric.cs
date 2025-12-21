@@ -31,7 +31,7 @@ public class DHCPOptionGeneric : DHCPOptionBase
 
     public DHCPOptionGeneric(TDHCPOption option) : base(option)
     {
-        _data = new byte[0];
+        _data = [];
     }
 
     public DHCPOptionGeneric(TDHCPOption option, byte[] data) : base(option)

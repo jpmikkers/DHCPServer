@@ -76,11 +76,11 @@ public class Utils
 
     public static IPAddress UInt32ToIPAddress(UInt32 address)
     {
-        return new IPAddress(new byte[] {
+        return new IPAddress([
             (byte)((address>>24) & 0xFF) ,
             (byte)((address>>16) & 0xFF) ,
             (byte)((address>>8)  & 0xFF) ,
-            (byte)( address & 0xFF)});
+            (byte)( address & 0xFF)]);
     }
 
     public static UInt32 IPAddressToUInt32(IPAddress address)

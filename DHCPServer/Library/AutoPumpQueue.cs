@@ -6,7 +6,7 @@ namespace GitHub.JPMikkers.DHCP;
 public class AutoPumpQueue<T>
 {
     public delegate void DataDelegate(AutoPumpQueue<T> sender, T data);
-    private readonly object _dispatchSync = new object();
+    private readonly object _dispatchSync = new();
     private readonly ConcurrentQueue<T> _queue;
     private readonly DataDelegate _dataDelegate;
 

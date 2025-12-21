@@ -32,7 +32,7 @@ public class DHCPOptionFullyQualifiedDomainName : DHCPOptionBase
     public DHCPOptionFullyQualifiedDomainName()
         : base(TDHCPOption.FullyQualifiedDomainName)
     {
-        _data = new byte[0];
+        _data = [];
     }
 
     public override string ToString()

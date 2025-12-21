@@ -14,8 +14,8 @@ public class DHCPClient : IEquatable<DHCPClient>
         Assigned
     }
 
-    private byte[] _identifier = new byte[0];
-    private byte[] _hardwareAddress = new byte[0];
+    private byte[] _identifier = [];
+    private byte[] _hardwareAddress = [];
     private string _hostName = "";
     private TState _state = TState.Released;
     private IPAddress _IPAddress = IPAddress.Any;
