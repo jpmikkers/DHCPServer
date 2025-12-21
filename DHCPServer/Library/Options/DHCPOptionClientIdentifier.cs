@@ -27,7 +27,7 @@ public class DHCPOptionClientIdentifier : DHCPOptionBase
         DHCPOptionClientIdentifier result = new DHCPOptionClientIdentifier();
         _hardwareType = (DHCPMessage.THardwareType)ParseHelper.ReadUInt8(s);
         result._data = new byte[s.Length - s.Position];
-        s.Read(result._data, 0, result._data.Length);
+        s.ReadExactly(result._data);
         return result;
     }
 

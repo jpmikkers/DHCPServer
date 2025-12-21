@@ -18,7 +18,7 @@ public class DHCPOptionVendorSpecificInformation : DHCPOptionBase
     {
         DHCPOptionVendorSpecificInformation result = new DHCPOptionVendorSpecificInformation();
         result._data = new byte[s.Length];
-        s.Read(result._data, 0, result._data.Length);
+        s.ReadExactly(result._data);
         return result;
     }
 

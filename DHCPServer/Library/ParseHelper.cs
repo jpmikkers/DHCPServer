@@ -9,7 +9,7 @@ public class ParseHelper
     public static IPAddress ReadIPAddress(Stream s)
     {
         byte[] bytes = new byte[4];
-        s.Read(bytes, 0, bytes.Length);
+        s.ReadExactly(bytes);
         return new IPAddress(bytes);
     }
 

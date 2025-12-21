@@ -306,14 +306,14 @@ public class DHCPMessage
         _yourIPAddress = ParseHelper.ReadIPAddress(s);
         _nextServerIPAddress = ParseHelper.ReadIPAddress(s);
         _relayAgentIPAddress = ParseHelper.ReadIPAddress(s);
-        s.Read(_clientHardwareAddress, 0, _clientHardwareAddress.Length);
+        s.ReadExactly(_clientHardwareAddress);
         for(int t = _clientHardwareAddress.Length; t < 16; t++) s.ReadByte();
 
         byte[] serverHostNameBuffer = new byte[64];
-        s.Read(serverHostNameBuffer, 0, serverHostNameBuffer.Length);
+        s.ReadExactly(serverHostNameBuffer);
 
         byte[] bootFileNameBuffer = new byte[128];
-        s.Read(bootFileNameBuffer, 0, bootFileNameBuffer.Length);
+        s.ReadExactly(bootFileNameBuffer);
 
         // read options magic cookie
         if(s.ReadByte() != 99) throw new IOException();
@@ -322,7 +322,7 @@ public class DHCPMessage
         if(s.ReadByte() != 99) throw new IOException();
 
         byte[] optionsBuffer = new byte[s.Length - s.Position];
-        s.Read(optionsBuffer, 0, optionsBuffer.Length);
+        s.ReadExactly(optionsBuffer);
 
         byte overload = ScanOverload(new MemoryStream(optionsBuffer));
 
@@ -362,7 +362,7 @@ public class DHCPMessage
     private static void CopyBytes(Stream source, Stream target, int length)
     {
         byte[] buffer = new byte[length];
-        source.Read(buffer, 0, length);
+        source.ReadExactly(buffer, 0, length);
         target.Write(buffer, 0, length);
     }
 

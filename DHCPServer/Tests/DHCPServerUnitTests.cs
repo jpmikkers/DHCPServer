@@ -10,7 +10,7 @@ namespace Tests;
 public class DHCPServerUnitTests
 {
     [TestMethod]
-    [Timeout(10000)]
+    [Timeout(10000, CooperativeCancellation = true)]
     public async Task VerifyDiscoverOfferRequestAck()
     {
         var clientInfoPath = Path.Combine(Path.GetTempPath(), "dhcptest", "dhcptest.xml");
@@ -35,8 +35,8 @@ public class DHCPServerUnitTests
         var socket = udpSocketFactory.UdpSocket!;
 
         Assert.AreEqual(dhcpServer.EndPoint, socket.LocalEndPoint);
-        Assert.AreEqual(true, socket.DontFragment);
-        Assert.AreEqual(0, dhcpServer.Clients.Count);   // initially we shouldn't have registered clients
+        Assert.IsTrue(socket.DontFragment);
+        Assert.IsEmpty(dhcpServer.Clients);   // initially we shouldn't have registered clients
 
         var client = new FakeClient(socket, dhcpServer.MinimumPacketSize);
 
@@ -125,7 +125,7 @@ public class DHCPServerUnitTests
 
         // ***** Check dhcpserver client administration *****
 
-        Assert.AreEqual(1, dhcpServer.Clients.Count);
+        Assert.HasCount(1, dhcpServer.Clients);
         var registeredClient = dhcpServer.Clients[0];
 
         Assert.AreEqual(expectedClientIPAddress, registeredClient.IPAddress);

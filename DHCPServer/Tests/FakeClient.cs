@@ -36,7 +36,7 @@ public class FakeClient
         var msg = await _socket.ClientReceive();
 
         Assert.AreEqual(msg.targetEndPoint.Address, IPAddress.Broadcast);
-        Assert.AreEqual(msg.targetEndPoint.Port, 68);
+        Assert.AreEqual(68, msg.targetEndPoint.Port);
         Assert.IsNotNull(msg.msg);
 
         var response = DHCPMessage.FromStream(new MemoryStream(msg.msg.ToArray()));
