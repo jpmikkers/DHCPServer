@@ -4,4 +4,4 @@ Open source managed ipv4 DHCP server implementation, written in C#. With extensi
 
 Check out the [wiki](../../wiki) for more details on how to embed the DHCP server in your application.
 
-NOTE: for a more modern implementation on .net 10, using the generic host model, see the [netcore branch](/jpmikkers/DHCPServer/tree/netcore).
+NOTE: for a more modern implementation on .net 10, using the generic host model, see the [netcore branch](https://github.com/jpmikkers/DHCPServer/tree/netcore).
