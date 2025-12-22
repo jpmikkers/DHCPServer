@@ -1,7 +1,6 @@
-﻿using GitHub.JPMikkers.DHCP;
-using System;
+﻿using System;
 
-namespace ManagedDHCPService;
+namespace Baksteen.DHCPServer.ConfigFile;
 
 [Serializable()]
 public class OptionConfigurationTFTPServerName : OptionConfiguration
@@ -11,10 +10,5 @@ public class OptionConfigurationTFTPServerName : OptionConfiguration
     public OptionConfigurationTFTPServerName()
     {
         Name = "";
-    }
-
-    protected override IDHCPOption ConstructDHCPOption()
-    {
-        return new DHCPOptionTFTPServerName(Name);
     }
 }

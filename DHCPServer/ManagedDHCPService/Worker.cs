@@ -1,3 +1,4 @@
+using Baksteen.DHCPServer.ConfigFile;
 using GitHub.JPMikkers.DHCP;
 
 namespace ManagedDHCPService;

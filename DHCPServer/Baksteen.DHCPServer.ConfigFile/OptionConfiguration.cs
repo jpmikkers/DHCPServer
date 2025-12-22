@@ -1,9 +1,15 @@
-﻿using GitHub.JPMikkers.DHCP;
-using System;
+﻿using System;
 using System.Runtime.Serialization;
 using System.Xml.Serialization;
 
-namespace ManagedDHCPService;
+namespace Baksteen.DHCPServer.ConfigFile;
+
+public enum OptionConfigMode
+{
+    Default,
+    Force
+}
+
 
 [Serializable()]
 [XmlInclude(typeof(OptionConfigurationTFTPServerName))]
@@ -16,22 +22,13 @@ namespace ManagedDHCPService;
 [XmlInclude(typeof(OptionConfigurationDomainNameServer))]
 public abstract class OptionConfiguration
 {
-    public OptionMode Mode;
+    public OptionConfigMode Mode;
 
     [OptionalField]
     public bool ZeroTerminatedStrings;
 
     public OptionConfiguration()
     {
-        Mode = OptionMode.Default;
+        Mode = OptionConfigMode.Default;
     }
-
-    public OptionItem ConstructOptionItem()
-    {
-        var option = ConstructDHCPOption();
-        option.ZeroTerminatedStrings = ZeroTerminatedStrings;
-        return new OptionItem(Mode, option);
-    }
-
-    protected abstract IDHCPOption ConstructDHCPOption();
 }

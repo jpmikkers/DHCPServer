@@ -1,7 +1,6 @@
-﻿using GitHub.JPMikkers.DHCP;
-using System;
+﻿using System;
 
-namespace ManagedDHCPService;
+namespace Baksteen.DHCPServer.ConfigFile;
 
 [Serializable()]
 public class OptionConfigurationVendorSpecificInformation : OptionConfiguration
@@ -11,10 +10,5 @@ public class OptionConfigurationVendorSpecificInformation : OptionConfiguration
     public OptionConfigurationVendorSpecificInformation()
     {
         Information = "";
-    }
-
-    protected override IDHCPOption ConstructDHCPOption()
-    {
-        return new DHCPOptionVendorSpecificInformation(Information);
     }
 }

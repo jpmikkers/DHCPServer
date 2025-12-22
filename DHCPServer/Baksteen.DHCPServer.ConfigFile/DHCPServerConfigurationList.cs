@@ -3,7 +3,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Xml.Serialization;
 
-namespace ManagedDHCPService;
+namespace Baksteen.DHCPServer.ConfigFile;
 
 [Serializable()]
 public class DHCPServerConfigurationList : List<DHCPServerConfiguration>

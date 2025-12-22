@@ -1,3 +1,4 @@
+using Baksteen.DHCPServer.ConfigFile;
 using GitHub.JPMikkers.DHCP;
 using System;
 using System.Collections.Generic;
@@ -63,14 +64,14 @@ public class DHCPServerResurrector : IDisposable
                     List<OptionItem> options = new List<OptionItem>();
                     foreach(OptionConfiguration optionConfiguration in _config.Options)
                     {
-                        options.Add(optionConfiguration.ConstructOptionItem());
+                        options.Add(OptionConfigurationConverter.ToOptionItem(optionConfiguration));
                     }
                     _server.Options = options;
 
                     List<ReservationItem> reservations = new List<ReservationItem>();
                     foreach(ReservationConfiguration reservationConfiguration in _config.Reservations)
                     {
-                        reservations.Add(reservationConfiguration.ConstructReservationItem());
+                        reservations.Add(ReservationConfigurationConverter.ConstructReservationItem(reservationConfiguration));
                     }
                     _server.Reservations = reservations;
 

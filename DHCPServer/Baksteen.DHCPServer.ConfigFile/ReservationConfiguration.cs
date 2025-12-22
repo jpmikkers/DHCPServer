@@ -1,9 +1,8 @@
-﻿using GitHub.JPMikkers.DHCP;
-using System;
+﻿using System;
 using System.ComponentModel;
 using System.Net;
 
-namespace ManagedDHCPService;
+namespace Baksteen.DHCPServer.ConfigFile;
 
 [Serializable()]
 public class ReservationConfiguration
@@ -59,17 +58,5 @@ public class ReservationConfiguration
         {
             _preempt = value;
         }
-    }
-
-    public ReservationItem ConstructReservationItem()
-    {
-        return new ReservationItem()
-        {
-            HostName = this.HostName,
-            MacTaste = this.MacTaste,
-            PoolStart = _poolStart,
-            PoolEnd = _poolEnd,
-            Preempt = _preempt,
-        };
     }
 }

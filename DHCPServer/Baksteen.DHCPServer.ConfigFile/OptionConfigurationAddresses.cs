@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Xml.Serialization;
 
-namespace ManagedDHCPService;
+namespace Baksteen.DHCPServer.ConfigFile;
 
 [Serializable()]
 public abstract class OptionConfigurationAddresses : OptionConfiguration

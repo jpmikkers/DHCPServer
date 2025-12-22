@@ -13,6 +13,7 @@
     <PackageReference Include="Microsoft.Extensions.Hosting.WindowsServices" Version="10.0.1" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Baksteen.DHCPServer.ConfigFile\Baksteen.DHCPServer.ConfigFile.csproj" />
     <ProjectReference Include="..\Library\Library.csproj" />
   </ItemGroup>
   <ItemGroup>
@@ -22,5 +23,8 @@
     <None Update="unregister.ps1">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Configuration\" />
   </ItemGroup>
 </Project>
