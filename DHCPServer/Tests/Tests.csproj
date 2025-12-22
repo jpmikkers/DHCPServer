@@ -19,6 +19,7 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Baksteen.DHCPServer.ConfigFile\Baksteen.DHCPServer.ConfigFile.csproj" />
     <ProjectReference Include="..\Library\Library.csproj" />
   </ItemGroup>
 </Project>

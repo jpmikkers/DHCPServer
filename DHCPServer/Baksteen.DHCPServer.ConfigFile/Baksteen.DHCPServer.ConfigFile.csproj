@@ -6,8 +6,4 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Baksteen.Extensions.DeepCopy" Version="1.0.5" />
-  </ItemGroup>
-
 </Project>

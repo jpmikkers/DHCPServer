@@ -1,4 +1,3 @@
-using Baksteen.Extensions.DeepCopy;
 using System;
 using System.Collections.Generic;
 using System.Net;
@@ -145,10 +144,5 @@ public class DHCPServerConfiguration
         _minimumPacketSize = 576;
         _options = [];
         _reservations = [];
-    }
-
-    public DHCPServerConfiguration Clone()
-    {
-        return this.DeepCopy()!;
     }
 }

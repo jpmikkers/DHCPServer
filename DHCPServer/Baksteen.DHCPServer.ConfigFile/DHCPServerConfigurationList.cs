@@ -6,9 +6,10 @@ using System.Xml.Serialization;
 namespace Baksteen.DHCPServer.ConfigFile;
 
 [Serializable()]
+[XmlRoot("DHCPServerConfigurationList")]
 public class DHCPServerConfigurationList : List<DHCPServerConfiguration>
 {
-    private static readonly XmlSerializer s_serializer = new XmlSerializer(typeof(DHCPServerConfigurationList));
+    private static readonly XmlSerializer s_serializer = new(typeof(DHCPServerConfigurationList));
 
     public static DHCPServerConfigurationList Read(string file)
     {
